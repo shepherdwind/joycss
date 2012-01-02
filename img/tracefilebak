@@ -1,0 +1,87 @@
+== Info: About to connect() to localhost port 80 (#0)
+== Info:   Trying 127.0.0.1... == Info: connected
+== Info: Connected to localhost (127.0.0.1) port 80 (#0)
+=> Send header, 284 bytes (0x11c)
+0000: POST /ci/index.php?c=upload&m=do_upload HTTP/1.1
+0032: User-Agent: curl/7.21.1 (i686-pc-mingw32) libcurl/7.21.1 OpenSSL
+0072: /0.9.8r zlib/1.2.3
+0086: Host: localhost
+0097: Accept: */*
+00a4: Content-Length: 496
+00b9: Expect: 100-continue
+00cf: Content-Type:image/png; boundary=----------------------------bc7
+010f: 8e3f99b83
+011a: 
+<= Recv header, 23 bytes (0x17)
+0000: HTTP/1.1 100 Continue
+=> Send data, 156 bytes (0x9c)
+0000: ------------------------------bc78e3f99b83
+002c: Content-Disposition: form-data; name="userfile"; filename="more.
+006c: png"
+0072: Content-Type: application/octet-stream
+009a: 
+=> Send data, 292 bytes (0x124)
+0000: .PNG
+0006: ......IHDR...Q.........p......'PLTE.............................
+0046: ..........F.dS....IDATx^..1..0.Cs.^.....0p.&.....9...d..Z.J...Y.
+0086: ....'.Q.4]...2..B..tPL.t.......I....-H....[......n..z$..:.E.....
+00c6: Y'tq.._..t..U<....'...[ V$.H...._=... >s..."zg..Do^......?....
+0106: C..M...../3..~.......IEND.B`.
+=> Send data, 48 bytes (0x30)
+0000: 
+0002: ------------------------------bc78e3f99b83--
+<= Recv header, 17 bytes (0x11)
+0000: HTTP/1.1 200 OK
+<= Recv header, 21 bytes (0x15)
+0000: Server: nginx/1.0.0
+<= Recv header, 37 bytes (0x25)
+0000: Date: Sun, 25 Dec 2011 10:06:52 GMT
+<= Recv header, 25 bytes (0x19)
+0000: Content-Type: text/html
+<= Recv header, 28 bytes (0x1c)
+0000: Transfer-Encoding: chunked
+<= Recv header, 24 bytes (0x18)
+0000: Connection: keep-alive
+<= Recv header, 25 bytes (0x19)
+0000: X-Powered-By: PHP/5.3.6
+<= Recv header, 2 bytes (0x2)
+0000: 
+<= Recv data, 1204 bytes (0x4b4)
+0000: 4a8
+0005: CI_Upload::__set_state(array(.   'max_size' => '100',.   'max_wi
+0045: dth' => 1024,.   'max_height' => 768,.   'max_filename' => 0,.  
+0085:  'allowed_types' => .  array (.    0 => 'gif',.    1 => 'jpg',. 
+00c5:    2 => 'png',.  ),.   'file_temp' => '',.   'file_name' => '',.
+0105:    'orig_name' => '',.   'file_type' => '',.   'file_size' => ''
+0145: ,.   'file_ext' => '',.   'upload_path' => './uploads/',.   'ove
+0185: rwrite' => false,.   'encrypt_name' => false,.   'is_image' => f
+01c5: alse,.   'image_width' => '',.   'image_height' => '',.   'image
+0205: _type' => '',.   'image_size_str' => '',.   'error_msg' => .  ar
+0245: ray (.    0 => 'You did not select a file to upload.',.  ),.   '
+0285: mimes' => .  array (.  ),.   'remove_spaces' => true,.   'xss_cl
+02c5: ean' => false,.   'temp_prefix' => 'temp_file_',.   'client_name
+0305: ' => '',.   '_file_name_override' => '',.))<html>
+0338: <head>
+0340: <title>Upload Form</title>
+035c: </head>
+0365: <body>
+036d: 
+036f: <p>You did not select a file to upload.</p>
+039c: <form action="http://localhost/ci/index.php?c=upload&m=do_upload
+03dc: " method="post" accept-charset="utf-8" enctype="multipart/form-d
+041c: ata">
+0423: <input type="file" name="userfile" size="20" />
+0454: 
+0456: <br /><br />
+0464: 
+0466: <input type="submit" value="upload" />
+048e: 
+0490: </form>
+0499: 
+049b: </body>
+04a4: </html>
+04ad: 
+04af: 0
+04b2: 
+== Info: Connection #0 to host localhost left intact
+== Info: Closing connection #0
