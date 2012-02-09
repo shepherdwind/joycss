@@ -10,7 +10,7 @@
         display: block;
         width: 276px;
         height: 78px;
-        background: url(http://img04.taobaocdn.com/tps/i4/T1NUuCXa0rXXXXXXXX-276-78.png) 0 0 no-repeat;
+        background: url("../img/diy.png") no-repeat left 100% transparent;
         _background-image: none;
         _filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://img04.taobaocdn.com/tps/i4/T1NUuCXa0rXXXXXXXX-276-78.png',sizingMethod='crop'); 
         *position: relative;
@@ -19,6 +19,18 @@
         left: 6px;
         top: -55px;
         z-index: 999;
+      }
+      
+      @media screen and not (script) {
+        .foo {
+          color: red;
+        }
+      }
+      
+      @-moz-document url-prefix(){
+        .ks-ajax-uploader-input {
+          margin-left: -120px;
+        }
       }
     </style>
   </head>

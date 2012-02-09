@@ -22,17 +22,17 @@ function extend(constructor, superConstructor, methods){
 }
 
 /**
- * Base include method get,set and init
- * @class Base
+ * StdClass include method get,set and init
+ * @class StdClass
  * @extends EventEmitter
  * @constructor
  */
-var Base = function(){
+var StdClass = function(){
     Events.call(this);
     this.initialize.apply(this, arguments);
 };
 
-extend(Base, Events, {
+extend(StdClass, Events, {
 
     /**
      * 属性集合，在每个子对象中，相对独立
@@ -93,14 +93,14 @@ extend(Base, Events, {
 /**
  * css parser
  * @class CssParser
- * @extends Base
+ * @extends StdClass
  * @constructor
  */
 var CssParser = function(){
-    Base.call(this);
+    StdClass.call(this);
 };
 
-extend(CssParser, Base, {
+extend(CssParser, StdClass, {
 
     attributes : {
 
@@ -147,7 +147,9 @@ extend(CssParser, Base, {
 
         if(ruleType === 'selector'){
             rules.push({ selectors: _.clone(rule), property: {} });
+
         } else {
+
             var len = rules.length;
             var last = rules[len - 1];
             //copy rule to property

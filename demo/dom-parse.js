@@ -21,8 +21,8 @@
 
 
     parser.addListener("error", function(event){
-        console.log("Parse error: " + event.message + " (" + event.line + "," + event.col + ")", "error");
-        console.log(event);
+        //console.log("Parse error: " + event.message + " (" + event.line + "," + event.col + ")", "error");
+        //console.log(event);
     });
     parser.parse(css);
 
