@@ -1,0 +1,5 @@
+.test input { color: red; font: 12px/1.5 arial; background: blue; }
+#len { font-size: 12px; font-size: 14px\9; _font-size: 13px; *font-size: 15px; }
+#len .name .u { background: url(test.png?16) 10px 10px; }
+#len .name .u1 { background: url(test.png?) 10px 10px; }
+#len .name .u2 { background: url(http://myurl/test.png) 10px 10px; color: red; _color: blue; *color: green; color: yellow\9; }
