@@ -1,0 +1,25 @@
+.svn/
+*.un~
+*.png
+*.jpg
+*.gif
+*.psd
+*.db
+# Windows image file caches
+Thumbs.db
+
+.*.sw[a-z]
+*.un~
+Session.vim
+
+# Folder config file
+Desktop.ini
+
+.DS_Store
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
