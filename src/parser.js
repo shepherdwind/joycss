@@ -1,6 +1,6 @@
 var fs        = require('fs');
 var path      = require('path');
-var cssfile   = '../css/test.css';
+var cssfile   = '../demo/css/test.css';
 var CssParser = require('./cssParesr');
 var log = console && console.log ;
 

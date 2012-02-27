@@ -145,7 +145,7 @@ StdClass.extend(CssParser, StdClass, {
     _addProperty: function(event){
 
         var property     = {};
-        var propertyName = event.property;
+        var propertyName = event.property.text;
         var propertyVal  = property[propertyName];
         var value        = event.value.text;
         var isSprite     = propertyName === 'background' &&//propertyName equal background

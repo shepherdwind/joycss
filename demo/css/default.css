@@ -72,4 +72,7 @@
 .grid-s230m0e190 .col-extra {
 	width: 190px;
 	margin-left: -190px;
+	_margin-left: -190px;
+	*margin-left: -190px;
+	margin-left: -190px\9;
 }
