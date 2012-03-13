@@ -1,3 +1,31 @@
+a:hover,
+b {
+  display: block;
+  color: blue;
+}
 
+/* test */.id,
+.tab:focus {
+  /*sdf*/
+  margin: 1px 10px;
+}
 
-  
+/** sprite: mysprite; sprite-image: url('../img/mysprite.png'); sprite-layout: vertical;sprite-matte-color: #ffffff; */
+/**
+ * Created by hanwen.sah@taobao.com.
+ * Date: 2011-11-22
+ * Time: 10:26
+ * Desc: 主体架构样式，狗狗市场首页
+ */
+a,
+a:hover,
+a:focus {
+  outline: none;
+}
+.foo a {
+}
+.content {
+  background: url(http://img01.taobaocdn.com/tps/i1/T1ia9DXXFXXXXXXXXX-25-24.png);
+  padding-top: 67px;
+  padding-bottom: 20px;
+}

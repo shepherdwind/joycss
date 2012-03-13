@@ -9,6 +9,7 @@
  */
 var Events  = require('events').EventEmitter;
 var util    = require('util');
+var TRIM_REG = /(^\s+)|(\s+$)/g;
 
 /**
  * 原型继承方法,调用util.inherits
@@ -28,7 +29,6 @@ function StdClass(){
     this.init.apply(this, arguments);
 }
 StdClass.extend = extend;
-//如果使用extend方法，会有问题
 extend(StdClass, Events, {
 
     //属性集合，在每个子对象中，相对独立
@@ -45,9 +45,10 @@ extend(StdClass, Events, {
     /**
      * 对于attributes下的都进行触发事件，其他对象的修改，不触发事件，除非
      * 强制设置force为true
-     * @param force {Bool}
+     * @param opt_force {bool}
+     * @param opt_data  {object} data to event
      */
-    set: function(key, value, force) {
+    set: function set(key, value, opt_force, opt_data) {
 
         var type   = this.getType(key);
         var old    = this[type][key];
@@ -62,17 +63,21 @@ extend(StdClass, Events, {
 
         //判断时候触发事件
         if (type === 'attributes'){
-            if (value != old || force === true) isFire = true;
+            if (value != old || opt_force === true) isFire = true;
         } else {
-            if (force) isFire = 1;
+            if (opt_force) isFire = 1;
         }
 
         //触发事件
-        if (isFire && force !== false){
+        if (isFire && opt_force !== false){
 
-            this.emit('change:' + key, { old: old, now: value, target: this });
-            isFire === true && this.emit('change:' + key + ':'+value, 
-                {old: old, now: value, target: this});
+            opt_data = opt_data || {};
+            opt_data.old = old;
+            opt_data.now = value;
+            opt_data.target = this;
+
+            this.emit('change:' + key, opt_data);
+            isFire === true && this.emit('change:' + key + ':'+value, opt_data);
 
         }
 
@@ -82,7 +87,7 @@ extend(StdClass, Events, {
     //判断属性对象的类型
     //node | attr | consit
     //依次从attributes>nodes>CONSIT中查找
-    getType: function(key){
+    getType: function getType(key){
 
         var o = {
             attributes : this.attributes, 
@@ -109,7 +114,7 @@ extend(StdClass, Events, {
      * 则使用S.all获取之，并且返回获得的node
      * @param {String} key
      */
-    get: function(key){ 
+    get: function get(key){ 
         var type = this.getType(key);
         var ret  = this[type][key];
 
@@ -121,7 +126,7 @@ extend(StdClass, Events, {
         return ret;
     },
 
-    _setNode: function(key, value){
+    _setNode: function setNode(key, value){
 
         var node;
         var Node = S && S.Node;
@@ -156,7 +161,7 @@ extend(StdClass, Events, {
 
     },
 
-    init: function(cfg){
+    init: function initialize(cfg){
 
         //建立相对独立的attributes属性表
         var attributes = {};
@@ -173,17 +178,26 @@ extend(StdClass, Events, {
         this._init && this._init();
     },
 
-    //事件执行一次
-    once: function(event, fn, context){
+    /**
+     * the same to function on, bind event on self, the only
+     * change is add the ability of bind mult event 
+     * @example this.on('a, b, c', fn);
+     * @note the dismember is ', ', do not lost the blank space
+     * @param ev {string} event string, dismember by ', ',semicolon add an
+     * blank space
+     * @param fn {function} function executed when the event is emit
+     */
+    on: function on(ev, fn){
+        var self = this;
+        var evs = ev.split(',');
+        var i = 0;
+        var evt = '';
 
-        context = context || this;
-
-        function __fn(e){
-            fn.call(context, e);
-            this.removeListener(event, __fn);
+        while(evs[i]) {
+            evt = evs[i].replace(TRIM_REG, '');
+            if (evt) Events.prototype.on.call(this, evt, fn);
+            i++;
         }
-
-        this.on(event, __fn, context);
     }
 
 });
