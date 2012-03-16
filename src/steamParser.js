@@ -24,12 +24,16 @@ StdClass.extend(SteamParser, StdClass, {
         properties : [],
         //value collections
         values : [],
+        //single line rules, such as {charset "UTF-8";}
+        metas: {},
         //history of events
         history : [],
         //right now status
         //{'start' | 'ruleStart' | 'ruleEnd' | 'valueStart' | 'valueEnd' |
         // 'selectorBreak'}
         status : '',
+        //nest level
+        nest : 0,
         timeStart : '',
         timeEnd : ''
     },
@@ -57,7 +61,8 @@ StdClass.extend(SteamParser, StdClass, {
         },
 
         MAX_LEN_HISTORY: 10,
-        TRIM_REG: /(^\s+)|(\s+$)/g
+        TRIM_REG: /(^\s+)|(\s+$)/g,
+        RULE_END_EVT: 'ruleEnd'
     },
 
     _init: function init(){
@@ -72,27 +77,60 @@ StdClass.extend(SteamParser, StdClass, {
     },
 
     _bind: function bind(){
+
         this._addEvent('start');
         this._steam.on('data', this._read.bind(this));
         this._steam.on('end', this._readEnd.bind(this));
 
-        this.on("change:status:selectorBreak, change:status:ruleStart",
-            this._addSelector);
+        this.on('change:status:ruleStart', this._ruleStart);
+        this.on("change:status:selectorBreak", this._addSelector);
         this.on("change:status:valueStart", this._addProperty);
         this.on("change:status:valueEnd", this._addValue);
-        this.on("change:status:ruleEnd", this._fixEnd);
+        this.on("change:status:ruleEnd", this._ruleEnd);
+
     },
 
-    //fix the problem when have some empty rule such as
-    //.foo {}
-    //remove the selector in the collections of selector
-    _fixEnd: function(e){
+    /**
+     * 1. fix the problem when have some empty rule such as
+     * @example .foo {}
+     * remove the selector in the collections of selector
+     * 2. fix when the last value don't end with the semicolon
+     * @example .foo { color: red }
+     */
+    _ruleEnd: function ruleEnd(e){
+
+        this.attributes.nest--;
         var selectors ;
+        var isNew = false;
+
         if (e.old === 'ruleStart'){
             selectors = this.get('selectors');
             //delete the last selector
             selectors.pop();
+
+            return;
+        } else if (e.old === 'valueStart') {
+            this._addValue(e);
         }
+
+        if (!this.attributes.nest){
+            this.fire(this.get('RULE_END_EVT'), {
+                selectors : this._getLast(isNew),
+                properties : this._getLast(isNew, 'properties'),
+                values : this._getLast(isNew, 'values')
+            });
+        }
+    },
+
+    _ruleStart: function ruleStart(e){
+        var isNew = true;
+        this._addSelector(e);
+
+        if (e.old === 'ruleStart') {
+            this._getLast(isNew, 'properties');
+            this._getLast(isNew, 'values');
+        }
+        ++this.attributes.nest;
     },
 
     _addSelector: function addSelector(e){
@@ -107,14 +145,37 @@ StdClass.extend(SteamParser, StdClass, {
         property && property.push(e.data);
     },
 
+    /**
+     * add value and when meet with single rule, such as '@charset "UTF-8";',
+     * push the is to the object of metas
+     */
     _addValue: function addValue(e){
-        var history = this.get('history');
-        var len = history.length;
-        var preStatus = history[len - 3];
-        var isNew = preStatus == 'ruleStart';
-        var value = this._getLast(isNew, 'values');
 
-        value && value.push(e.data);
+        var len;
+
+        if (e.old === 'valueStart') {
+            var history = this.get('history');
+            len = history.length;
+            var preStatus = history[len - 3];
+            isNew = preStatus == 'ruleStart';
+            value = this._getLast(isNew, 'values');
+
+            value && value.push(e.data);
+        } else {
+            var metas = this.get('metas');
+            var selectors = this.get('selectors');
+            len = selectors.length;
+            metas[len] = metas[len] || [];
+            var data = '';
+
+            /*when @import url("booya.css") print, screen;*/
+            if (e.old === 'selectorBreak'){
+                data = selectors.pop().join(', ') + ', ';
+            }
+
+            data += e.data;
+            metas[len].push(data);
+        }
     },
 
     /**
@@ -127,9 +188,14 @@ StdClass.extend(SteamParser, StdClass, {
     _getLast: function getLast(isNew, opt_key){
         opt_key = opt_key || 'selectors';
         var items = this.get(opt_key);
-
-        if (isNew) items.push([]);
         var len = items.length;
+
+        if (isNew) {
+            len++;
+            items.push([]);
+            if (this.get('nest') > 1) items[len - 2].push(items[len - 1]);
+        }
+
         return items[len - 1];
     },
 
@@ -149,8 +215,11 @@ StdClass.extend(SteamParser, StdClass, {
         this.set('status', ev, true, {data: val});
     },
 
-    /**
-     * read data steam
+    /** 
+     * read data steam, loop exam the assic code one by one. filter the comment
+     * and when meet with code in dismember, fire some event, then change the
+     * property of status, push event into the array of history, and deliver a
+     * string of selector or property or value.
      */
     _read: function read(data){
 
@@ -183,8 +252,8 @@ StdClass.extend(SteamParser, StdClass, {
                 //filter the condiction of pseudo selector(:)
                 var isPseudo = code == 58 && status != 'ruleStart' &&
                         status != 'valueEnd';
+
                 if (isPseudo || isFalseSelecterBreak){
-                    isFalseSelecterBreak && console.log(status);
                     code = data[++i];
                     continue;
                 }
@@ -198,13 +267,18 @@ StdClass.extend(SteamParser, StdClass, {
         }
 
     },
+
     _readEnd: function readEnd(){
         this.set('timeEnd', (new Date()).getTime());
         console.log(['end', this.get('timeEnd') - this.get('timeStart')]);
+        console.log(this.get('metas'));
         //console.log(this.get('selectors'));
         //console.log(this.get('properties'));
-        assert.equal(this.get('values').length, this.get('properties').length);
-        assert.equal(this.get('selectors').length, this.get('values').length);
+        //console.log(this.get('values'));
+        assert.equal(this.get('selectors').length, 
+            this.get('values').length, 'selectors is not equal values'); 
+        assert.equal(this.get('values').length, 
+            this.get('properties').length, 'values is not equal properties');
     }
 
 });

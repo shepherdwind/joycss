@@ -198,7 +198,9 @@ extend(StdClass, Events, {
             if (evt) Events.prototype.on.call(this, evt, fn);
             i++;
         }
-    }
+    },
+
+    fire: Events.prototype.emit
 
 });
 

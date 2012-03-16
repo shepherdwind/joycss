@@ -1,31 +1,51 @@
-a:hover,
-b {
-  display: block;
-  color: blue;
+@charset "UTF-8";
+
+@import url("booya.css") print,screen, print;
+@import "whatup.css" screen;
+
+@namespace "http://www.w3.org/1999/xhtml";
+@namespace svg "http://www.w3.org/2000/svg";
+
+/*Warning: empty ruleset */
+.foo {
 }
 
-/* test */.id,
-.tab:focus {
-  /*sdf*/
-  margin: 1px 10px;
+h1 {
+    font-weight: bold;
 }
 
-/** sprite: mysprite; sprite-image: url('../img/mysprite.png'); sprite-layout: vertical;sprite-matte-color: #ffffff; */
-/**
- * Created by hanwen.sah@taobao.com.
- * Date: 2011-11-22
- * Time: 10:26
- * Desc: 主体架构样式，狗狗市场首页
- */
-a,
-a:hover,
-a:focus {
-  outline: none;
+@import "wicked.css";
+/*Warning: adjoining classes */
+.foo.bar {
+    zoom: 1;
 }
-.foo a {
+
+@import url("booya.css") print,screen, print;
+li.inline {
+    width: 100%;  /*Warning: 100% can be problematic*/
 }
-.content {
-  background: url(http://img01.taobaocdn.com/tps/i1/T1ia9DXXFXXXXXXXXX-25-24.png);
-  padding-top: 67px;
-  padding-bottom: 20px;
+
+li.last {
+  display: inline;
+  padding-left: 3px !important;
+  padding-right: 3px;
+  border-right: 0px;
+}
+
+@media print {
+    li.inline {
+      color: black;
+    }
+}
+
+@page {
+  margin: 10%;
+  counter-increment: page;
+
+  @top-center {
+    font-family: sans-serif;
+    font-weight: bold;
+    font-size: 2em;
+    content: counter(page);
+  }
 }
