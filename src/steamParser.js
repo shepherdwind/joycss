@@ -1,3 +1,49 @@
+/**
+ * parser css file by the way of FileSteam, support the less file. That mean
+ * that this can deal with the nest rule, such as:
+ * @example 1
+ * <code css>
+ * @charset "UTF-8"
+ * @import url("booya.css") print,screen, print;
+ * a { 
+ *  .foo { color: red;}
+ *  .foo2 { 
+ *     color: blue; 
+ *     .foo2-1 { 
+ *       color: yello; 
+ *     }
+ *   }
+ * }
+ * </code>
+ * Althought you may never write css like this, but, when meet with @media, you
+ * may need nest rule support.
+ *
+ * Some meta info for example @charset "UTF-8" stored in the metas object, get 
+ * it in the property metas, such as
+ * @example 2
+ * <code>
+ *  var p = new SteamParser({
+ *      file: 'path/to/cssfile.css'
+ *  });
+ *  //when the property timeEnd setted, parser css is finished
+ *  p.on('change:timeEnd', function(e){
+ *      var metas = p.get('metas');
+ *  });
+ * </code>
+ * the css rule of example 1, the metas is 
+ * { '0': ['@charset "UTF-8"', '@import url("booya.css") print, screen, print']}
+ * the key in metas object represent where it should set to.
+ *
+ * when one rule is finish, you can watch the event 'RULE_END_EVT'(get by 
+ * parser.get('RULE_END_EVT')), you can get a object of css rule object, at
+ * example 1, you can get this kind object
+ * {
+ *   selector: ['a', ['.foo'], ['.foo2', ['.foo2-1']]],
+ *   property: [['color'], ['color', [ 'color']]],
+ *   value: [['red'], ['blue', ['yello']]]
+ * }
+ */
+
 var fs = require('fs');
 var path = require('path');
 var assert = require('assert').ok;
@@ -5,7 +51,6 @@ var assert = require('assert').ok;
 var StdClass = require('./stdclass');
 
 /**
- * parser css file by the way of FileSteam
  * @constructor
  * @extends StdClass
  */
@@ -33,7 +78,7 @@ StdClass.extend(SteamParser, StdClass, {
         // 'selectorBreak'}
         status : '',
         //nest level
-        nest : 0,
+        nest : [],
         timeStart : '',
         timeEnd : ''
     },
@@ -99,9 +144,7 @@ StdClass.extend(SteamParser, StdClass, {
      */
     _ruleEnd: function ruleEnd(e){
 
-        this.attributes.nest--;
         var selectors ;
-        var isNew = false;
 
         if (e.old === 'ruleStart'){
             selectors = this.get('selectors');
@@ -113,24 +156,29 @@ StdClass.extend(SteamParser, StdClass, {
             this._addValue(e);
         }
 
-        if (!this.attributes.nest){
-            this.fire(this.get('RULE_END_EVT'), {
-                selectors : this._getLast(isNew),
-                properties : this._getLast(isNew, 'properties'),
-                values : this._getLast(isNew, 'values')
-            });
+        ruleEnd.recode = ruleEnd.recode || 0;
+        ruleEnd.recode++;
+        this.attributes.nest.pop();
+
+        if (!this.attributes.nest.length){
+            var num = this.getLen() - ruleEnd.recode;
+            ruleEnd.recode = 0;
+
+            this.fire(this.get('RULE_END_EVT'), this.getRule(num));
         }
     },
 
     _ruleStart: function ruleStart(e){
-        var isNew = true;
-        this._addSelector(e);
 
+        var isNew = true;
         if (e.old === 'ruleStart') {
+            //@media print { li.inline { color: red; } }
             this._getLast(isNew, 'properties');
             this._getLast(isNew, 'values');
         }
-        ++this.attributes.nest;
+
+        this.attributes.nest.push(this.getLen());
+        this._addSelector(e);
     },
 
     _addSelector: function addSelector(e){
@@ -178,6 +226,25 @@ StdClass.extend(SteamParser, StdClass, {
         }
     },
 
+    getRule: function(i){
+        var selectors = this.get('selectors');
+        var properties = this.get('properties');
+        var values = this.get('values');
+
+        i = parseInt(i, 10);
+        if(this.getLen() > i){
+            return {
+                selector: selectors[i],
+                property: properties[i],
+                value: values[i]
+            };
+        }
+    },
+
+    getLen: function(){
+        return this.attributes.selectors.length;
+    },
+
     /**
      * get last item of selectors or properties or values
      * @param isNew {bool} if isNew, push it an new empty array, if isNew 
@@ -190,10 +257,17 @@ StdClass.extend(SteamParser, StdClass, {
         var items = this.get(opt_key);
         var len = items.length;
 
-        if (isNew) {
+        if (isNew){
             len++;
             items.push([]);
-            if (this.get('nest') > 1) items[len - 2].push(items[len - 1]);
+
+            var nest = this.get('nest');
+            var nLen = nest.length;
+            if (nLen > 1){
+                //console.log([nest, nest[nLen - 2], len - 1]);
+                //push the new rule to is father
+                items[nest[nLen - 2]].push(items[len - 1]);
+            }
         }
 
         return items[len - 1];
@@ -271,14 +345,14 @@ StdClass.extend(SteamParser, StdClass, {
     _readEnd: function readEnd(){
         this.set('timeEnd', (new Date()).getTime());
         console.log(['end', this.get('timeEnd') - this.get('timeStart')]);
-        console.log(this.get('metas'));
+        //console.log(this.get('metas'));
         //console.log(this.get('selectors'));
         //console.log(this.get('properties'));
         //console.log(this.get('values'));
-        assert.equal(this.get('selectors').length, 
-            this.get('values').length, 'selectors is not equal values'); 
-        assert.equal(this.get('values').length, 
-            this.get('properties').length, 'values is not equal properties');
+        assert.equal(this.get('selectors').length, this.get('values').length, 
+            'the lenght of selectors is not equal to the lenght of values'); 
+        assert.equal(this.get('values').length, this.get('properties').length, 
+            'the length of values is not equal to the length of properties');
     }
 
 });

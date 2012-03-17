@@ -7,20 +7,18 @@
 @namespace svg "http://www.w3.org/2000/svg";
 
 /*Warning: empty ruleset */
-.foo {
-}
 
 h1 {
     font-weight: bold;
 }
 
-@import "wicked.css";
+/*@import "wicked.css";*/
 /*Warning: adjoining classes */
 .foo.bar {
     zoom: 1;
 }
 
-@import url("booya.css") print,screen, print;
+/*@import url("booya.css") print,screen, print;*/
 li.inline {
     width: 100%;  /*Warning: 100% can be problematic*/
 }
@@ -36,6 +34,10 @@ li.last {
     li.inline {
       color: black;
     }
+
+    @top-left {
+      color: red;
+    }
 }
 
 @page {
@@ -47,5 +49,29 @@ li.last {
     font-weight: bold;
     font-size: 2em;
     content: counter(page);
+
+    @media {
+      padding-left: 3px !important;
+      padding-right: 3px;
+      border-right: 0px;
+
+      @media {
+        padding-left: 3px !important;
+        padding-right: 3px;
+        border-right: 0px;
+      }
+    }
+
+
+    @media {
+      padding-left: 3px !important;
+      padding-right: 3px;
+      border-right: 0px;
+    }
+
   }
+
+    @top-left {
+      color: red;
+    }
 }
