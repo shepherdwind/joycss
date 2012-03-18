@@ -1,6 +1,6 @@
 var fs        = require('fs');
 var path      = require('path');
-var cssfile   = '../demo/css/test.css';
+var cssfile   = '../demo/css/index.css';
 var CssParser = require('./cssParesr');
 var log = console && console.log ;
 
@@ -14,8 +14,11 @@ fs.readFile(cssfile, 'utf-8', function (err, data) {
     //    var spawn = require('child_process').spawn;
     //});
 
+    var time = (new Date()).getTime();
+
     cssParser.on('change:cssText', function(e){
         log(e.now);
+        log((new Date().getTime() - time));
     });
     cssParser.parse(data);
 });
