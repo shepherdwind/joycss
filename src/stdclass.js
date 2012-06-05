@@ -3,6 +3,10 @@
  * abstruct class
  * @class StdClass
  * @author hanwen
+ * @TODO
+ * 1. 事件组合
+ * 2. 多属性管理
+ * 3. debug控制
  * [+] 2011-12-1
  * 修改set方法，增加change:xxx:xxx时间，对应与某个属性值的变化
  * [+] set方法增加force强制不触发事件的配置
