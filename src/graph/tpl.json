@@ -1,0 +1,236 @@
+{
+  "mysprite": {
+    "background" : "ffffff7f",
+    "colorcount" : "256",
+    "dataurl"    : true,
+    "filename"   : "../img/mysprite.png",
+    "width"      : 270,
+    "force8bit"  : true,
+    "height"     : 956,
+    "imagetype"  : 3,
+    "layout"     : "vertical",
+    "margin"     : 3,
+    "images": {
+      "../img/bangpai.png": {
+        "align": "", 
+        "file_location": "../img/bangpai.png", 
+        "height": 37, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 220, 
+        "type": 3, 
+        "width": 99
+      }, 
+      "../img/close.png": {
+        "align": "", 
+        "file_location": "../img/close.png", 
+        "height": 8, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 939, 
+        "type": 3, 
+        "width": 8
+      }, 
+      "../img/dapei.png": {
+        "align": "", 
+        "file_location": "../img/dapei.png", 
+        "height": 46, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 91, 
+        "type": 3, 
+        "width": 120
+      }, 
+      "../img/diy.png": {
+        "align": "right", 
+        "file_location": "../img/diy.png", 
+        "height": 46, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 174, 
+        "type": 3, 
+        "width": 106
+      }, 
+      "../img/fenlei.png": {
+        "align": "", 
+        "file_location": "../img/fenlei.png", 
+        "height": 46, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 257, 
+        "type": 3, 
+        "width": 80
+      }, 
+      "../img/festival-bg.png": {
+        "align": "", 
+        "file_location": "../img/festival-bg.png", 
+        "height": 24, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 0, 
+        "type": 3, 
+        "width": 270
+      }, 
+      "../img/huabao.png": {
+        "align": "", 
+        "file_location": "../img/huabao.png", 
+        "height": 46, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 303, 
+        "type": 3, 
+        "width": 80
+      }, 
+      "../img/hunli.png": {
+        "align": "", 
+        "file_location": "../img/hunli.png", 
+        "height": 46, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 349, 
+        "type": 3, 
+        "width": 80
+      }, 
+      "../img/jiaju.png": {
+        "align": "", 
+        "file_location": "../img/jiaju.png", 
+        "height": 46, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 395, 
+        "type": 3, 
+        "width": 80
+      }, 
+      "../img/jieri.png": {
+        "align": "", 
+        "file_location": "../img/jieri.png", 
+        "height": 46, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 441, 
+        "type": 3, 
+        "width": 80
+      }, 
+      "../img/left-list.png": {
+        "align": "", 
+        "file_location": "../img/left-list.png", 
+        "height": 130, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 640, 
+        "type": 3, 
+        "width": 41
+      }, 
+      "../img/list1.png": {
+        "align": "", 
+        "file_location": "../img/list1.png", 
+        "height": 18, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 900, 
+        "type": 3, 
+        "width": 18
+      }, 
+      "../img/list2.png": {
+        "align": "", 
+        "file_location": "../img/list2.png", 
+        "height": 21, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 918, 
+        "type": 3, 
+        "width": 18
+      }, 
+      "../img/radius.png": {
+        "align": "right", 
+        "file_location": "../img/radius.png", 
+        "height": 21, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 70, 
+        "type": 3, 
+        "width": 139
+      }, 
+      "../img/right-list.png": {
+        "align": "", 
+        "file_location": "../img/right-list.png", 
+        "height": 130, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 770, 
+        "type": 3, 
+        "width": 41
+      }, 
+      "../img/search.png": {
+        "align": "", 
+        "file_location": "../img/search.png", 
+        "height": 24, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 579, 
+        "type": 3, 
+        "width": 66
+      }, 
+      "../img/shenghuo.png": {
+        "align": "", 
+        "file_location": "../img/shenghuo.png", 
+        "height": 46, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 487, 
+        "type": 3, 
+        "width": 80
+      }, 
+      "../img/tes-list.png": {
+        "align": "left", 
+        "file_location": "../img/tes-list.png", 
+        "height": 9, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 947, 
+        "type": 3, 
+        "width": 7
+      }, 
+      "../img/tese.png": {
+        "align": "", 
+        "file_location": "../img/tese.png", 
+        "height": 46, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 533, 
+        "type": 3, 
+        "width": 80
+      }, 
+      "../img/weibo.png": {
+        "align": "", 
+        "file_location": "../img/weibo.png", 
+        "height": 37, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 137, 
+        "type": 3, 
+        "width": 108
+      }, 
+      "../img/zhuti.png": {
+        "align": "", 
+        "file_location": "../img/zhuti.png", 
+        "height": 46, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 24, 
+        "type": 3, 
+        "width": 148
+      }, 
+      "../img/zixun.png": {
+        "align": "", 
+        "file_location": "../img/zixun.png", 
+        "height": 37, 
+        "repeat": "no-repeat", 
+        "spritepos_left": 0, 
+        "spritepos_top": 603, 
+        "type": 3, 
+        "width": 43
+      }
+    }
+  }
+}

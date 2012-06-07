@@ -6,10 +6,10 @@ var file = '../demo/css/test.css';
 //var file = '../demo/css/index.css';//巨大压力
 //var file = '../demo/css/bootstrap.css';
 //var file = '../demo/css/t.css';
-var SteamParser = require('./steamParser');
+var CssReader = require('./cssReader');
 //var file = '../demo/css/index.css';
 
-var p = new SteamParser({
+var p = new CssReader({
     file: file
 });
 p.on(p.get('RULE_END_EVT'), function(e){

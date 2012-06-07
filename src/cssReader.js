@@ -22,7 +22,7 @@
  * it in the property metas, such as
  * @example 2
  * <code>
- *  var p = new SteamParser({
+ *  var p = new CssReader({
  *      file: 'path/to/cssfile.css'
  *  });
  *  //when the property timeEnd setted, parser css is finished
@@ -54,11 +54,11 @@ var StdClass = require('./stdclass');
  * @constructor
  * @extends StdClass
  */
-function SteamParser(){
+function CssReader(){
   StdClass.apply(this, arguments);
 }
 
-StdClass.extend(SteamParser, StdClass, {
+StdClass.extend(CssReader, StdClass, {
 
   attributes: {
     //file path
@@ -236,7 +236,8 @@ StdClass.extend(SteamParser, StdClass, {
       return {
         selector: selectors[i],
         property: properties[i],
-        value: values[i]
+        value: values[i],
+        id: i
       };
     }
   },
@@ -303,7 +304,7 @@ StdClass.extend(SteamParser, StdClass, {
     var len = data.length;
     var code = data[0];
     var val;
-    console.log("one\n");
+    //console.log("one\n");
 
     while(code){
 
@@ -344,7 +345,7 @@ StdClass.extend(SteamParser, StdClass, {
 
   _readEnd: function readEnd(){
     this.set('timeEnd', (new Date()).getTime());
-    console.log(['end', this.get('timeEnd') - this.get('timeStart')]);
+    //console.log(['end', this.get('timeEnd') - this.get('timeStart')]);
     //console.log(this.get('metas'));
     //console.log(this.get('selectors'));
     //console.log(this.get('properties'));
@@ -357,4 +358,4 @@ StdClass.extend(SteamParser, StdClass, {
 
 });
 
-module.exports = SteamParser;
+module.exports = CssReader;
