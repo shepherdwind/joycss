@@ -66,10 +66,17 @@ StdClass.extend(SpriteDef, StdClass, {
 
   _bind: function(){
     var cssReader = this.cssReader;
+    //收集css规则
     cssReader.on(cssReader.get('RULE_END_EVT'), this.getRule, this);
+    //收集规则结束
     cssReader.on('change:timeEnd', this.cssEnd, this);
   },
 
+  /**
+   * 获取css属性组合
+   * @param e {object} 一组css规则{selector: [], property: [], value: [], id: 0}
+   * selector, property, value分别是css规则的选择器、属性和值，id是规则序号
+   */
   getRule: function(e){
     var property = e.property;
     var imageIndex = property.indexOf('background');
@@ -78,15 +85,26 @@ StdClass.extend(SpriteDef, StdClass, {
     }
   },
 
+  /**
+   * 获取css中背景图
+   * @param css {object} css规则
+   * @param imageIndex {number} 背景图属性所在的位置
+   */
   collectImages: function(css, imageIndex){
     var urlVal = css.value[imageIndex];
     var image  = this._isSpriteImage(urlVal);
     var images = this.images;
+
     if (image){
       images[css.id] = image;
     }
   },
 
+  /**
+   * 判断是否是需要做sprite的图片
+   * @param val {string} css background 对应的value值，比如 url(a.png) left
+   * right;
+   */
   _isSpriteImage: function(val){
     //存在url，并且url不是http方式
     var isHttpUrl = val.indexOf('//') > -1;
@@ -111,6 +129,7 @@ StdClass.extend(SpriteDef, StdClass, {
 
     files = Object.keys(files);
 
+    //获取图片大小
     Api.getImagesSize(files, this.setDef, this);
   },
 
@@ -160,6 +179,7 @@ StdClass.extend(SpriteDef, StdClass, {
 
   createSprite: function(){
     var cfg = JSON.stringify(this.sprites);
+    //拼图
     Api.mergeImages([this.get('file'), cfg]);
   },
 
