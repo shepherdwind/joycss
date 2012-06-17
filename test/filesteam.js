@@ -6,7 +6,7 @@ var file = '../demo/css/test.css';
 //var file = '../demo/css/index.css';//巨大压力
 //var file = '../demo/css/bootstrap.css';
 //var file = '../demo/css/t.css';
-var CssReader = require('./cssReader');
+var CssReader = require('../src/cssReader');
 //var file = '../demo/css/index.css';
 
 var p = new CssReader({

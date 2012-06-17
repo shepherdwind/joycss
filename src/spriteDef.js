@@ -6,6 +6,7 @@ var Api       = require('./graph/api');
 var some      = require('./utils').some;
 var forEach   = require('./utils').forEach;
 var util      = require('util');
+var fs        = require('fs');
 
 var conf = {
   "background" : "ffffff7f",
@@ -60,6 +61,7 @@ StdClass.extend(SpriteDef, StdClass, {
      * 图片属性集合，记录图片大小以及图片类型
      */
     this.imagesDef = {};
+    this.cssReult = '';
 
     this._bind();
   },
@@ -80,9 +82,19 @@ StdClass.extend(SpriteDef, StdClass, {
   getRule: function(e){
     var property = e.property;
     var imageIndex = property.indexOf('background');
+
     if (imageIndex > -1) {
       this.collectImages(e, imageIndex);
     }
+  },
+
+  writeRule: function(rule){
+    var self = this;
+    self.cssReult += rule.selector.join(",\n") + " {\n";
+    forEach(rule.property, function(p, i){
+      self.cssReult += '  ' + p + ': ' + rule.value[i] + ";\n";
+    });
+    self.cssReult += "}\n";
   },
 
   /**
@@ -177,10 +189,65 @@ StdClass.extend(SpriteDef, StdClass, {
     this.createSprite();
   },
 
+  /**
+   * 生成sprite图片
+   * @next writeCssBack 回写css样式，生成sprite样式
+   */
   createSprite: function(){
     var cfg = JSON.stringify(this.sprites);
     //拼图
-    Api.mergeImages([this.get('file'), cfg]);
+    Api.mergeImages([this.get('file'), cfg], this.writeCssBack, this);
+  },
+
+  writeCssBack: function(err, data){
+    var file = this.get('file');
+    var spriteFile = file.replace('.css', '.sprite.css');
+    var cssReader = this.cssReader;
+    var len = cssReader.getLen();
+    var indexs = Object.keys(this.images);
+    var index = indexs.shift();
+    var rule, img;
+    var multSelector = [];
+
+    for (var i = 0; i < len; i++) {
+      rule = cssReader.getRule(i);
+      if (index != i){
+        this.writeRule(rule);
+      } else {
+        img = this.images[index];
+        multSelector = multSelector.concat(rule.selector);
+        this.writeSpriteRule(rule, this.imagesDef[img]);
+        index = indexs.shift();
+      }
+    }
+    this.writeRule({
+      'selector': multSelector,
+      'property': ['background-image'],
+      'value': ['url(' + this.sprites['mysprite']['filename'] + ')']
+    });
+    fs.writeFile(spriteFile, this.cssReult, function(err, data){
+      console.log(err);
+      console.log(data);
+    });
+    //console.log(this.imagesDef);
+  },
+
+  writeSpriteRule: function(rule, def){
+    var repeat = def['repeat'];
+    var position = [def['spritepos_left'], def['spritepos_left']];
+    var self = this;
+    var backgroudProp = ['background', 'background-position', 
+      'background-repeat', 'background-image'];
+
+    self.cssReult += rule.selector.join(', ') + " {\n";
+    forEach(rule.property, function(prop, i){
+      if (backgroudProp.indexOf(prop) == -1){
+        self.cssReult += '  ' + rule.property[i] + ': ' + rule.value[i] + ';\n';
+      }
+    });
+    self.cssReult += '  background-repeat: ' + repeat + ';\n';
+    self.cssReult += '  background-position: ' + position.join(', ') + ';\n';
+    self.cssReult += "}\n";
   },
 
   coords: function(img, result){
@@ -223,75 +290,75 @@ StdClass.extend(SpriteDef, StdClass, {
           //position
           if (!isPos && (parseInt(str, 10) > -1 || 
             ['left', 'right', 'center'].indexOf(str))){
-            isPos = true;
-            self._getBackgroudAlign([str, arr[i + 1]], ret, isVertical);
-          } else {
-            isPos =false;
-          }
-        });
-      }
-
-      //get height
-      if (['height', 'line-height'].indexOf(property) > -1 && 
-        val.indexOf('px') > 0){
-        height = +val > height ? +val : height;
-      }
-      //get padding
-      //Todo:
-
-    });
-
-    return ret;
-  },
-
-  _getBackgroudAlign: function(val, ret, isVertical){
-
-    var pos = util.isArray(val) ? val :
-    val.split(' ').map(function(v){
-      return v.trim();
-    });
-
-    var aligns = ['left', 'right', 'center', '0', '50%', '100%'];
-    (aligns.indexOf(pos[0]) > -1 && isVertical) ?
-    ret['align'] = pos[0] :
-    ret['spritepos_left'] = parseInt(pos[0], 10) || 0;
-
-    (aligns.indexOf(pos[1]) > -1 && !isVertical) ?
-    ret['align'] = pos[1]:
-    ret['spritepos_top'] = parseInt(pos[1], 10) || 0;
-
-    if (ret['align'] == '0'){
-      ret['align'] = isVertical ? 'left': 'top';
-    }
-    if (ret['align'] == '100%'){
-      ret['align'] = isVertical ? 'right': 'bottom';
-    }
-    if (ret['align'] == '50%'){
-      ret['align'] = 'center';
+          isPos = true;
+          self._getBackgroudAlign([str, arr[i + 1]], ret, isVertical);
+        } else {
+          isPos =false;
+        }
+      });
     }
 
-  },
+    //get height
+    if (['height', 'line-height'].indexOf(property) > -1 && 
+      val.indexOf('px') > 0){
+      height = +val > height ? +val : height;
+    }
+    //get padding
+    //Todo:
 
-  /**
-   * 获取图片对应的css规则，规定，同一个图片对应同一个规则，不允许同一个图片，
-   * 使用不同的方式设置规则
-   * @param img {string} img url
-   * @return {object} css rules
-   */
-  getCss: function(img){
-    var cssReader = this.cssReader;
-    var images    = this.images;
-    var imgId     = null;
+  });
 
-    some(images, function(imgPath, id){
-      if (imgPath == img){
-        imgId = id;
-        return true;
-      }
-    });
+  return ret;
+},
 
-    return cssReader.getRule(imgId);
+_getBackgroudAlign: function(val, ret, isVertical){
+
+  var pos = util.isArray(val) ? val :
+  val.split(' ').map(function(v){
+    return v.trim();
+  });
+
+  var aligns = ['left', 'right', 'center', '0', '50%', '100%'];
+  (aligns.indexOf(pos[0]) > -1 && isVertical) ?
+  ret['align'] = pos[0] :
+  ret['spritepos_left'] = parseInt(pos[0], 10) || 0;
+
+  (aligns.indexOf(pos[1]) > -1 && !isVertical) ?
+  ret['align'] = pos[1]:
+  ret['spritepos_top'] = parseInt(pos[1], 10) || 0;
+
+  if (ret['align'] == '0'){
+    ret['align'] = isVertical ? 'left': 'top';
   }
+  if (ret['align'] == '100%'){
+    ret['align'] = isVertical ? 'right': 'bottom';
+  }
+  if (ret['align'] == '50%'){
+    ret['align'] = 'center';
+  }
+
+},
+
+/**
+ * 获取图片对应的css规则，规定，同一个图片对应同一个规则，不允许同一个图片，
+ * 使用不同的方式设置规则
+ * @param img {string} img url
+ * @return {object} css rules
+ */
+getCss: function(img){
+  var cssReader = this.cssReader;
+  var images    = this.images;
+  var imgId     = null;
+
+  some(images, function(imgPath, id){
+    if (imgPath == img){
+      imgId = id;
+      return true;
+    }
+  });
+
+  return cssReader.getRule(imgId);
+}
 
 });
 

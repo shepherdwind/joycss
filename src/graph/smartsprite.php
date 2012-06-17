@@ -8,9 +8,16 @@ class SmartSprite
     protected $currentDir = '';
     protected $_maxColors = 0;
     protected $_trueColor;
+    protected $log;
 
     function __construct($filename, $config){
         $this->_filename = $filename;
+
+        $this->log = new stdclass();
+        $this->log->info = array();
+        $this->log->spriteImgs = array();
+        $this->log->filename = $filename;
+
         $this->sprites = $config;
         $this->chkGDVersion();
         $this->createSpriteImages();
@@ -21,7 +28,7 @@ class SmartSprite
         if ($gdInfo) {
             $gdVersion = $gdInfo['GD Version'];
             if ($this->verbose)
-                echo "Using: GD_lib $gdVersion \n\n";
+                $this->log->info[] = "Using: GD_lib $gdVersion \n\n";
         } else die ( "ERROR: no GD Library found.\n" );
     }
 
@@ -33,7 +40,7 @@ class SmartSprite
 
             $DATAURL = $this->sprites[$spritekey]['dataurl'];
 
-            echo "creating css-sprite-file: $filename \n";
+            $this->log->info[] = "creating css-sprite-file: $filename \n";
             $backgroundHEX = $this->sprites[$spritekey]['background'];
 
             if ($_imagelocations) {
@@ -44,12 +51,12 @@ class SmartSprite
 
                 // $this->_trueColor &&  
                 if ($this->sprites[$spritekey]['force8bit'] == false ) {
-                    echo "using truecolor mode\n";
+                    $this->log->info[] = "using truecolor mode\n";
                     if ( $fileEXT == 'png')  $image = imagecreatetruecolor($w, $h);
                     if ( $fileEXT == 'gif')  $image = imagecreatetruecolor($w, $h);
                     if ( $fileEXT == 'jpg')  $image =  imagecreatetruecolor($w, $h);
                 } else {
-                    echo "using 8bit mode\n";
+                    $this->log->info[] = "using 8bit mode\n";
                     if ( $fileEXT == 'png')  $image = imagecreate($w, $h);
                     if ( $fileEXT == 'gif')  $image = imagecreate($w, $h);
                     if ( $fileEXT == 'jpg')  $image =  imagecreate($w, $h);
@@ -122,12 +129,15 @@ class SmartSprite
                 $this->safeImageToFile($image, $this->sprites[$spritekey]['imagetype'], $this->sprites[$spritekey]['filename'], $spritekey, $DATAURL ); 
             }	// if images exists
         }	// Sprite loop
+
+        $this->log->info[] = 'end';
+        echo json_encode($this->log);
     }
     function safeImageToFile($imgres, $imgtype, $filename, $spritekey, $dataurl) {
         $filename = dirname($this->_filename).'/'.$filename;
         //if ($this->verbose)
 
-        echo "Writing smartsprite file: $filename  colors: $this->_maxColors  ...\n";
+        $this->log->info[] = "Writing smartsprite file: $filename  colors: $this->_maxColors  ...\n";
 
         $_result = 0;
         switch ($imgtype) {
@@ -151,12 +161,13 @@ class SmartSprite
 
         if (!$_result) die("ERROR: Can not write smartsprite file to: $filename\n");
 
+        $this->log->spriteImgs[] = $filename;
         $_optIMG = $filename;	
         // dirname($this->_filename).'/'.
 
-        $dataurl 
-            ? $this->getImageDataURL($_optIMG, $_mime, $spritekey) 
-            : $this->getImageJointBG($_optIMG, $spritekey);//'';
+        //$dataurl 
+            //? $this->getImageDataURL($_optIMG, $_mime, $spritekey) 
+            //: $this->getImageJointBG($_optIMG, $spritekey);//'';
     }
 
     function loadImageFromFile($imageInfo) {
@@ -180,7 +191,7 @@ class SmartSprite
         }
 
         $_colorCount = ImageColorsTotal($_result);
-        echo 'testing imagefile: '.$filelocation.' colors: '.$_colorCount."\n";
+        $this->log->info[] = 'testing imagefile: '.$filelocation.' colors: '.$_colorCount."\n";
 
         if (  $this->_maxColors < $_colorCount ) $this->_maxColors = $_colorCount;
         if ($_colorCount  == 0) $this->_trueColor = true;

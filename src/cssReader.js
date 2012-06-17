@@ -239,6 +239,8 @@ StdClass.extend(CssReader, StdClass, {
         value: values[i],
         id: i
       };
+    } else {
+      return false;
     }
   },
 
