@@ -48,7 +48,7 @@ var fs = require('fs');
 var path = require('path');
 var assert = require('assert').ok;
 
-var StdClass = require('./stdclass');
+var StdClass = require('../lib/stdclass');
 
 /**
  * @constructor

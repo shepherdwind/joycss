@@ -1,10 +1,10 @@
 "use strict";
 var path      = require('path');
 var cssReader = require('./cssReader');
-var StdClass  = require('./stdclass');
+var StdClass  = require('../lib/stdclass');
 var Api       = require('./graph/api');
-var some      = require('./utils').some;
-var forEach   = require('./utils').forEach;
+var some      = require('../lib/utils').some;
+var forEach   = require('../lib/utils').forEach;
 var util      = require('util');
 var fs        = require('fs');
 
@@ -288,77 +288,75 @@ StdClass.extend(SpriteDef, StdClass, {
           }
 
           //position
-          if (!isPos && (parseInt(str, 10) > -1 || 
-            ['left', 'right', 'center'].indexOf(str))){
-          isPos = true;
-          self._getBackgroudAlign([str, arr[i + 1]], ret, isVertical);
-        } else {
-          isPos =false;
-        }
-      });
+          if (!isPos && (parseInt(str, 10) > -1 || ['left', 'right', 'center'].indexOf(str))){
+            isPos = true;
+            self._getBackgroudAlign([str, arr[i + 1]], ret, isVertical);
+          } else {
+            isPos =false;
+          }
+        });
+      }
+
+      //get height
+      if (['height', 'line-height'].indexOf(property) > -1 && val.indexOf('px') > 0){
+        height = +val > height ? +val : height;
+      }
+      //get padding
+      //Todo:
+
+    });
+
+    return ret;
+  },
+
+  _getBackgroudAlign: function(val, ret, isVertical){
+
+    var pos = util.isArray(val) ? val :
+    val.split(' ').map(function(v){
+      return v.trim();
+    });
+
+    var aligns = ['left', 'right', 'center', '0', '50%', '100%'];
+    (aligns.indexOf(pos[0]) > -1 && isVertical) ?
+    ret['align'] = pos[0] :
+    ret['spritepos_left'] = parseInt(pos[0], 10) || 0;
+
+    (aligns.indexOf(pos[1]) > -1 && !isVertical) ?
+    ret['align'] = pos[1]:
+    ret['spritepos_top'] = parseInt(pos[1], 10) || 0;
+
+    if (ret['align'] == '0'){
+      ret['align'] = isVertical ? 'left': 'top';
+    }
+    if (ret['align'] == '100%'){
+      ret['align'] = isVertical ? 'right': 'bottom';
+    }
+    if (ret['align'] == '50%'){
+      ret['align'] = 'center';
     }
 
-    //get height
-    if (['height', 'line-height'].indexOf(property) > -1 && 
-      val.indexOf('px') > 0){
-      height = +val > height ? +val : height;
-    }
-    //get padding
-    //Todo:
+  },
 
-  });
+  /**
+   * 获取图片对应的css规则，规定，同一个图片对应同一个规则，不允许同一个图片，
+   * 使用不同的方式设置规则
+   * @param img {string} img url
+   * @return {object} css rules
+   */
+  getCss: function(img){
+    var cssReader = this.cssReader;
+    var images    = this.images;
+    var imgId     = null;
 
-  return ret;
-},
+    some(images, function(imgPath, id){
+      if (imgPath == img){
+        imgId = id;
+        return true;
+      }
+    });
 
-_getBackgroudAlign: function(val, ret, isVertical){
-
-  var pos = util.isArray(val) ? val :
-  val.split(' ').map(function(v){
-    return v.trim();
-  });
-
-  var aligns = ['left', 'right', 'center', '0', '50%', '100%'];
-  (aligns.indexOf(pos[0]) > -1 && isVertical) ?
-  ret['align'] = pos[0] :
-  ret['spritepos_left'] = parseInt(pos[0], 10) || 0;
-
-  (aligns.indexOf(pos[1]) > -1 && !isVertical) ?
-  ret['align'] = pos[1]:
-  ret['spritepos_top'] = parseInt(pos[1], 10) || 0;
-
-  if (ret['align'] == '0'){
-    ret['align'] = isVertical ? 'left': 'top';
+    return cssReader.getRule(imgId);
   }
-  if (ret['align'] == '100%'){
-    ret['align'] = isVertical ? 'right': 'bottom';
-  }
-  if (ret['align'] == '50%'){
-    ret['align'] = 'center';
-  }
-
-},
-
-/**
- * 获取图片对应的css规则，规定，同一个图片对应同一个规则，不允许同一个图片，
- * 使用不同的方式设置规则
- * @param img {string} img url
- * @return {object} css rules
- */
-getCss: function(img){
-  var cssReader = this.cssReader;
-  var images    = this.images;
-  var imgId     = null;
-
-  some(images, function(imgPath, id){
-    if (imgPath == img){
-      imgId = id;
-      return true;
-    }
-  });
-
-  return cssReader.getRule(imgId);
-}
 
 });
 
