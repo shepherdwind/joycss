@@ -1,9 +1,9 @@
 .main-left .fenlei h2 {
-  background: url(../img/fenlei.png) repeat 10px 10px;/** sprite-ref: mysprite; */
+  background: url(../img/fenlei.png?id=1) repeat 10px 10px;
   width: 80px;
 }
 .main-right .tese h2 {
-  background: url(../img/tese.png) repeat-x center top;/** sprite-ref: mysprite; */
+  background: url(../img/tese.png?id=1) repeat-x center top;/** sprite-ref: mysprite; */
   width: 80px;
 }
 .main-left .zhuti h2 {

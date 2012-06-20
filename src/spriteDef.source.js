@@ -7,31 +7,22 @@ var some      = require('../lib/utils').some;
 var forEach   = require('../lib/utils').forEach;
 var util      = require('util');
 var fs        = require('fs');
-var Box       = require('../lib/box');
-var url       = require('url');
-var ESC_KEY   = 'esc';
 
 var conf = {
   "background" : "ffffff7f",
   "colorcount" : "256",
   "dataurl"    : false,
-  "filename"   : "",
+  "filename"   : "../img/mysprite.png",
   "width"      : 0,
   "height"     : 0,
   "force8bit"  : true,
   "imagetype"  : 3,
   "layout"     : "vertical",
-  "margin"     : 0
+  "margin"     : 0,
+  "images"     : {}
 };
 
-function mixin(from, to){
-  forEach(from, function(val, key){
-    to[key] = val;
-  });
-  return to;
-}
-
-var imageUrlReg = /url\(['"]*([a-z0-9A-Z&?=_\-.\/\\]+)['"]*\)/;
+var imageUrlReg = /url\(['"]*([a-z0-9A-Z_\-.\/\\]+)['"]*\)/;
 //console.log(imageUrlReg.exec('background: red;'));
 //console.log(imageUrlReg.exec('background: url("b\\a.png") top left;'));
 
@@ -42,11 +33,7 @@ function SpriteDef (){
 StdClass.extend(SpriteDef, StdClass, {
 
   attributes: {
-    file: '',
-    basename: '',
-    id: 0,
-    ids: {},
-    imgPath: ''
+    file: ''
   },
 
   CONSIT: {
@@ -58,13 +45,12 @@ StdClass.extend(SpriteDef, StdClass, {
 
     this.cssReader = new cssReader({file: file});
 
-    var basename = path.basename(file, '.css');
-    this.set('basename', basename);
     /**
      * 所有sprites属性集合
      */
-    this.sprites = {};
-    this.initSpriteConf();
+    this.sprites = {
+      mysprite: conf
+    };
 
     /**
      * 所有含有background的css集合，{id: url}，id指css集合id，url是图片路径
@@ -80,42 +66,12 @@ StdClass.extend(SpriteDef, StdClass, {
     this._bind();
   },
 
-  /**
-   * 初始化配置，对应可能存在的多图情况
-   */
-  initSpriteConf: function(){
-    var id = this.get('id');
-    var basename = this.get('basename');
-    var ids = this.get('ids');
-    var spriteId = id ? basename + id : basename;
-    var imgPath = this.get('imgPath');
-
-    this.sprites[spriteId] = mixin(conf, {});
-    this.sprites[spriteId]['images'] = {};
-    if (imgPath) {
-      this.sprites[spriteId]['filename'] = imgPath + '/' + spriteId + '-sprite.png';
-    }
-
-    ids[id] = spriteId;
-    id++;
-    this.set('id', id);
-    return id - 1;
-  },
-
   _bind: function(){
     var cssReader = this.cssReader;
     //收集css规则
     cssReader.on(cssReader.get('RULE_END_EVT'), this.getRule, this);
     //收集规则结束
     cssReader.on('change:timeEnd', this.cssEnd, this);
-    this.on('change:imgPath', this.setImgPath);
-  },
-
-  setImgPath: function(e){
-    var path = e.now + '/';
-    forEach(this.sprites, function(sprite, id){
-      if (!sprite.filename) sprite['filename'] = path + id + '-sprite.png';
-    });
   },
 
   /**
@@ -132,20 +88,13 @@ StdClass.extend(SpriteDef, StdClass, {
     }
   },
 
-  writeRule: function(rule, isBegin){
+  writeRule: function(rule){
     var self = this;
-    var cssReult = '';
-    cssReult += rule.selector.join(",\n") + " {\n";
+    self.cssReult += rule.selector.join(",\n") + " {\n";
     forEach(rule.property, function(p, i){
-      cssReult += '  ' + p + ': ' + rule.value[i] + ";\n";
+      self.cssReult += '  ' + p + ': ' + rule.value[i] + ";\n";
     });
-    cssReult += "}\n";
-
-    if (!isBegin){
-      this.cssReult += cssReult;
-    } else {
-      this.cssReult = cssReult + this.cssReult;
-    }
+    self.cssReult += "}\n";
   },
 
   /**
@@ -173,24 +122,8 @@ StdClass.extend(SpriteDef, StdClass, {
     var isHttpUrl = val.indexOf('//') > -1;
     var ret = false;
     if (!isHttpUrl){
-      var uri = imageUrlReg.exec(val);
-      if (uri){
-        var imgurl = url.parse(uri[1], true);
-        var params = imgurl.query;
-        var id = params['id'] || 0;
-        //过滤图片
-        if (!params[ESC_KEY]){
-          ret = imgurl.pathname;
-          //设置第一个图片为sprite图片位置
-          if (!this.get('imgPath')){
-            this.set('imgPath', path.dirname(ret));
-          }
-        }
-
-        if (id && this.get('id') === id){
-          this.initSpriteConf();
-        }
-      }
+      var url = imageUrlReg.exec(val);
+      ret = url ? url[1] : false;
     }
 
     return ret;
@@ -234,45 +167,26 @@ StdClass.extend(SpriteDef, StdClass, {
       return imagesDef[img2].width - imagesDef[img1].width;
     });
 
-    var self = this;
+    var sprites = this.sprites['mysprite'];
+    var images  = sprites.images;
+    var self    = this;
+    var height  = 0;
+    sprites['width'] = imagesDef[imgs[0]].width;
 
     forEach(imgs, function(img){
-      var imageInfo = imagesDef[img];
-      var css = self.getCss(img);
-      var box = new Box(css.property, css.value);
-      imageInfo['file_location'] = img;
-      mixin(self.coords(box), imageInfo);
-
-      self.setImageInfo(box, imageInfo);
+      var image;
+      images[img] = imagesDef[img];
+      image = images[img];
+      self.coords(img, image);
+      height += image['spritepos_top'];
+      image['spritepos_top'] = height;
+      image['file_location'] = img;
+      height += parseInt(image.height, 10);
     });
 
-    this.createSprite();
-  },
-
-  setImageInfo: function(box, imageInfo){
-    var id = this.get('id');
-    var background = box.background;
-    var params = background.params;
-    var basename = this.get('basename');
-
-    if (params.id && params.id == id){
-      this.initSpriteConf();
-    }
-
-    var spriteId = params.id ? basename + params.id : basename;
-    var sprites = this.sprites[spriteId];
-    var width = sprites['width'];
-    var height = sprites['height'];
-
-    if (imageInfo.width > width) width = imageInfo.width;
-
-    height += imageInfo['spritepos_top'];
-    imageInfo['spritepos_top'] = height;
-    height += parseInt(imageInfo.height, 10);
-
-    sprites['images'][imageInfo['file_location']] = imageInfo;
-    sprites['width'] = width;
     sprites['height'] = height;
+
+    this.createSprite();
   },
 
   /**
@@ -293,7 +207,7 @@ StdClass.extend(SpriteDef, StdClass, {
     var indexs = Object.keys(this.images);
     var index = indexs.shift();
     var rule, img;
-    var multSelector = {};
+    var multSelector = [];
 
     for (var i = 0; i < len; i++) {
       rule = cssReader.getRule(i);
@@ -301,35 +215,26 @@ StdClass.extend(SpriteDef, StdClass, {
         this.writeRule(rule);
       } else {
         img = this.images[index];
-        multSelector[img] = rule.selector;
+        multSelector = multSelector.concat(rule.selector);
         this.writeSpriteRule(rule, this.imagesDef[img]);
         index = indexs.shift();
       }
     }
-
-    var _this = this;
-    forEach(this.sprites, function(sprites, spriteId){
-      var selectors = [];
-      forEach(sprites.images, function(def, img){
-        selectors = selectors.concat(multSelector[img]);
-      });
-
-      _this.writeRule({
-        'selector': selectors,
-        'property': ['background-image', 'background-repeat'],
-        'value': ['url(' + sprites['filename'] + ')', 'no-repeat']
-      }, true);
+    this.writeRule({
+      'selector': multSelector,
+      'property': ['background-image'],
+      'value': ['url(' + this.sprites['mysprite']['filename'] + ')']
     });
-
     fs.writeFile(spriteFile, this.cssReult, function(err, data){
       console.log(err);
       console.log(data);
     });
+    //console.log(this.imagesDef);
   },
 
   writeSpriteRule: function(rule, def){
     var repeat = def['repeat'];
-    var position = [def['spritepos_left'] + 'px', def['spritepos_top'] + 'px'];
+    var position = [def['spritepos_left'], def['spritepos_left']];
     var self = this;
     var backgroudProp = ['background', 'background-position', 
       'background-repeat', 'background-image'];
@@ -340,36 +245,98 @@ StdClass.extend(SpriteDef, StdClass, {
         self.cssReult += '  ' + rule.property[i] + ': ' + rule.value[i] + ';\n';
       }
     });
-
-    if (repeat !== 'no-repeat'){
-      self.cssReult += '  background-repeat: ' + repeat + ';\n';
-    }
+    self.cssReult += '  background-repeat: ' + repeat + ';\n';
     self.cssReult += '  background-position: ' + position.join(', ') + ';\n';
     self.cssReult += "}\n";
   },
 
-  coords: function(box){
+  coords: function(img, result){
+    var css = this.getCss(img);
+    forEach(this._getBackgroudDef(css), function(val, key){
+      result[key] = val;
+    });
+  },
+
+  _getBackgroudDef: function(css){
     var ret = {
       "repeat"         : 'no-repeat',
       "align"          : '',
       "spritepos_left" : 0,
       "spritepos_top"  : 0
     };
-    var background = box.background;
-    var repeat = background.repeat;
-    var position = background.position;
+    var self = this;
+    var height = 0;
+    var padding = 0;
 
-    ret.repeat = repeat;
-    if (position){
-      if (position.x !== 'right') ret['align'] = 'left';
+    forEach(css.property, function(property, id){
 
-      //is number
-      if (+position.x) ret['spritepos_left'] = parseInt(position.x, 10);
-      if (+position.y) ret['spritepos_top'] = parseInt(position.y, 10);
-    }
+      var layout = 'vertical';
+      var isVertical = layout === 'vertical';
+      var val = css.value[id];
+      if (property == 'background-repeat') ret['repeat'] = val;
+
+      if (property == 'background-position'){
+        self._getBackgroudAlign(val, ret, isVertical);
+      }
+
+      if (property == 'background'){
+        var isPos = false;
+        val.split(' ').forEach(function(str, i, arr){
+          //repeat
+          if (str.indexOf('repeat') > -1){
+            ret['repeat'] = str;
+          }
+
+          //position
+          if (!isPos && (parseInt(str, 10) > -1 || ['left', 'right', 'center'].indexOf(str))){
+            isPos = true;
+            self._getBackgroudAlign([str, arr[i + 1]], ret, isVertical);
+          } else {
+            isPos =false;
+          }
+        });
+      }
+
+      //get height
+      if (['height', 'line-height'].indexOf(property) > -1 && val.indexOf('px') > 0){
+        height = +val > height ? +val : height;
+      }
+      //get padding
+      //Todo:
+
+    });
 
     return ret;
   },
+
+  _getBackgroudAlign: function(val, ret, isVertical){
+
+    var pos = util.isArray(val) ? val :
+    val.split(' ').map(function(v){
+      return v.trim();
+    });
+
+    var aligns = ['left', 'right', 'center', '0', '50%', '100%'];
+    (aligns.indexOf(pos[0]) > -1 && isVertical) ?
+    ret['align'] = pos[0] :
+    ret['spritepos_left'] = parseInt(pos[0], 10) || 0;
+
+    (aligns.indexOf(pos[1]) > -1 && !isVertical) ?
+    ret['align'] = pos[1]:
+    ret['spritepos_top'] = parseInt(pos[1], 10) || 0;
+
+    if (ret['align'] == '0'){
+      ret['align'] = isVertical ? 'left': 'top';
+    }
+    if (ret['align'] == '100%'){
+      ret['align'] = isVertical ? 'right': 'bottom';
+    }
+    if (ret['align'] == '50%'){
+      ret['align'] = 'center';
+    }
+
+  },
+
   /**
    * 获取图片对应的css规则，规定，同一个图片对应同一个规则，不允许同一个图片，
    * 使用不同的方式设置规则
