@@ -13,8 +13,6 @@
 }
 .main-left .fenlei h2 {
   background: url(../img/fenlei.png?id=1&way=h) repeat-y 0 0;
-  /*background: url(../img/fenlei.png?id=1&way=1) repeat-x 0 0;*/
-  /*background: url(../img/fenlei.png?id=1) no-repeat 10px 10px;*/
   width: 180px;
   height: 180px;
 }
