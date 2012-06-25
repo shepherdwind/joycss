@@ -119,7 +119,19 @@ class SmartSprite
                         } 
                         break;
                     case 'repeat-y':
-                        imagecopyresampled($image,$subimg,$imagevalue['spritepos_left'],$imagevalue['spritepos_top'],0,0,$imagevalue['width'],$h,$imagevalue['width'],$imagevalue['height']);			
+                        echo 'repeat-y';
+                        $nHeight = 0;
+                        while($nHeight <= $h) {
+                            imagecopyresampled($image,$subimg,
+                                $imagevalue['spritepos_left'],
+                                $imagevalue['spritepos_top'] + $nHeight,
+                                0,0,
+                                $imagevalue['width'],
+                                $imagevalue['height'],
+                                $imagevalue['width'],
+                                $imagevalue['height']);
+                            $nHeight += $imagevalue['height'];
+                        }
                         break;
                     default:
                         imagecopy($image,$subimg,$imagevalue['spritepos_left'],$imagevalue['spritepos_top'],0,0,$imagevalue['width'],$imagevalue['height']);

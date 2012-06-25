@@ -1,13 +1,29 @@
+.main-left {
+  width: 800px;
+  margin: 0 auto;
+  color: transparent;
+}
+#J_btn {
+  padding: 8px 1em;
+}
+.main-left h2 {
+  height: 60px;
+  width: 100%;
+  border: 1px solid #124;
+}
 .main-left .fenlei h2 {
-  background: url(../img/fenlei.png?id=1) repeat 10px 10px;
-  width: 80px;
+  background: url(../img/fenlei.png?id=1&way=h) repeat-y 0 0;
+  /*background: url(../img/fenlei.png?id=1&way=1) repeat-x 0 0;*/
+  /*background: url(../img/fenlei.png?id=1) no-repeat 10px 10px;*/
+  width: 180px;
+  height: 180px;
 }
 .main-right .tese h2 {
-  background: url(../img/tese.png?id=1) repeat-x center top;/** sprite-ref: mysprite; */
-  width: 80px;
+  background: url(../img/tese.png?id=1) no-repeat 0 10px;
+  width: 480px;
 }
 .main-left .zhuti h2 {
-  background: url(../img/zhuti.png) no-repeat;
+  background: url(../img/zhuti.png?esc) no-repeat;
   width: 148px;
 }
 .main-right .jieri h2 {

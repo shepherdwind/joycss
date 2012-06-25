@@ -10,6 +10,11 @@ var fs        = require('fs');
 var Box       = require('../lib/box');
 var url       = require('url');
 var ESC_KEY   = 'esc';
+var PARAMS    = {
+  'nosprite' : 'esc',
+  'direction' : 'way',
+  'horizontal' : 'h'
+};
 
 var conf = {
   "background" : "ffffff7f",
@@ -46,7 +51,9 @@ StdClass.extend(SpriteDef, StdClass, {
     basename: '',
     id: 0,
     ids: {},
-    imgPath: ''
+    imgPath: '',
+    //预处理数组
+    preParam: []
   },
 
   CONSIT: {
@@ -64,7 +71,6 @@ StdClass.extend(SpriteDef, StdClass, {
      * 所有sprites属性集合
      */
     this.sprites = {};
-    this.initSpriteConf();
 
     /**
      * 所有含有background的css集合，{id: url}，id指css集合id，url是图片路径
@@ -75,7 +81,7 @@ StdClass.extend(SpriteDef, StdClass, {
      * 图片属性集合，记录图片大小以及图片类型
      */
     this.imagesDef = {};
-    this.cssReult = '';
+    this.cssResult = '';
 
     this._bind();
   },
@@ -83,7 +89,7 @@ StdClass.extend(SpriteDef, StdClass, {
   /**
    * 初始化配置，对应可能存在的多图情况
    */
-  initSpriteConf: function(){
+  initSpriteConf: function(params){
     var id = this.get('id');
     var basename = this.get('basename');
     var ids = this.get('ids');
@@ -93,13 +99,19 @@ StdClass.extend(SpriteDef, StdClass, {
     this.sprites[spriteId] = mixin(conf, {});
     this.sprites[spriteId]['images'] = {};
     if (imgPath) {
-      this.sprites[spriteId]['filename'] = imgPath + '/' + spriteId + '-sprite.png';
+      this.sprites[spriteId]['filename'] = imgPath + '/' + 
+                       spriteId + '-sprite.png';
+    }
+
+    var dir = params[PARAMS['direction']];
+    if (dir && dir == PARAMS['horizontal']) {
+      this.sprites[spriteId]['layout'] = 'horizontal';
     }
 
     ids[id] = spriteId;
     id++;
     this.set('id', id);
-    return id - 1;
+    return spriteId;
   },
 
   _bind: function(){
@@ -111,6 +123,11 @@ StdClass.extend(SpriteDef, StdClass, {
     this.on('change:imgPath', this.setImgPath);
   },
 
+  /**
+   * 设置sprites图片的url地址，规则是imgPath + id + '-sprite'.png，id由两部分构
+   * 成，前缀为css文件名，后缀是id，默认情况下id为空，其他id从1开始计数，imgPath
+   * 是由第一个需要做拼图的图片地址决定的
+   */
   setImgPath: function(e){
     var path = e.now + '/';
     forEach(this.sprites, function(sprite, id){
@@ -132,19 +149,24 @@ StdClass.extend(SpriteDef, StdClass, {
     }
   },
 
+  /**
+   * 写一条css规则，结果合并到this.cssResult
+   * @param {object} rule css rule
+   * @param {bool} isBegin 默认为false，为true时，规则写在最前面
+   */
   writeRule: function(rule, isBegin){
     var self = this;
-    var cssReult = '';
-    cssReult += rule.selector.join(",\n") + " {\n";
+    var cssResult = '';
+    cssResult += rule.selector.join(",\n") + " {\n";
     forEach(rule.property, function(p, i){
-      cssReult += '  ' + p + ': ' + rule.value[i] + ";\n";
+      cssResult += '  ' + p + ': ' + rule.value[i] + ";\n";
     });
-    cssReult += "}\n";
+    cssResult += "}\n";
 
     if (!isBegin){
-      this.cssReult += cssReult;
+      this.cssResult += cssResult;
     } else {
-      this.cssReult = cssReult + this.cssReult;
+      this.cssResult = cssResult + this.cssResult;
     }
   },
 
@@ -164,7 +186,10 @@ StdClass.extend(SpriteDef, StdClass, {
   },
 
   /**
-   * 判断是否是需要做sprite的图片
+   * 判断是否是需要做sprite的图片，默认情况下，所有的图片都需要做拼合处理，当遇
+   * 到如下情况是，不做拼图：
+   * 1. 如果是http方式url，不做sprite
+   * 2. 图片url参数中有ESC_KEY，比如a.png?esc
    * @param val {string} css background 对应的value值，比如 url(a.png) left
    * right;
    */
@@ -179,16 +204,29 @@ StdClass.extend(SpriteDef, StdClass, {
         var params = imgurl.query;
         var id = params['id'] || 0;
         //过滤图片
-        if (!params[ESC_KEY]){
+        if (!(PARAMS['nosprite'] in params)){
           ret = imgurl.pathname;
           //设置第一个图片为sprite图片位置
           if (!this.get('imgPath')){
             this.set('imgPath', path.dirname(ret));
           }
-        }
 
-        if (id && this.get('id') === id){
-          this.initSpriteConf();
+          var preParam = this.get('preParam');
+          var _id = this.get('id');
+          if (_id == id){
+            this.initSpriteConf(params);
+            //依次初始化图片配置
+            preParam.forEach(this.initSpriteConf, this);
+            preParam = [];
+          } else if (_id < id){
+            //如果id提前出现，既id为0的图片没有出现之前，id是1的已经出现了，把
+            //当前参数存在数组preParam中
+            var isNewImg = preParam.every(function(params){
+              return params.id < id;
+            });
+            if (isNewImg) preParam.push(params);
+          }
+          this.set('preParam', preParam);
         }
       }
     }
@@ -196,6 +234,10 @@ StdClass.extend(SpriteDef, StdClass, {
     return ret;
   },
 
+  /**
+   * 文件读取完毕
+   * @next Api.getImagesSize -> this.setDef
+   */
   cssEnd: function(){
     var images  = this.images;
     var baseDir = path.dirname(this.get('file'));
@@ -212,6 +254,12 @@ StdClass.extend(SpriteDef, StdClass, {
     Api.getImagesSize(files, this.setDef, this);
   },
 
+  /**
+   * 设置图片配置，Api.getImagesSize函数回调
+   * @param {Error} err 错误信息
+   * @param {string|json} data 读取图片大小接口返回数据，包括图片大小和图片类型
+   * @next this.setPos
+   */
   setDef: function(err, data){
     if (err) throw Error(data.toString());
 
@@ -227,6 +275,9 @@ StdClass.extend(SpriteDef, StdClass, {
     this.setPos();
   },
 
+  /**
+   * 设置背景图位置
+   */
   setPos: function(){
     var imagesDef = this.imagesDef;
     //排序
@@ -255,21 +306,86 @@ StdClass.extend(SpriteDef, StdClass, {
     var params = background.params;
     var basename = this.get('basename');
 
-    if (params.id && params.id == id){
-      this.initSpriteConf();
-    }
-
+    //sprite图片地址
     var spriteId = params.id ? basename + params.id : basename;
     var sprites = this.sprites[spriteId];
+    var layout = this.sprites[spriteId]['layout'];
+
     var width = sprites['width'];
     var height = sprites['height'];
 
-    if (imageInfo.width > width) width = imageInfo.width;
+    var left, top, ceil;
+    if (layout == 'vertical'){
+      var imageWidth = imageInfo.width + imageInfo['spritepos_left'];
 
-    height += imageInfo['spritepos_top'];
-    imageInfo['spritepos_top'] = height;
-    height += parseInt(imageInfo.height, 10);
+      if (imageWidth> width) width = imageWidth;
 
+      //position计算
+      left = imageInfo['align'] || '0';
+      top = height;
+      if (top && imageInfo.height < height){
+        top = '-' + top + 'px';
+      } else {
+        top = 0;
+      }
+
+      //repeat时候必须是整数倍宽度
+      if (imageInfo['repeat'] == 'repeat-x'){
+        ceil = Math.ceil(width / imageInfo.width);
+        if (ceil < 2) ceil = 2;
+        width = imageInfo['width'] * ceil;
+      }
+
+      height += imageInfo['spritepos_top'];
+      imageInfo['spritepos_top'] = height;
+
+      height += parseInt(imageInfo.height, 10);
+      //bottom padding
+      if (params.bottom){
+        height += parseInt(params.bottom, 10);
+      } else if (box.height) {
+        var bottom = box.height - imageInfo['spritepos_top'] - 
+                     imageInfo['height'];
+        height += bottom > 0 ? bottom : 0;
+      }
+
+    } else if(layout === 'horizontal'){
+      var imageHeight = imageInfo.height + imageInfo['spritepos_top'];
+
+      if (imageHeight> height) height = imageHeight;
+
+      //position计算
+      top = imageInfo['align'] || '0';
+      left = width;
+      if (left && imageInfo.width < width){
+        left = '-' + left + 'px';
+      } else {
+        left = '0';
+      }
+
+      //repeat时候必须是整数倍宽度
+      if (imageInfo['repeat'] == 'repeat-y'){
+        ceil = Math.ceil(height / imageInfo.height);
+        if (ceil < 2) ceil = 2;
+        height = imageInfo['height'] * ceil;
+      }
+
+      width += imageInfo['spritepos_left'];
+      imageInfo['spritepos_left'] = width;
+
+      width += parseInt(imageInfo.width, 10);
+      //bottom padding
+      if (params.right){
+        width += parseInt(params.right, 10);
+      } else if (box.width) {
+        var right = box.width - imageInfo['spritepos_left'] - 
+                    imageInfo['width'];
+        width += right > 0 ? right : 0;
+      }
+
+    }
+
+    imageInfo['position'] = left + ' ' + top;
     sprites['images'][imageInfo['file_location']] = imageInfo;
     sprites['width'] = width;
     sprites['height'] = height;
@@ -321,7 +437,7 @@ StdClass.extend(SpriteDef, StdClass, {
       }, true);
     });
 
-    fs.writeFile(spriteFile, this.cssReult, function(err, data){
+    fs.writeFile(spriteFile, this.cssResult, function(err, data){
       console.log(err);
       console.log(data);
     });
@@ -329,23 +445,22 @@ StdClass.extend(SpriteDef, StdClass, {
 
   writeSpriteRule: function(rule, def){
     var repeat = def['repeat'];
-    var position = [def['spritepos_left'] + 'px', def['spritepos_top'] + 'px'];
     var self = this;
     var backgroudProp = ['background', 'background-position', 
       'background-repeat', 'background-image'];
 
-    self.cssReult += rule.selector.join(', ') + " {\n";
+    self.cssResult += rule.selector.join(', ') + " {\n";
     forEach(rule.property, function(prop, i){
       if (backgroudProp.indexOf(prop) == -1){
-        self.cssReult += '  ' + rule.property[i] + ': ' + rule.value[i] + ';\n';
+        self.cssResult += '  ' + rule.property[i] + ': ' + rule.value[i] + ';\n';
       }
     });
 
     if (repeat !== 'no-repeat'){
-      self.cssReult += '  background-repeat: ' + repeat + ';\n';
+      self.cssResult += '  background-repeat: ' + repeat + ';\n';
     }
-    self.cssReult += '  background-position: ' + position.join(', ') + ';\n';
-    self.cssReult += "}\n";
+    self.cssResult += '  background-position: ' + def.position + ';\n';
+    self.cssResult += "}\n";
   },
 
   coords: function(box){
@@ -361,7 +476,7 @@ StdClass.extend(SpriteDef, StdClass, {
 
     ret.repeat = repeat;
     if (position){
-      if (position.x !== 'right') ret['align'] = 'left';
+      if (position.x == 'right') ret['align'] = 'right';
 
       //is number
       if (+position.x) ret['spritepos_left'] = parseInt(position.x, 10);
