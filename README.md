@@ -76,6 +76,7 @@ url参数指的是上面css中，background的url中那一段`?id=1&way=h`，表
 图，排列方式way为水平horizontal
   
 参数以及对应的意义
+```
 | 参数名 | 参数全名   | 参数的值   | 意义与作用                   | 使用实例    |
 |--------|------------|------------|------------------------------|-------------|
 | esc    | escape     | ''         | 图片无需拼图                 | a.png?esc   |
@@ -86,6 +87,7 @@ url参数指的是上面css中，background的url中那一段`?id=1&way=h`，表
 | bg     | background | color      | 背景色，默认值是ffffff7f[g]  |             |
 | b      | bottom     | \d         | 图片设置margin bottom[v]     | a.png?b=10  |
 | r      | right      | \d         | 图片设置margin right[h]      | a.ong?r=10  |
+```
 说明：表格中，[g]标志表示为组范围内定义，一组只需定义定一个出现的图片。[h]标
 志说明，只有在水平布局[horizontal]下才有效，[v]表示只在垂直布局[vertical]有
 效。其他都是针对单个图片设置的
