@@ -25,6 +25,7 @@ var a = {
 var ks = Object.keys(a);
 console.log(ks);
 ks.sort(function(a1, a2){
+  debugger;
   return +a[a1].width - a[a2].width;
 });
 ks.forEach(function(val){

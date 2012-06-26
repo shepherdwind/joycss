@@ -3,12 +3,12 @@
   background-image: url(../img/test1-sprite.png);
   background-repeat: no-repeat;
 }
-.main-right .dapei h2,
-.main-left .diy h2,
 .main-right .jieri h2,
 .main-left .hunli h2,
 .main-right .huabao h2,
 .main-left .jiaju h2,
+.main-right .dapei h2,
+.main-left .diy h2,
 .main-right .shenghuo h2 {
   background-image: url(../img/test-sprite.png);
   background-repeat: no-repeat;

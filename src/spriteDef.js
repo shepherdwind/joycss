@@ -9,7 +9,6 @@ var util      = require('util');
 var fs        = require('fs');
 var Box       = require('../lib/box');
 var url       = require('url');
-var ESC_KEY   = 'esc';
 var PARAMS    = {
   'nosprite' : 'esc',
   'direction' : 'way',
@@ -281,9 +280,7 @@ StdClass.extend(SpriteDef, StdClass, {
   setPos: function(){
     var imagesDef = this.imagesDef;
     //排序
-    var imgs = Object.keys(imagesDef).sort(function(img1, img2){
-      return imagesDef[img2].width - imagesDef[img1].width;
-    });
+    var imgs = Object.keys(imagesDef);
 
     var self = this;
 
@@ -295,6 +292,15 @@ StdClass.extend(SpriteDef, StdClass, {
       mixin(self.coords(box), imageInfo);
 
       self.setImageInfo(box, imageInfo);
+    });
+
+    //拼图算法接口调用
+    forEach(this.sprites, function(sprite){
+      var layout = sprite.layout;
+      var Locate = require('./locating/' + layout);
+      var Loc = new Locate(sprite.images, imagesDef);
+      sprite.height = Loc.height;
+      sprite.width = Loc.width;
     });
 
     this.createSprite();
@@ -309,86 +315,9 @@ StdClass.extend(SpriteDef, StdClass, {
     //sprite图片地址
     var spriteId = params.id ? basename + params.id : basename;
     var sprites = this.sprites[spriteId];
-    var layout = this.sprites[spriteId]['layout'];
 
-    var width = sprites['width'];
-    var height = sprites['height'];
-
-    var left, top, ceil;
-    if (layout == 'vertical'){
-      var imageWidth = imageInfo.width + imageInfo['spritepos_left'];
-
-      if (imageWidth> width) width = imageWidth;
-
-      //position计算
-      left = imageInfo['align'] || '0';
-      top = height;
-      if (top && imageInfo.height < height){
-        top = '-' + top + 'px';
-      } else {
-        top = 0;
-      }
-
-      //repeat时候必须是整数倍宽度
-      if (imageInfo['repeat'] == 'repeat-x'){
-        ceil = Math.ceil(width / imageInfo.width);
-        if (ceil < 2) ceil = 2;
-        width = imageInfo['width'] * ceil;
-      }
-
-      height += imageInfo['spritepos_top'];
-      imageInfo['spritepos_top'] = height;
-
-      height += parseInt(imageInfo.height, 10);
-      //bottom padding
-      if (params.bottom){
-        height += parseInt(params.bottom, 10);
-      } else if (box.height) {
-        var bottom = box.height - imageInfo['spritepos_top'] - 
-                     imageInfo['height'];
-        height += bottom > 0 ? bottom : 0;
-      }
-
-    } else if(layout === 'horizontal'){
-      var imageHeight = imageInfo.height + imageInfo['spritepos_top'];
-
-      if (imageHeight> height) height = imageHeight;
-
-      //position计算
-      top = imageInfo['align'] || '0';
-      left = width;
-      if (left && imageInfo.width < width){
-        left = '-' + left + 'px';
-      } else {
-        left = '0';
-      }
-
-      //repeat时候必须是整数倍宽度
-      if (imageInfo['repeat'] == 'repeat-y'){
-        ceil = Math.ceil(height / imageInfo.height);
-        if (ceil < 2) ceil = 2;
-        height = imageInfo['height'] * ceil;
-      }
-
-      width += imageInfo['spritepos_left'];
-      imageInfo['spritepos_left'] = width;
-
-      width += parseInt(imageInfo.width, 10);
-      //bottom padding
-      if (params.right){
-        width += parseInt(params.right, 10);
-      } else if (box.width) {
-        var right = box.width - imageInfo['spritepos_left'] - 
-                    imageInfo['width'];
-        width += right > 0 ? right : 0;
-      }
-
-    }
-
-    imageInfo['position'] = left + ' ' + top;
-    sprites['images'][imageInfo['file_location']] = imageInfo;
-    sprites['width'] = width;
-    sprites['height'] = height;
+    sprites['images'][imageInfo['file_location']] = mixin(imageInfo, {});
+    imageInfo.box = box;
   },
 
   /**
