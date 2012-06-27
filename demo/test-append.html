@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Test</title>
+  <link rel="stylesheet" href="css/append.css" id="J_css"/>
+</head>
+<body>
+
+  <div class="main-right main-left">
+    <button id="J_btn">切换sprite样式</button>
+    <div class="fenlei">
+    	<h2>分类</h2>
+    </div>
+    <div class="tese">
+      <h2>test</h2>
+    </div>
+    <div class="zhuti">
+      <h2>zhuanti</h2>
+    </div>
+    <div class="jieri">
+      <h2>节日</h2>
+    </div>
+    <div class="hunli">
+      <h2>婚礼</h2>
+    </div>
+    <div class="huabao">
+      <h2>画报</h2>
+    </div>
+    <div class="jiaju">
+      <h2>家俱</h2>
+    </div>
+    <div class="dapei">
+      <h2>搭配</h2>
+    </div>
+  	<div class="shenghuo">
+  		<h2>生活</h2>
+  	</div>
+  </div>
+  <script type="text/javascript">
+    var btn = document.getElementById('J_btn');
+    var style = document.getElementById('J_css');
+    var isSpriteStyle = false;
+    var id = 1;
+    btn.onclick = function(){
+      style.href = (isSpriteStyle ? 'css/append.css' : 'css/append.sprite.css') + '?t=' + id;
+      btn.innerHTML = !isSpriteStyle ? '切换到源样式' : '切换到sprite样式';
+      isSpriteStyle = !isSpriteStyle;
+      id++;
+    };
+  </script>
+
+</body>
+</html>  

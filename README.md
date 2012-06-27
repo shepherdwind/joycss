@@ -3,19 +3,14 @@ cssPaser
 
 ###什么是cssParser
 
-cssParser是一个基于nodejs和php的自动拼图工具。自动拼图的工具已经有不少了，比如
-cssgaga， smartsprite等等，为嘛还要自己做呢。主要问题还是，这些工具的使用，不够
-简单。我所想象的css图片处理工具需要做到，尽可能简单，可自定义化，能够集成，自动
-发布。
+说明：详细文档，请看：[文档](http://git.shepherdwind.com/cssParser.html) 
+
+cssParser是一个基于nodejs和php的自动拼图工具。
 
 cssParser的目标：*使用尽可能简单，功能尽可能强大* 。
 
-在默认情况下，cssParser假设一个css中所有的非http地址的图片都是需要sprite拼图的，
-开发者按照正常的模式写css，然后，cssParser通过分析css文件，把css中需要拼图的图片
-合并到一起，然后重写生成合适的css文件。在拼图过程中，cssParser会自动分析css每个
-背景图定位的规则，计算出应该需要的位置，如果css本身的信息实在不足够的情况下，需
-要开发写一些api接口，让cssParser知道应该如何处理。
-
+首先来个例子体验一下吧：
+example:: [test.css](https://github.com/shepherdwind/cssParser/blob/master/demo/css/test.css) vs [tes.sprite.css](https://github.com/shepherdwind/cssParser/blob/master/demo/css/test.sprite.css) 
 ###支持的特性
 
 根据现有的需求，主要实现以下特性：
@@ -29,6 +24,7 @@ cssParser的目标：*使用尽可能简单，功能尽可能强大* 。
 计划中需要实现的功能
 - 开发模式到发布过程的简单切换——通过结合Plum实现
 - 支持在已有sprite图片上增加或修改sprite图片
+- 自动计算布局方式，使用最有布局
 
 ###如何使用
 
@@ -65,17 +61,18 @@ background可以分开(position, image, repeat)写或者写在一起，不过，
 
 cssParser的所有与开发者交互，都是通过背景图url参数来实现的，比如
 
-{{{css
+```
 .main-right .tese h2 {
   background: url(../img/fenlei.png?id=1&way=h) repeat-y 0 0;
   width: 480px;
 }
-  }}}
+```
   
 url参数指的是上面css中，background的url中那一段`?id=1&way=h`，表示第二组sprite
 图，排列方式way为水平horizontal
   
 参数以及对应的意义
+
 ```
 | 参数名 | 参数全名   | 参数的值   | 意义与作用                   | 使用实例    |
 |--------|------------|------------|------------------------------|-------------|
@@ -88,6 +85,7 @@ url参数指的是上面css中，background的url中那一段`?id=1&way=h`，表
 | b      | bottom     | \d         | 图片设置margin bottom[v]     | a.png?b=10  |
 | r      | right      | \d         | 图片设置margin right[h]      | a.ong?r=10  |
 ```
+
 说明：表格中，[g]标志表示为组范围内定义，一组只需定义定一个出现的图片。[h]标
 志说明，只有在水平布局[horizontal]下才有效，[v]表示只在垂直布局[vertical]有
 效。其他都是针对单个图片设置的
@@ -147,4 +145,13 @@ sprite图片名是文件名加上spriteId加上-sprite组成的，比如文件a.
 
 ###其他
 
-暂无
+非常感谢Alexander Kaupp提供的php版本
+[smartsprite](http://www.tanila.de/smartsprite/index.php), 如果没有这个拼图过程
+的api，cssParser还是在摸索如何拼图中，smartsprite提供了很好的拼图功能
+，`src/graph/smartsprite.php`中，把smartsprite的拼图功能独立出来，通过
+`src/graph/tpl.json`这样的json文件作为数据源，php版的smartsprite完成图片处理过程
+， node执行css分析过程。
+
+此外,`lib/PropertyValuePart.js`使用了
+[nzakas/parser-lib](https://github.com/nzakas/parser-lib) 中的
+`src/css/PropertyValuePart.js`，一个很好的css value读取代码。

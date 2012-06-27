@@ -29,33 +29,44 @@ Horizontal.prototype = {
 
     if (imageHeight> height) height = imageHeight;
 
-    //position计算
-    top = imageInfo['align'] || '0';
-    left = width;
-    if (left && imageInfo.width < width){
-      left = '-' + left + 'px';
+    //设置固定的坐标
+    var coods = params.cood;
+
+    if (!coods){
+      //position计算
+      top = imageInfo['align'] || '0';
+      left = width;
+      if (left && imageInfo.width < width){
+        left = '-' + left + 'px';
+      } else {
+        left = '0';
+      }
+
+      //repeat时候必须是整数倍宽度
+      if (imageInfo['repeat'] == 'repeat-y'){
+        var ceil = Math.ceil(height / imageInfo.height);
+        if (ceil < 2) ceil = 2;
+        height = imageInfo['height'] * ceil;
+      }
+
+      width += imageInfo['spritepos_left'];
+      imageInfo['spritepos_left'] = width;
+
+      width += parseInt(imageInfo.width, 10);
+      //bottom padding
+      if (params.right){
+        width += parseInt(params.right, 10);
+      } else if (box.width) {
+        var right = box.width - imageInfo['spritepos_left'] - 
+                    imageInfo['width'];
+        width += right > 0 ? right : 0;
+      }
     } else {
-      left = '0';
-    }
-
-    //repeat时候必须是整数倍宽度
-    if (imageInfo['repeat'] == 'repeat-y'){
-      var ceil = Math.ceil(height / imageInfo.height);
-      if (ceil < 2) ceil = 2;
-      height = imageInfo['height'] * ceil;
-    }
-
-    width += imageInfo['spritepos_left'];
-    imageInfo['spritepos_left'] = width;
-
-    width += parseInt(imageInfo.width, 10);
-    //bottom padding
-    if (params.right){
-      width += parseInt(params.right, 10);
-    } else if (box.width) {
-      var right = box.width - imageInfo['spritepos_left'] - 
-                  imageInfo['width'];
-      width += right > 0 ? right : 0;
+      coods = JSON.parse(coods);
+      left = coods[0] + 'px';
+      top = coods[1] ? coods[1] + 'px': coods[1];
+      imageInfo['spritepos_top'] =  coods[1];
+      imageInfo['spritepos_left'] = Math.abs(coods[0]);
     }
 
     this.images[img]['spritepos_top'] = imageInfo['spritepos_top'];
@@ -67,13 +78,28 @@ Horizontal.prototype = {
 
   sortImgs: function(){
     var images = this.images;
+    var imagesDef = this.spriteDef;
     var imgsList = Object.keys(images);
+
     imgsList.sort(function(img1, img2){
-      return images[img2]['height'] - images[img1]['height'];
+      var imageInfo1 = imagesDef[img1];
+      var params1 = imageInfo1.box.background.params;
+
+      var imageInfo2 = imagesDef[img2];
+      var params2 = imageInfo2.box.background.params;
+
+      //base参数，强制放在前面
+      if ('base' in params1){
+        return -1;
+      } else if('base' in params2) {
+        return 1;
+      } else {
+
+        return images[img2]['height'] - images[img1]['height'];
+      }
     });
     return imgsList;
   }
 };
 
 module.exports = Horizontal;
-

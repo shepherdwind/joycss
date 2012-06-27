@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+var parser = require('../src/spriteDef');
+var argv = process.argv.slice();
+var path = require('path');
+var input = path.resolve(process.cwd(), argv[2]);
+debugger;
+new parser({
+  file: input
+});

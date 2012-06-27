@@ -5,6 +5,7 @@ var StdClass  = require('../lib/stdclass');
 var Api       = require('./graph/api');
 var some      = require('../lib/utils').some;
 var forEach   = require('../lib/utils').forEach;
+var mixin     = require('../lib/utils').mixin;
 var util      = require('util');
 var fs        = require('fs');
 var Box       = require('../lib/box');
@@ -28,16 +29,9 @@ var conf = {
   "margin"     : 0
 };
 
-function mixin(from, to){
-  forEach(from, function(val, key){
-    to[key] = val;
-  });
-  return to;
-}
-
-var imageUrlReg = /url\(['"]*([a-z0-9A-Z&?=_\-.\/\\]+)['"]*\)/;
+var imageUrlReg = /url\(['"]*([a-z0-9A-Z&?=_\-.,\[\]\/\\]+)['"]*\)/;
 //console.log(imageUrlReg.exec('background: red;'));
-//console.log(imageUrlReg.exec('background: url("b\\a.png") top left;'));
+//console.log(imageUrlReg.exec('background: url("b\\a.png?cood=[0,-230]") top left;'));
 
 function SpriteDef (){
   StdClass.apply(this, arguments);
@@ -142,6 +136,8 @@ StdClass.extend(SpriteDef, StdClass, {
   getRule: function(e){
     var property = e.property;
     var imageIndex = property.indexOf('background');
+
+    if (imageIndex == -1) imageIndex = property.indexOf('background-image');
 
     if (imageIndex > -1) {
       this.collectImages(e, imageIndex);
@@ -309,7 +305,7 @@ StdClass.extend(SpriteDef, StdClass, {
   setImageInfo: function(box, imageInfo){
     var id = this.get('id');
     var background = box.background;
-    var params = background.params;
+    var params = background.params || {};
     var basename = this.get('basename');
 
     //sprite图片地址
@@ -331,6 +327,11 @@ StdClass.extend(SpriteDef, StdClass, {
   },
 
   writeCssBack: function(err, data){
+    if (err) throw new Error(err);
+
+    data = JSON.parse(data);
+    console.log(data.info.join(''));
+
     var file = this.get('file');
     var spriteFile = file.replace('.css', '.sprite.css');
     var cssReader = this.cssReader;
@@ -346,7 +347,10 @@ StdClass.extend(SpriteDef, StdClass, {
         this.writeRule(rule);
       } else {
         img = this.images[index];
-        multSelector[img] = rule.selector;
+
+        //合并selector，处理一个图片有多个selector的情况
+        multSelector[img] = multSelector[img] || [];
+        multSelector[img] = multSelector[img].concat(rule.selector);
         this.writeSpriteRule(rule, this.imagesDef[img]);
         index = indexs.shift();
       }
@@ -367,8 +371,7 @@ StdClass.extend(SpriteDef, StdClass, {
     });
 
     fs.writeFile(spriteFile, this.cssResult, function(err, data){
-      console.log(err);
-      console.log(data);
+      if (!err) console.log('success');
     });
   },
 
@@ -378,7 +381,7 @@ StdClass.extend(SpriteDef, StdClass, {
     var backgroudProp = ['background', 'background-position', 
       'background-repeat', 'background-image'];
 
-    self.cssResult += rule.selector.join(', ') + " {\n";
+    self.cssResult += rule.selector.join(', \n') + " {\n";
     forEach(rule.property, function(prop, i){
       if (backgroudProp.indexOf(prop) == -1){
         self.cssResult += '  ' + rule.property[i] + ': ' + rule.value[i] + ';\n';
