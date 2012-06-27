@@ -1,3 +1,5 @@
+var forEach = require('../../lib/utils').forEach;
+var GrowingPacker = require('../../lib/packer');
 /**
  * 垂直布局算法，计算图片位置spritepos_left和spritepos_top，大图的宽度高度
  * @param {object} images 图片对象，记录align, height, width, repeat
@@ -8,14 +10,62 @@ function Vertical(images, spriteDef){
   this.spriteDef = spriteDef;
   this.width = 0;
   this.height = 0;
+  this.labels = {
+    //固定定位
+    fix: [],
+    //占独立一行
+    line: [],
+    //紧凑拼图
+    close: []
+  };
+  this.blocks = [];
   this.init();
 }
 
 Vertical.prototype = {
   constructor: Vertical,
   init: function(){
-    var imgList = this.sortImgs();
-    imgList.forEach(this.siteImg, this);
+    var spriteDef = this.spriteDef;
+    var labels = this.labels;
+
+    forEach(spriteDef, this.setLables, this);
+
+    this.sortImgs(labels.line);
+    this.sortImgs(labels.close);
+
+    forEach(labels.close, this.setBlocks, this);
+
+    var packer = new GrowingPacker();
+    packer.fit(this.blocks);
+    debugger;
+    this.width = packer.root.w;
+    this.height = packer.root.h;
+    forEach(labels.close, this.closeSiteImg, this);
+    forEach(labels.line, this.siteImg, this);
+  },
+
+  setBlocks: function(img){
+    var spriteDef = this.spriteDef;
+    var def = spriteDef[img];
+    var box = def.box;
+    var blocks = this.blocks;
+    blocks.push({w: box.width, h: def.height});
+  },
+
+  closeSiteImg: function(img, i){
+    var fit = this.blocks[i].fit;
+    this.spriteDef[img]['coods'] = [fit.x, fit.y];
+    this.siteImg(img, i);
+  },
+
+  setLables: function(val, img){
+    var labels = this.labels;
+    var box = val.box;
+    if (box.hasWidth){
+      labels.close.push(img);
+    } else {
+      labels.line.push(img);
+    }
   },
 
   siteImg: function(img, i){
@@ -29,7 +79,7 @@ Vertical.prototype = {
     if (imageWidth> width) width = imageWidth;
 
     //设置固定的坐标
-    var coods = params.cood;
+    var coods = imageInfo.coods || params.cood || '';
 
     if (!coods) {
       //position计算
@@ -40,7 +90,6 @@ Vertical.prototype = {
       } else {
         top = 0;
       }
-
 
       //repeat时候必须是整数倍宽度
       if (imageInfo['repeat'] == 'repeat-x'){
@@ -62,7 +111,7 @@ Vertical.prototype = {
         height += bottom > 0 ? bottom : 0;
       }
     } else {
-      coods = JSON.parse(coods);
+      coods = coods instanceof Array ? coods : JSON.parse(coods);
       top = coods[1] + 'px';
       left = coods[0] ? coods[0] + 'px': coods[0];
       imageInfo['spritepos_top'] =  Math.abs(coods[1]);
@@ -76,10 +125,9 @@ Vertical.prototype = {
     this.height = height;
   },
 
-  sortImgs: function(){
-    var images = this.images;
+  sortImgs: function(imgsList){
     var imagesDef = this.spriteDef;
-    var imgsList = Object.keys(images);
+    var images = this.images;
 
     imgsList.sort(function(img1, img2){
       var imageInfo1 = imagesDef[img1];
@@ -97,8 +145,6 @@ Vertical.prototype = {
         return images[img2]['width'] - images[img1]['width'];
       }
     });
-
-    return imgsList;
   }
 };
 
