@@ -1,29 +1,35 @@
-cssPaser
+JoyCss
 --------
 
-###什么是cssParser
+###什么是joycss
 
-说明：详细文档，请看：[文档](http://git.shepherdwind.com/cssParser.html) 
+说明：详细文档，请看：[文档](http://git.shepherdwind.com/joycss.html) 
 
-cssParser是一个基于nodejs和php的自动拼图工具。
+joycss是一个基于nodejs和php的自动拼图工具。
+joycss的目标：*使用尽可能简单，功能尽可能强大* 。
 
-cssParser的目标：*使用尽可能简单，功能尽可能强大* 。
+css生成后的效果：[test.css](https://github.com/shepherdwind/joycss/blob/master/demo/css/test.css) vs [tes.sprite.css](https://github.com/shepherdwind/joycss/blob/master/demo/css/test.sprite.css) 
+使用
 
-首先来个例子体验一下吧：
-example:: [test.css](https://github.com/shepherdwind/cssParser/blob/master/demo/css/test.css) vs [tes.sprite.css](https://github.com/shepherdwind/cssParser/blob/master/demo/css/test.sprite.css) 
+```
+npm install -g joycss
+
+joycss xx.css
+```
+
 ###支持的特性
 
 根据现有的需求，主要实现以下特性：
 - sprite分组支持，可以在同一个css文件合并成多个sprite图片
 - sprite支持垂直和水平两种布局方式，使用非紧密拼图，和smartsprite效果一致
 - x或者y方向图片平铺支持，图片水平排列支持y方向拼图，垂直排列则相反
+- 支持在已有sprite图片上增加或修改sprite图片，支持追加和覆盖两种形式
 - 支持png8和png24背景透明，默认情况下，使用png8透明
 - 支持通过在css规则中的line-height或者height，width等属性，定位图片应该的位置
 - sprite图片位置自定义设置，所有的配置都通过背景图url参数方式，比如：`a.png?id=1`
 
 计划中需要实现的功能
 - 开发模式到发布过程的简单切换——通过结合Plum实现
-- 支持在已有sprite图片上增加或修改sprite图片
 - 自动计算布局方式，使用最有布局
 
 ###如何使用
@@ -59,7 +65,7 @@ background可以分开(position, image, repeat)写或者写在一起，不过，
 
 ####url参数使用说明
 
-cssParser的所有与开发者交互，都是通过背景图url参数来实现的，比如
+joycss的所有与开发者交互，都是通过背景图url参数来实现的，比如
 
 ```
 .main-right .tese h2 {
@@ -147,7 +153,7 @@ sprite图片名是文件名加上spriteId加上-sprite组成的，比如文件a.
 
 非常感谢Alexander Kaupp提供的php版本
 [smartsprite](http://www.tanila.de/smartsprite/index.php), 如果没有这个拼图过程
-的api，cssParser还是在摸索如何拼图中，smartsprite提供了很好的拼图功能
+的api，joycss还是在摸索如何拼图中，smartsprite提供了很好的拼图功能
 ，`src/graph/smartsprite.php`中，把smartsprite的拼图功能独立出来，通过
 `src/graph/tpl.json`这样的json文件作为数据源，php版的smartsprite完成图片处理过程
 ， node执行css分析过程。
