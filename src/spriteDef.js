@@ -327,7 +327,7 @@ StdClass.extend(SpriteDef, StdClass, {
   },
 
   writeCssBack: function(err, data){
-    if (err) throw new Error(err);
+    if (err) throw new Error(data);
 
     debugger;
     data = JSON.parse(data);

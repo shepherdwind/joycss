@@ -22,7 +22,7 @@ var Api = {
 
     var ret = '';
     var err = false;
-    var cmd = spawn(phpCmd, [sizeCmd].concat(files));
+    var cmd = spawn(phpCmd, [sizeCmd].concat(files), {cwd: __dirname});
 
     cmd.stdout.on('data', function cmdSuccess(data){
       ret += data.toString();
@@ -50,7 +50,7 @@ var Api = {
 
     var ret = '';
     var err = false;
-    var cmd = spawn(phpCmd, [combineCmd].concat(conf));
+    var cmd = spawn(phpCmd, [combineCmd].concat(conf), {cwd: __dirname});
 
     callback = callback || function(err, ret){
       console.log(ret);
