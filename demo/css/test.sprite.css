@@ -42,19 +42,19 @@
 }
 .main-right .jieri h2 {
   width: 80px;
-  background-position: 0 -92px;
+  background-position: -120px 0;
 }
 .main-left .hunli h2 {
   width: 80px;
-  background-position: 0 -138px;
+  background-position: -120px -46px;
 }
 .main-right .huabao h2 {
   width: 80px;
-  background-position: 0 -184px;
+  background-position: 0 -92px;
 }
 .main-left .jiaju h2 {
   width: 80px;
-  background-position: 0 -230px;
+  background-position: -80px -92px;
 }
 .main-right .dapei h2 {
   width: 120px;
@@ -62,9 +62,9 @@
 }
 .main-left .diy h2 {
   width: 106px;
-  background-position: 0 0;
+  background-position: 0 -46px;
 }
 .main-right .shenghuo h2 {
   width: 80px;
-  background-position: 0 -276px;
+  background-position: 0 -138px;
 }

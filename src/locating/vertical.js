@@ -28,18 +28,26 @@ Vertical.prototype = {
     var spriteDef = this.spriteDef;
     var labels = this.labels;
 
-    forEach(spriteDef, this.setLables, this);
+    forEach(this.images, this.setLables, this);
 
     this.sortImgs(labels.line);
     this.sortImgs(labels.close);
 
     forEach(labels.close, this.setBlocks, this);
 
-    var packer = new GrowingPacker();
-    packer.fit(this.blocks);
-    debugger;
-    this.width = packer.root.w;
-    this.height = packer.root.h;
+    //大于3个时候才使用紧凑拼图
+    if (this.blocks.length > 2){
+      var packer = new GrowingPacker();
+      packer.fit(this.blocks);
+      this.width = packer.root.w;
+      this.height = packer.root.h;
+    } else {
+      labels.line = labels.close.concat(labels.line);
+      labels.close = [];
+      this.sortImgs(labels.line);
+    }
+
+    forEach(labels.fix, this.siteImg, this);
     forEach(labels.close, this.closeSiteImg, this);
     forEach(labels.line, this.siteImg, this);
   },
@@ -60,8 +68,12 @@ Vertical.prototype = {
 
   setLables: function(val, img){
     var labels = this.labels;
-    var box = val.box;
-    if (box.hasWidth){
+    var def = this.spriteDef[img];
+    var box = def.box;
+    var params = box.background.params;
+    if ('base' in params){
+      labels.fix.push(img);
+    } else if (box.hasWidth){
       labels.close.push(img);
     } else {
       labels.line.push(img);
@@ -79,7 +91,7 @@ Vertical.prototype = {
     if (imageWidth> width) width = imageWidth;
 
     //设置固定的坐标
-    var coods = imageInfo.coods || params.cood || '';
+    var coods = imageInfo.coods || params.coods || '';
 
     if (!coods) {
       //position计算
@@ -112,10 +124,14 @@ Vertical.prototype = {
       }
     } else {
       coods = coods instanceof Array ? coods : JSON.parse(coods);
-      top = coods[1] + 'px';
-      left = coods[0] ? coods[0] + 'px': coods[0];
-      imageInfo['spritepos_top'] =  Math.abs(coods[1]);
-      imageInfo['spritepos_left'] = coods[0];
+
+      top = Math.abs(coods[1]);
+      imageInfo['spritepos_top'] =  top;
+      top = top ? '-' + top + 'px' : top;
+
+      left = Math.abs(coods[0]);
+      imageInfo['spritepos_left'] = left;
+      left = left ? '-' + left + 'px': left;
     }
 
     this.images[img]['spritepos_top'] = imageInfo['spritepos_top'];

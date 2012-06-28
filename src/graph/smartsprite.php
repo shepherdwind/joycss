@@ -119,7 +119,6 @@ class SmartSprite
                         } 
                         break;
                     case 'repeat-y':
-                        echo 'repeat-y';
                         $nHeight = 0;
                         while($nHeight <= $h) {
                             imagecopyresampled($image,$subimg,

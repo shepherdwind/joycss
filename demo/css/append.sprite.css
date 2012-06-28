@@ -6,7 +6,7 @@
 .main-left .diy h2,
 .main-right .shenghuo h2,
 .main-left .zhuti h2,
-.main-left .jiaju h2 {
+.main-left .hunli h2 {
   background-image: url(../img/append-sprite.png);
   background-repeat: no-repeat;
 }
@@ -17,10 +17,10 @@
 }
 .main-right .jieri h2, 
 .main-left .hunli h2, 
-.main-right .huabao h2 {
+.main-right .huabao h2, 
+.main-left .jiaju h2 {
   background-position: 0 0;
 }
-.main-left .jiaju h2, 
 .main-right .dapei h2, 
 .main-left .diy h2, 
 .main-right .shenghuo h2 {
@@ -51,23 +51,23 @@
 }
 .main-left .zhuti h2 {
   width: 148px;
-  background-position: 0 -322px;
+  background-position: 0 -184px;
 }
 .main-right .jieri h2 {
   width: 80px;
-  background-position: 0 -92px;
+  background-position: -120px 0;
 }
 .main-left .hunli h2 {
   width: 80px;
-  background-position: 0 -138px;
+  background-position: -120px -46px;
 }
 .main-right .huabao h2 {
   width: 80px;
-  background-position: 0 -184px;
+  background-position: 0 -92px;
 }
 .main-left .jiaju h2 {
-  width: 120px;
-  background-position: 0 -230px;
+  width: 80px;
+  background-position: -80px -92px;
 }
 .main-right .dapei h2 {
   width: 120px;
@@ -75,9 +75,9 @@
 }
 .main-left .diy h2 {
   width: 106px;
-  background-position: 0 0;
+  background-position: 0 -46px;
 }
 .main-right .shenghuo h2 {
   width: 80px;
-  background-position: 0 -276px;
+  background-position: 0 -138px;
 }

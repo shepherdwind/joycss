@@ -31,13 +31,13 @@ li.last {
 }
 
 @media print {
-    li.inline {
-      color: black;
-    }
+  li.inline {
+    color: black;
+  }
 
-    @top-left {
-      color: red;
-    }
+  @top-left {
+    color: red;
+  }
 }
 
 @page {
@@ -71,7 +71,7 @@ li.last {
 
   }
 
-    @top-left {
-      color: red;
-    }
+  @top-left {
+    color: red;
+  }
 }
