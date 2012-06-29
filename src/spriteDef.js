@@ -250,7 +250,7 @@ StdClass.extend(SpriteDef, StdClass, {
         var id = params['id'] || 0;
         //过滤图片
         if (!(PARAMS['nosprite'] in params)){
-          ret = imgurl.pathname.replace('\\', '/');
+          ret = imgurl.pathname.replace(/\\+/g, '/');
           //设置第一个图片为sprite图片位置
           if (!this.get('imgPath')){
             this.set('imgPath', path.dirname(ret));
@@ -314,7 +314,7 @@ StdClass.extend(SpriteDef, StdClass, {
 
     forEach(JSON.parse(data), function(def, file){
       filePath = path.relative(baseDir, file);
-      filePath = filePath.replace('\\', '/');
+      filePath = filePath.replace(/\\+/g, '/');
       imagesDef[filePath] = def;
     });
 
