@@ -197,7 +197,7 @@ StdClass.extend(SpriteDef, StdClass, {
     if (!isBegin){
       this.cssResult += cssResult;
     } else {
-      this.cssResult = cssResult + this.cssResult;
+      this.cssResult = cssResult + "\}\n" + this.cssResult;
     }
 
     forEach(subs, function(sub){
@@ -206,10 +206,7 @@ StdClass.extend(SpriteDef, StdClass, {
 
     if (!isBegin){
       this.cssResult += "}\n";
-    } else {
-      this.cssResult = "}\n" + this.cssResult;
     }
-
   },
 
   _ruleToStr: function(rule){
