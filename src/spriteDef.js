@@ -46,7 +46,8 @@ StdClass.extend(SpriteDef, StdClass, {
     ids: {},
     imgPath: '',
     //预处理数组
-    preParam: []
+    preParam: [],
+    ruleIds: []
   },
 
   CONSIT: {
@@ -110,7 +111,7 @@ StdClass.extend(SpriteDef, StdClass, {
   _bind: function(){
     var cssReader = this.cssReader;
     //收集css规则
-    cssReader.on(cssReader.get('RULE_END_EVT'), this.getRule, this);
+    cssReader.on('ruleEnd', this.getRule, this);
     //收集规则结束
     cssReader.on('change:timeEnd', this.cssEnd, this);
     this.on('change:imgPath', this.setImgPath);
@@ -135,10 +136,12 @@ StdClass.extend(SpriteDef, StdClass, {
    */
   getRule: function(e){
     var property = e.property;
+    var ruleIds = this.get('ruleIds');
     var imageIndex = property.indexOf('background');
 
     if (imageIndex == -1) imageIndex = property.indexOf('background-image');
 
+    ruleIds.push(e.id);
     if (imageIndex > -1) {
       this.collectImages(e, imageIndex);
     }
@@ -152,17 +155,64 @@ StdClass.extend(SpriteDef, StdClass, {
   writeRule: function(rule, isBegin){
     var self = this;
     var cssResult = '';
-    cssResult += rule.selector.join(",\n") + " {\n";
-    forEach(rule.property, function(p, i){
-      cssResult += '  ' + p + ': ' + rule.value[i] + ";\n";
+    var subs = [];
+    var selectors = [];
+
+    var index = 0;
+    function findNest(){
+      if (rule.property[index] instanceof Array){
+        return {
+          property: rule.property[index],
+          value: rule.value[index]
+        };
+      } else {
+        findNest(index++);
+      }
+    }
+
+    forEach(rule.selector, function(selector){
+      var sub = {
+        selector: [],
+        value: [],
+        property: []
+      };
+      if (selector instanceof Array){
+        sub = findNest();
+        sub.selector = selector;
+        index++;
+        subs.push(sub);
+      } else {
+        selectors.push(selector);
+      }
     });
-    cssResult += "}\n";
+
+    cssResult += selectors.join(",\n") + " {\n";
+
+    forEach(rule.property, function(p, i){
+      if (!(p instanceof Array)){
+        cssResult += '  ' + p + ': ' + rule.value[i] + ";\n";
+      }
+    });
 
     if (!isBegin){
       this.cssResult += cssResult;
     } else {
       this.cssResult = cssResult + this.cssResult;
     }
+
+    forEach(subs, function(sub){
+      this.writeRule(sub);
+    }, this);
+
+    if (!isBegin){
+      this.cssResult += "}\n";
+    } else {
+      this.cssResult = "}\n" + this.cssResult;
+    }
+
+  },
+
+  _ruleToStr: function(rule){
   },
 
   /**
@@ -233,7 +283,7 @@ StdClass.extend(SpriteDef, StdClass, {
    * 文件读取完毕
    * @next Api.getImagesSize -> this.setDef
    */
-  cssEnd: function(){
+  cssEnd: function(e){
     var images  = this.images;
     var baseDir = path.dirname(this.get('file'));
     var files   = {};
@@ -342,8 +392,9 @@ StdClass.extend(SpriteDef, StdClass, {
     var index = indexs.shift();
     var rule, img;
     var multSelector = {};
+    var ruleIds = this.get('ruleIds');
 
-    for (var i = 0; i < len; i++) {
+    forEach(ruleIds, function(i){
       rule = cssReader.getRule(i);
       if (index != i){
         this.writeRule(rule);
@@ -356,7 +407,8 @@ StdClass.extend(SpriteDef, StdClass, {
         this.writeSpriteRule(rule, this.imagesDef[img]);
         index = indexs.shift();
       }
-    }
+
+    }, this);
 
     var _this = this;
     forEach(this.sprites, function(sprites, spriteId){

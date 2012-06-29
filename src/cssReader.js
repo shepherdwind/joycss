@@ -150,6 +150,7 @@ StdClass.extend(CssReader, StdClass, {
       selectors = this.get('selectors');
       //delete the last selector
       selectors.pop();
+      this.attributes.nest.pop();
 
       return;
     } else if (e.old === 'valueStart') {
