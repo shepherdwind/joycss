@@ -47,7 +47,8 @@ StdClass.extend(SpriteDef, StdClass, {
     imgPath: '',
     //预处理数组
     preParam: [],
-    ruleIds: []
+    ruleIds: [],
+    layout: 'auto'
   },
 
   CONSIT: {
@@ -209,9 +210,6 @@ StdClass.extend(SpriteDef, StdClass, {
     }
   },
 
-  _ruleToStr: function(rule){
-  },
-
   /**
    * 获取css中背景图
    * @param css {object} css规则
@@ -331,9 +329,9 @@ StdClass.extend(SpriteDef, StdClass, {
     forEach(imgs, function(img){
       var imageInfo = imagesDef[img];
       var css = self.getCss(img);
-      var box = new Box(css.property, css.value);
+      var box = new Box(css.property, css.value, css.selector);
       imageInfo['file_location'] = img;
-      mixin(self.coords(box), imageInfo);
+      mixin(self.coords(box, imageInfo), imageInfo);
 
       self.setImageInfo(box, imageInfo);
     });
@@ -342,10 +340,10 @@ StdClass.extend(SpriteDef, StdClass, {
     forEach(this.sprites, function(sprite){
       var layout = sprite.layout;
       var Locate = require('./locating/' + layout);
-      var Loc = new Locate(sprite.images, imagesDef);
+      var Loc = new Locate(sprite.images, imagesDef, this.get('layout'));
       sprite.height = Loc.height;
       sprite.width = Loc.width;
-    });
+    }, this);
 
     this.createSprite();
   },
@@ -446,7 +444,7 @@ StdClass.extend(SpriteDef, StdClass, {
     self.cssResult += "}\n";
   },
 
-  coords: function(box){
+  coords: function(box, imageInfo){
     var ret = {
       "repeat"         : 'no-repeat',
       "align"          : '',
@@ -459,11 +457,33 @@ StdClass.extend(SpriteDef, StdClass, {
 
     ret.repeat = repeat;
     if (position){
+      //处理center
+      if (position.x === 'center'){
+        if (box.width){
+          position.x = Math.floor((box.width - imageInfo.width) / 2);
+        } else {
+          console.log('[Error info @]' + box.selector.join(', ') + 
+            ']use 50% for background-position but not set ');
+        }
+      }
+
+      if (position.y === 'center'){
+        if (box.width){
+          position.y = Math.floor((box.height - imageInfo.height) / 2);
+        } else {
+          console.log('[Error info @]' + box.selector.join(', ') + 
+            ']use 50% for background-position-y but not set height');
+        }
+      }
+
+
       if (position.x == 'right') ret['align'] = 'right';
 
       //is number
       if (+position.x) ret['spritepos_left'] = parseInt(position.x, 10);
       if (+position.y) ret['spritepos_top'] = parseInt(position.y, 10);
+
+
     }
 
     return ret;

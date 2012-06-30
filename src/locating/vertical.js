@@ -5,9 +5,10 @@ var GrowingPacker = require('../../lib/packer');
  * @param {object} images 图片对象，记录align, height, width, repeat
  * @param {object} spriteDef 图片对应的css规则
  */
-function Vertical(images, spriteDef){
+function Vertical(images, spriteDef, layout){
   this.images = images;
   this.spriteDef = spriteDef;
+  this.layout = layout;
   this.width = 0;
   this.height = 0;
   this.labels = {
@@ -73,7 +74,7 @@ Vertical.prototype = {
     var params = box.background.params;
     if ('base' in params){
       labels.fix.push(img);
-    } else if (box.hasWidth){
+    } else if (this.layout === 'auto' && box.hasWidth){
       labels.close.push(img);
     } else {
       labels.line.push(img);

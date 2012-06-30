@@ -1,10 +1,68 @@
 #!/usr/bin/env node
 
-var parser = require('../src/spriteDef');
-var argv = process.argv.slice();
+var argv = process.argv.slice(1);
 var path = require('path');
-var input = path.resolve(process.cwd(), argv[2]);
-debugger;
-new parser({
-  file: input
+var fs = require('fs');
+
+var config = {
+  file: '',
+  //布局方式
+  layout: 'auto'
+};
+
+var args = argv.filter(function(arg){
+  var match = arg.match(/^--?([a-z][0-9a-z-]*)(?:=([^\s]+))?$/i);
+  if (match) { 
+    arg = match[1];
+  } else { 
+    return arg;
+  }
+
+  switch (arg) {
+    case 'h':
+    case 'help': {
+      console.log("usage: joycss xx.css . See document " + 
+        "http://git.shepherdwind.com/joycss.html");
+      process.exit(0);
+    }
+
+    case 'y':
+    case 'vertical': {
+      config.layout = 'vertical';
+      break;
+    }
+
+    case 'x':
+    case 'horizontal': {
+      config.layout = 'horizontal';
+      break;
+    }
+
+    case 'v':
+    case 'version': {
+      var version = fs.readFileSync(path.resolve(__dirname, '../package.json'));
+      version = JSON.parse(version).version;
+      console.log("joycss " + version);
+      process.exit(0);
+    }
+
+  }
 });
+
+
+config.file = args[1];
+
+var exists = fs.existsSync || path.existsSync;
+if (!exists(config.file)){
+  console.log('no css file input or you file is not exists!');
+} else {
+  config.file = path.resolve(process.cwd(), config.file);
+  var parser = require('../src/spriteDef');
+
+  debugger;
+  new parser(config);
+}
+
+/**
+ * vim: ft=javascript:tw=80:
+ */
