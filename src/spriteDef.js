@@ -334,7 +334,7 @@ StdClass.extend(SpriteDef, StdClass, {
     forEach(imgs, function(img){
       var imageInfo = imagesDef[img];
       var css = self.getCss(img);
-      var box = new Box(css.property, css.value, css.selector);
+      var box = new Box(css.property, css.value, css.line);
       imageInfo['file_location'] = img;
       mixin(self.coords(box, imageInfo), imageInfo);
 
@@ -486,7 +486,7 @@ StdClass.extend(SpriteDef, StdClass, {
         if (box.width){
           position.x = Math.floor((box.width - imageInfo.width) / 2);
         } else {
-          console.log('[Error info @' + box.selector.join(', ') + 
+          console.log('[Error info @' + box.line + 
             ']use 50% for background-position but not set ');
         }
       }
@@ -495,7 +495,7 @@ StdClass.extend(SpriteDef, StdClass, {
         if (box.width){
           position.y = Math.floor((box.height - imageInfo.height) / 2);
         } else {
-          console.log('[Error info @]' + box.selector.join(', ') + 
+          console.log('[Error info @' + box.line + 
             ']use 50% for background-position-y but not set height');
         }
       }

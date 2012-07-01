@@ -79,6 +79,7 @@ StdClass.extend(CssReader, StdClass, {
     status : '',
     //nest level
     nest : [],
+    lines: [],
     timeStart : '',
     timeEnd : ''
   },
@@ -150,6 +151,9 @@ StdClass.extend(CssReader, StdClass, {
       selectors = this.get('selectors');
       //delete the last selector
       selectors.pop();
+      var lines = this.get('lines');
+      lines.pop();
+
       this.attributes.nest.pop();
 
       return;
@@ -185,7 +189,11 @@ StdClass.extend(CssReader, StdClass, {
   _addSelector: function addSelector(e){
     var isNew = e.old != 'selectorBreak';
     var selector = this._getLast(isNew);
-    selector && selector.push(e.data);
+    var lines = this.get('lines');
+    if (selector){
+      selector.push(e.data);
+      if (isNew) lines.push(e.line);
+    }
   },
 
   _addProperty: function addProperty(e){
@@ -220,6 +228,8 @@ StdClass.extend(CssReader, StdClass, {
       /*when @import url("booya.css") print, screen;*/
       if (e.old === 'selectorBreak'){
         data = selectors.pop().join(', ') + ', ';
+        var lines = this.get('lines');
+        lines.pop();
       }
 
       data += e.data;
@@ -231,6 +241,7 @@ StdClass.extend(CssReader, StdClass, {
     var selectors = this.get('selectors');
     var properties = this.get('properties');
     var values = this.get('values');
+    var lines = this.get('lines');
 
     i = parseInt(i, 10);
     if(this.getLen() > i){
@@ -238,7 +249,8 @@ StdClass.extend(CssReader, StdClass, {
         selector: selectors[i],
         property: properties[i],
         value: values[i],
-        id: i
+        id: i,
+        line: lines[i]
       };
     } else {
       return false;
@@ -282,7 +294,7 @@ StdClass.extend(CssReader, StdClass, {
    * shift the last recode
    * @param {string} ev event name
    */
-  _addEvent: function addEvent(ev, val){
+  _addEvent: function addEvent(ev, val, line){
 
     var history = this.get('history');
     var maxLen  = this.get('MAX_LEN_HISTORY');
@@ -290,7 +302,7 @@ StdClass.extend(CssReader, StdClass, {
 
     if (history.length > maxLen) history.shift();
 
-    this.set('status', ev, true, {data: val});
+    this.set('status', ev, true, {data: val, line: line});
   },
 
   /** 
@@ -306,13 +318,18 @@ StdClass.extend(CssReader, StdClass, {
     var comment = false;
     var len = data.length;
     var code = data[0];
+    var line = 1;
     var val;
     //console.log("one\n");
 
     while(code){
 
-      //comment end
-      if (code === 42 && data[i + 1] === 47){
+      if (code === 10 || code === 13){
+        var isoneLine = code === 10 && data[i - 1] === 13;
+        //isoneLine = isoneLine || (code === 10 && data[i - 1] === 13);
+        if (!isoneLine) line = line + 1;
+      } else if (code === 42 && data[i + 1] === 47){
+        //comment end 
         comment = false;
         i++;
         j = i + 1;
@@ -337,7 +354,7 @@ StdClass.extend(CssReader, StdClass, {
         }
 
         val = data.asciiSlice(j, i).replace(this.get('TRIM_REG'), '');
-        this._addEvent(dismember[code], val);
+        this._addEvent(dismember[code], val, line);
         j = i + 1;
       }
 
@@ -351,6 +368,7 @@ StdClass.extend(CssReader, StdClass, {
     //console.log(['end', this.get('timeEnd') - this.get('timeStart')]);
     //console.log(this.get('metas'));
     //console.log(this.get('selectors'));
+    //console.log(this.get('lines'));
     //console.log(this.get('properties'));
     //console.log(this.get('values'));
     assert.equal(this.get('selectors').length, this.get('values').length, 

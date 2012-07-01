@@ -13,3 +13,4 @@ Environment require:
 php cli with gd lib
 
 Documentation can be found at http://git.shepherdwind.com/joycss.html
+joycss@{version} {filename}

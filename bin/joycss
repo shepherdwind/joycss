@@ -26,7 +26,10 @@ var args = argv.filter(function(arg){
     case 'h':
     case 'help': {
       var help = fs.readFileSync(__dirname + '/help.txt');
-      console.log(help.toString());
+      var version = fs.readFileSync(path.resolve(__dirname, '../package.json'));
+      version = JSON.parse(version).version;
+      console.log(help.toString().replace('{version}', version).
+        replace('{filename}', __filename));
       process.exit(0);
     }
 
