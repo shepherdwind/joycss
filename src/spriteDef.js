@@ -11,8 +11,8 @@ var fs        = require('fs');
 var Box       = require('../lib/box');
 var url       = require('url');
 var PARAMS    = {
-  'nosprite' : 'esc',
-  'direction' : 'way',
+  'nosprite'   : 'esc',
+  'direction'  : 'way',
   'horizontal' : 'h'
 };
 
@@ -26,6 +26,7 @@ var conf = {
   "force8bit"  : true,
   "imagetype"  : 3,
   "layout"     : "vertical",
+  //默认间距
   "margin"     : 0
 };
 
@@ -48,7 +49,9 @@ StdClass.extend(SpriteDef, StdClass, {
     //预处理数组
     preParam: [],
     ruleIds: [],
-    layout: 'auto'
+    layout: 'auto',
+    force8bit: true,
+    background: 'ffffff7f'
   },
 
   CONSIT: {
@@ -62,6 +65,8 @@ StdClass.extend(SpriteDef, StdClass, {
 
     var basename = path.basename(file, '.css');
     this.set('basename', basename);
+    conf.force8bit = this.get('force8bit');
+    conf.background = this.get('background');
     /**
      * 所有sprites属性集合
      */
@@ -367,7 +372,21 @@ StdClass.extend(SpriteDef, StdClass, {
    * @next writeCssBack 回写css样式，生成sprite样式
    */
   createSprite: function(){
-    var cfg = JSON.stringify(this.sprites);
+    var sprites = mixin(this.sprites, {});
+
+    forEach(sprites, function(sprite, name){
+      if (!sprite.force8bit){
+        var file = name + '-ie6';
+        var spriteForIe = mixin(sprite, {});
+        spriteForIe = mixin({
+          force8bit: true,
+          filename: sprite.filename.replace(name, file)
+        }, spriteForIe);
+        sprites[name + '-ie6'] = spriteForIe;
+      }
+    });
+
+    var cfg = JSON.stringify(sprites);
     //拼图
     Api.mergeImages([this.get('file'), cfg], this.writeCssBack, this);
   },
@@ -412,11 +431,16 @@ StdClass.extend(SpriteDef, StdClass, {
         selectors = selectors.concat(multSelector[img]);
       });
 
-      _this.writeRule({
+      var rule = {
         'selector': selectors,
         'property': ['background-image', 'background-repeat'],
-        'value': ['url(' + sprites['filename'] + ')', 'no-repeat']
-      }, true);
+        'value': ['url(' + sprites['filename'] + ')!important', 'no-repeat']
+      };
+      if (!sprites.force8bit){
+        rule.property.push('_background-image');
+        rule.value.push(rule.value[0].replace(spriteId, spriteId + '-ie6'));
+      }
+      _this.writeRule(rule, true);
     });
 
     fs.writeFile(spriteFile, this.cssResult, function(err, data){
@@ -462,7 +486,7 @@ StdClass.extend(SpriteDef, StdClass, {
         if (box.width){
           position.x = Math.floor((box.width - imageInfo.width) / 2);
         } else {
-          console.log('[Error info @]' + box.selector.join(', ') + 
+          console.log('[Error info @' + box.selector.join(', ') + 
             ']use 50% for background-position but not set ');
         }
       }

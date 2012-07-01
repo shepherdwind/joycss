@@ -4,6 +4,10 @@ var argv = process.argv.slice(1);
 var path = require('path');
 var fs = require('fs');
 
+if (argv.length === 1){
+  //如果没有输入任何信息
+  argv.push('-h');
+}
 var config = {
   file: '',
   //布局方式
@@ -21,8 +25,8 @@ var args = argv.filter(function(arg){
   switch (arg) {
     case 'h':
     case 'help': {
-      console.log("usage: joycss xx.css . See document " + 
-        "http://git.shepherdwind.com/joycss.html");
+      var help = fs.readFileSync(__dirname + '/help.txt');
+      console.log(help.toString());
       process.exit(0);
     }
 
@@ -38,11 +42,32 @@ var args = argv.filter(function(arg){
       break;
     }
 
+    //全部使用紧凑拼图
+    case 'c':
+    case 'close': {
+      config.layout = 'close';
+      break;
+    }
+
+    //使用png24
+    case 'a':
+    case 'alpha': {
+      config.force8bit = false;
+      break;
+    }
+
+    //背景白色
+    case 'w':
+    case 'white': {
+      config.background = 'ffffff00';
+      break;
+    }
+
     case 'v':
     case 'version': {
       var version = fs.readFileSync(path.resolve(__dirname, '../package.json'));
       version = JSON.parse(version).version;
-      console.log("joycss " + version);
+      console.log("v" + version);
       process.exit(0);
     }
 

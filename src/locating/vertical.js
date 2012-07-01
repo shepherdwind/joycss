@@ -17,7 +17,9 @@ function Vertical(images, spriteDef, layout){
     //占独立一行
     line: [],
     //紧凑拼图
-    close: []
+    close: [],
+    //放置在最后
+    end: []
   };
   this.blocks = [];
   this.init();
@@ -51,6 +53,7 @@ Vertical.prototype = {
     forEach(labels.fix, this.siteImg, this);
     forEach(labels.close, this.closeSiteImg, this);
     forEach(labels.line, this.siteImg, this);
+    forEach(labels.end, this.siteImg, this);
   },
 
   setBlocks: function(img){
@@ -58,7 +61,18 @@ Vertical.prototype = {
     var def = spriteDef[img];
     var box = def.box;
     var blocks = this.blocks;
-    blocks.push({w: box.width, h: def.height});
+    var params = box.background.params;
+    //设置默认右边距
+    var width = def.width + def['spritepos_left'];
+    width += params.right ? params.right : 10;
+
+    var height = def.height + def['spritepos_top'];
+    height += params.bottom ? params.bottom : 10;
+
+    width = box.width > width ? box.width : width;
+    height = box.height > height ? box.height : height;
+
+    blocks.push({w: width, h: height});
   },
 
   closeSiteImg: function(img, i){
@@ -74,10 +88,21 @@ Vertical.prototype = {
     var params = box.background.params;
     if ('base' in params){
       labels.fix.push(img);
-    } else if (this.layout === 'auto' && box.hasWidth){
+    } else if ('end' in params) {
+      labels.end.push(img);
+    } else if (this.layout === 'auto' && box.hasWidth && 
+      box.width < (def.width + def.spritepos_left)* 3){//盒子宽度小于图片的3倍
       labels.close.push(img);
     } else {
-      labels.line.push(img);
+
+      if (this.layout == 'close' && !def['align'] && 
+        def['repeat'] == 'no-repeat' && 
+        box.width < (def.width + def.spritepos_left)* 3){
+
+        labels.close.push(img);
+      } else {
+        labels.line.push(img);
+      }
     }
   },
 
@@ -98,7 +123,8 @@ Vertical.prototype = {
       //position计算
       left = imageInfo['align'] || '0';
       top = height;
-      if (top && imageInfo.height < height){
+      //if (top && imageInfo.height < height){
+      if (top){
         top = '-' + top + 'px';
       } else {
         top = 0;
@@ -111,6 +137,7 @@ Vertical.prototype = {
         width = imageInfo['width'] * ceil;
       }
 
+      var bottom = box.height - imageInfo['spritepos_top'] - imageInfo['height'];
       height += imageInfo['spritepos_top'];
       imageInfo['spritepos_top'] = height;
 
@@ -118,20 +145,21 @@ Vertical.prototype = {
       //bottom padding
       if (params.bottom){
         height += parseInt(params.bottom, 10);
-      } else if (box.height) {
-        var bottom = box.height - imageInfo['spritepos_top'] - 
-                     imageInfo['height'];
+      } else if (box.hasHeight) {
         height += bottom > 0 ? bottom : 0;
+      } else {
+        //默认10像素间距
+        height += 10;
       }
     } else {
       coods = coods instanceof Array ? coods : JSON.parse(coods);
 
       top = Math.abs(coods[1]);
-      imageInfo['spritepos_top'] =  top;
+      imageInfo['spritepos_top'] =  top + imageInfo['spritepos_top'];
       top = top ? '-' + top + 'px' : top;
 
       left = Math.abs(coods[0]);
-      imageInfo['spritepos_left'] = left;
+      imageInfo['spritepos_left'] = left + imageInfo['spritepos_left'];
       left = left ? '-' + left + 'px': left;
     }
 

@@ -1,0 +1,15 @@
+Usage: joycss [ file.css ][options]
+       joycss [options] [ file.css ]
+
+Options:
+  -h, --help           print help info
+  -v, --version        print joycss's version
+  -y, --vertical       use vertical layout, do not use tight sprite images
+  -c, --close          merge images as close as possable
+  -a, --alpha          create sprite images use png24 formart
+  -w, --white          set sprite images background no transparent, white
+
+Environment require:
+php cli with gd lib
+
+Documentation can be found at http://git.shepherdwind.com/joycss.html

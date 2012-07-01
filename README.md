@@ -3,161 +3,91 @@ JoyCss
 
 ###什么是joycss
 
-说明：详细文档，请看：[文档](http://git.shepherdwind.com/joycss.html) 
 
 joycss是一个基于nodejs和php的自动拼图工具。
-joycss的目标：*使用尽可能简单，功能尽可能强大* 。
+joycss的目标：*使用简单，功能强大* 。
 
 css生成后的效果：[test.css](https://github.com/shepherdwind/joycss/blob/master/demo/css/test.css) vs [tes.sprite.css](https://github.com/shepherdwind/joycss/blob/master/demo/css/test.sprite.css) 
 使用
 
 ```
 npm install -g joycss
-
-joycss xx.css
+joycss -h
 ```
 
 ###支持的特性
 
-根据现有的需求，主要实现以下特性：
-- sprite分组支持，可以在同一个css文件合并成多个sprite图片
-- sprite支持垂直和水平两种布局方式，使用非紧密拼图，和smartsprite效果一致
+根据现有的需求，主要实现以下特点
+
+- 支持垂直，水平和紧凑拼图三者布局方式
+  - `joycss -c xx.css` 紧凑拼图
+  - `joycss -y xx.css` 垂直布局
+  - 水平布局也支持，不过不建议使用，使用url参数声明。请看文档。
+- 三种拼图布局可以混合使用，默认情况下，紧凑拼图和垂直布局同时使用，当可以通过
+  css规则确定合模型宽度，使用紧凑拼图，否则使用垂直布局方式。
+- 背景图定位自定义支持，默认布局形式下，背景图bottom和right是无法确定的，如果css
+  没有定义高度或宽度，默认bottom和right留10px间距。同时，可以使用url参数方式自定
+  义。
+- 支持多sprite图片，可以在同一个css文件合并成多个sprite图片
 - x或者y方向图片平铺支持，图片水平排列支持y方向拼图，垂直排列则相反
 - 支持在已有sprite图片上增加或修改sprite图片，支持追加和覆盖两种形式
-- 支持png8和png24背景透明，默认情况下，使用png8透明
-- 支持通过在css规则中的line-height或者height，width等属性，定位图片应该的位置
-- sprite图片位置自定义设置，所有的配置都通过背景图url参数方式，比如：`a.png?id=1`
+- 支持png8和png24背景透明，默认情况下，使用png8透明。`joycss -a xx.css`使用png24
+  在png24模式下，同时会生成png8的图片，用于兼容ie6。
 
-计划中需要实现的功能
-- 开发模式到发布过程的简单切换——通过结合Plum实现
-- 自动计算布局方式，使用最有布局
+###使用方式
 
-###如何使用
+使用非常简单，只要给我一个需要拼图的css文件，然后执行`joycss xx.css`，就好了
+。joycss会自动做好改完成的，生成sprite图片，重写background-position，生成新的
+sprite css文件。然后，检查一下，以下的情况，可能导致拼图出现异常的：
 
-第一步，按照正常方式书写css规则，比如
+* 背景图中本身就有sprite图片，这个最容易引起问题，本身已经做过一次拼图的，使用
+  background-position来定位的样式，如果只有一个sprite图，可以在此图后面追加，请
+  在图片url中声明`?base`, 这样sprite图所定义的背景定位保持原有状态，新的往后面追加
+  。如果，是有两个sprite，暂时无法支持同时修改两个sprite图片，请把这两个sprite增
+  加到过滤的图片范围，在图片的url中增加参数`?esc`。
 
-```
-.main-right .jieri h2 {
-  background: url(../img/jieri.png) no-repeat;
-  width: 80px;
-}
-.main-left .hunli h2 {
-  background: url(../img/hunli.png) no-repeat;
-  width: 80px;
-}
-.main-right .huabao h2 {
-  background: url(../img/huabao.png) no-repeat;
-  width: 80px;
-}
-```
+* css中没有声明高度，这种情况下，top和left定位是可以通过background-position来定位
+  的，而right可以通过宽度来定位，如果没有宽度，图片独自占有一行，所以不会有问题，
+  只有bottom的空隙定位，如果没有高度没法定位，此时，joycss会默认设置10px的间距，
+  如果，10px间距不够，自行在背景图url中增加参数设置`?bottom=100`
   
-background可以分开(position, image, repeat)写或者写在一起，不过，还是推荐使用写
-在一起比较好。如何写是没有什么限制的，不过需要确定的是，background-position不要写
-相对位置，那样就没法确定css的位置了，对于百分号，只支持0,50,100三个数。
-
-第二步，对图片进行分组，去除不需要拼图的图片。
-
-####分组规则
-
-默认情况下，所有的图片分在同一个组，合成一张图片，需要额外分组，则在相应背景图图
-片加上一个`id=\d`的参数，`\d`表示数字，从1开始计数，默认的sprite图片，id等于0，
-不需要写
-
-####url参数使用说明
-
-joycss的所有与开发者交互，都是通过背景图url参数来实现的，比如
-
-```
-.main-right .tese h2 {
-  background: url(../img/fenlei.png?id=1&way=h) repeat-y 0 0;
-  width: 480px;
-}
-```
+* 背景定位使用相对定位，比如10%，这种情况无法计算，对于百分号定位，只支持0 50
+  100 三种。背景图使用负值，同样会有问题，如果使用负值，可能出现sprite图片相互覆
+  盖的情况。
   
-url参数指的是上面css中，background的url中那一段`?id=1&way=h`，表示第二组sprite
-图，排列方式way为水平horizontal
+* 背景图可能会被覆盖，这种情况很难被发现。sprite的样式会最终被写在页面顶部，图片
+  所在的css样式中，只写了background-position，和repeat，在这中间，如果有使用
+  background，background样式会被覆盖。比如：
   
-参数以及对应的意义
-
-```
-| 参数名 | 参数全名   | 参数的值   | 意义与作用                   | 使用实例    |
-|--------|------------|------------|------------------------------|-------------|
-| esc    | escape     | ''         | 图片无需拼图                 | a.png?esc   |
-| way    | h          | horizontal | 排列方式水平排列 [g]         | a.png?way=h |
-| way    | v          | vertical   | 垂直排列，默认方式[g]        | a.png?way=v |
-| id     | id         | 0-9        | 分组id，id相同的图片合并一起 | a.png?id=1  |
-| color  | truecolor  | ''         | 使用png24 [g]                | a.png?color |
-| bg     | background | color      | 背景色，默认值是ffffff7f[g]  |             |
-| b      | bottom     | \d         | 图片设置margin bottom[v]     | a.png?b=10  |
-| r      | right      | \d         | 图片设置margin right[h]      | a.ong?r=10  |
-```
-
-说明：表格中，[g]标志表示为组范围内定义，一组只需定义定一个出现的图片。[h]标
-志说明，只有在水平布局[horizontal]下才有效，[v]表示只在垂直布局[vertical]有
-效。其他都是针对单个图片设置的
-
-###url参数的位置说明
-
-url参数中，在[g]下的参数，默认情况下，是读取页面第一次出现相应图片的时候。比如
-
-```
-.main-left .fenlei h2 {
-  background: url(../img/fenlei.png?id=1&way=h) repeat-y 0 0;
-  width: 180px;
-  height: 180px;
-}
-.main-right .tese h2 {
-  background: url(../img/tese.png?id=1) no-repeat 0 10px;
-  width: 480px;
-}
-```
+  ```
+    .comment-hd .sort .active,
+    .comment-hd .sort .disable {
+      background:#fff;
+      ...
+    }
+    .comment-hd .sort .active{
+      background:#fff url(../img/sort.png) 67px 4px no-repeat;
+      color:#666;
+    }
+    ```
+    
+  在这里，`.comment-hd .sort .active`中的background将被替换为
+  background-position, 而前面的一个background定义将覆盖sprite样式中定义的
+  background-image,最终效果没有背景图。这种情况很难发现，尽量不要使用background
+  来定义背景色吧。使用命令 `joycss xx.css -i`或者 `joycss xx.css --important`设
+  置sprite规则增加important，这样可以避免背景图被重写。
+ 
+* 背景图的repeat属性没有写，没有写repeat，安装正常情况下，css解析为repeat，但是
+  大多数情况下，背景图是不会用repeat的，不写repeat只是因为box本身大小和图片一样，
+  repeat和没有repeat一样，这时候，默认设置为no-repeat，如果有些图片确实需要使用
+  repeat，请不要省略。垂直布局支持repeat-x，水平布局支持repeat-y。
   
-以上css规则中，*必须*把参数`way=h`写在第一个选择器的背景图中，不能写在第二个图片
-上面，这一点规则非常重要。
+* 图片拼合以后失真问题，使用png8拼图，颜色相近的图片可能会相互融合，比如橘红色
+  和黄色，如果页面很多黄色的图片，拼图以后，橘红色的图片也会变成黄色的了。混色的
+  问题，和图片所处的位置没有关系。如果使用png24模式拼图，就不会有问题，但ie6无法
+  识别， ie6只能继续回归到png8。png24 拼图使用命名`joycss xx.css -a`或者
+  `joycss xx.css --alpha`。或者，对图片进行分组，手动避免颜色混合，分组使用id作
+  为参数。
 
-####背景图片定位规则说明
-
-背景图的位置信息，经过3个步骤的判断计算来确定的：
-
-- 首先是从background-position中获取到top，和left的位置，position 如果没有写top，
-  left，默认都是0。top和left定义不明确，比如使用相对位置也可能导致图片位置不对。
-  position识别一下属性`left, 0, 100%, 50%, right, top, bottom,\dpx` \d表示数字。
-
-- 第二步，根据图片本身的宽高，加上top和left的偏移，获得当前图片应该占有的空间
-
-- 第三步，修正图片的大小，图片所占有的空间，应该等于背景图所在的盒子的大小，图片
-  大小的修正，分两种方式，第一，使用手动设置`b=xx||r=xx`，标明底部或右边需要的空
-  间。第二种，根据当前图片所在css规则的`height, width, line-height`来设置，比如
-  上面一个例子中，有个css规则`width: 180px; height: 180px;`，可以确定背景图高宽。
-
-前面两步确定了三个方向的位置，最后一步确定最后一个方向的间距。因为拼图是垂直或水
-平方式，有一个方向是无需控制的。在垂直布局下，第三步只确定底部空间高度，水平布局
-，第三步确定右边间距。
-
-####背景图repeat
-
-repeat不能同时和定位使用，也就是，有repeat，必须是position:0 0，这样的形式。
-
-####sprite图片合并规则
-
-sprite图片名是文件名加上spriteId加上-sprite组成的，比如文件a.css，拼图后生成的
-图片地址是`a-sprite.png, a1-sprite.png`。
-
-第三步：通过node调用
-
-###依赖
-
-需要nodejs和php支持，php需要有gd库支持。
-
-###其他
-
-非常感谢Alexander Kaupp提供的php版本
-[smartsprite](http://www.tanila.de/smartsprite/index.php), 如果没有这个拼图过程
-的api，joycss还是在摸索如何拼图中，smartsprite提供了很好的拼图功能
-，`src/graph/smartsprite.php`中，把smartsprite的拼图功能独立出来，通过
-`src/graph/tpl.json`这样的json文件作为数据源，php版的smartsprite完成图片处理过程
-， node执行css分析过程。
-
-此外,`lib/PropertyValuePart.js`使用了
-[nzakas/parser-lib](https://github.com/nzakas/parser-lib) 中的
-`src/css/PropertyValuePart.js`，一个很好的css value读取代码。
+好了，还有什么问题，可以查看[文档](http://git.shepherdwind.com/joycss.html) ，
+或者可以直接联系我，欢迎使用。
