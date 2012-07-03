@@ -8,6 +8,14 @@ Options:
   -c, --close          merge images as close as possable
   -a, --alpha          create sprite images use png24 formart
   -w, --white          set sprite images background no transparent, white
+  -s, --source         write the origin file and set .source file as a backup,
+                       commend joycss a.css, use a.source.css as source file
+  -i, --important      add !important for sprite css, make background-image will
+                       not be replace by other css rule
+  -u, --upload         upload image file
+  --config             config the upload image api, if after you css sprite, image
+                       need upload to some other server, in you current dir, you
+                       should have an file name upload.json
 
 Environment require:
 php cli with gd lib

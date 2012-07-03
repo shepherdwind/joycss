@@ -10,7 +10,9 @@ var util      = require('util');
 var fs        = require('fs');
 var Box       = require('../lib/box');
 var url       = require('url');
+var post      = require('../lib/post');
 var exists    = fs.existsSync || path.existsSync;
+
 var PARAMS    = {
   'nosprite'   : 'esc',
   'direction'  : 'way',
@@ -56,7 +58,10 @@ StdClass.extend(SpriteDef, StdClass, {
     force8bit: true,
     background: 'ffffff7f',
     writeFile: false,
-    useImportant: false
+    useImportant: false,
+    uploadFile: false,
+    //需要等待的任务
+    task: -1
   },
 
   CONSIT: {
@@ -444,29 +449,142 @@ StdClass.extend(SpriteDef, StdClass, {
 
     }, this);
 
+    this.once('change:task:0', function(){
+      fs.writeFile(spriteFile, this.cssResult, function(err, data){
+        if (!err) console.log('success');
+      });
+    });
+
+    this.writeAllSprite(multSelector);
+
+  },
+
+  getUploader: function(){
+    if (this.get('uploadFile')){
+      var config = fs.readFileSync(path.resolve(__dirname, '../upload.json'));
+      try {
+        var conf = JSON.parse(config);
+        return conf;
+      } catch(e){
+        console.log('upload.json is not setted, pleace config you upload api');
+        return false;
+      }
+    } else {
+      return false;
+    }
+  },
+
+  writeAllSprite: function(multSelector){
+
     var _this = this;
+    var uploader = this.getUploader();
+
+    var num = 0;
     forEach(this.sprites, function(sprites, spriteId){
+
       var selectors = [];
       forEach(sprites.images, function(def, img){
         selectors = selectors.concat(multSelector[img]);
       });
 
-      var important = _this.get('useImportant') ? '!important': '';
-      var rule = {
-        'selector': selectors,
-        'property': ['background-image', 'background-repeat'],
-        'value': ['url(' + sprites['filename'] + ')' + important, 'no-repeat']
-      };
-      if (!sprites.force8bit){
-        rule.property.push('_background-image');
-        rule.value.push(rule.value[0].replace(spriteId, spriteId + '-ie6'));
-      }
-      _this.writeRule(rule, true);
-    });
+      var filename = sprites['filename'];
+      var fileForIe = sprites.force8bit ? '' :
+      filename.replace(spriteId, spriteId + '-ie6');
 
-    fs.writeFile(spriteFile, this.cssResult, function(err, data){
-      if (!err) console.log('success');
-    });
+      if (uploader) {
+        var newImgUrl = '';
+        var upload1 = this._getUploader(filename, uploader);
+
+        upload1.on('uploadEnd', function(e){
+          newImgUrl = this._uploadEnd(e) || filename;
+          if (fileForIe) {
+            if (newImgUrl2) this._writeAll(selectors, newImgUrl, newImgUrl2);
+          } else {
+            this._writeAll(selectors, newImgUrl);
+          }
+          this.finishTask();
+        }, this);
+
+        if (fileForIe){
+          var upload2 = this._getUploader(fileForIe, uploader);
+          var newImgUrl2 = '';
+
+          upload2.on('uploadEnd', function(e){
+            newImgUrl2 = this._uploadEnd(e) || fileForIe;
+            if (newImgUrl) this._writeAll(selectors, newImgUrl, newImgUrl2);
+            this.finishTask();
+          }, this);
+        }
+
+      } else {
+        this._writeAll(selectors, filename, fileForIe);
+        this.finishTask(true);
+      }
+
+    }, this);
+  },
+
+  _getUploader: function(file, config){
+
+    var basePath = path.dirname(this.get('file'));
+    var task = this.get('task');
+    task++;
+    if (!task) task = 1;
+    this.set('task', task);
+
+    console.log('uploading file ' + file);
+    return new post(mixin(config, {
+      file: path.resolve(basePath, file)
+    }));
+  },
+
+  finishTask: function(isAll){
+    var task = this.get('task');
+    task = isAll? 0 : task - 1;
+    this.set('task', task);
+  },
+
+  _uploadEnd: function(e){
+    var ret = false;
+
+    if (e.success) {
+
+      try {
+        ret = JSON.parse(e.success);
+        if (ret['url']){
+          ret = ret['url'];
+          console.log('upload file get url ' + ret + ' success');
+        } else {
+          console.log(e.success.msg || e.success);
+          ret = false;
+        }
+
+      } catch(e) {
+        console.log(e.success);
+        ret = false;
+      }
+
+    } else {
+      console.log(e.err || e);
+    }
+
+    return ret;
+
+  },
+
+  _writeAll: function(selectors, filename, fileForIe){
+    var important = this.get('useImportant') ? '!important': '';
+    var rule = {
+      'selector': selectors,
+      'property': ['background-image', 'background-repeat'],
+      'value': ['url(' + filename + ')' + important, 'no-repeat']
+    };
+
+    if (fileForIe){
+      rule.property.push('_background-image');
+      rule.value.push('url(' + fileForIe + ')' + important);
+    }
+    this.writeRule(rule, true);
   },
 
   writeSpriteRule: function(rule, def){

@@ -1,8 +1,8 @@
 {
-  'host'    : '',
-  'path'    : '',
-  'filekey' : '',
-  'headers' : {
-    'Cookie' : ''
+  "host"    : "upload.xx.com",
+  "path"    : "/path/upload.htm",
+  "filekey" : "photo",
+  "headers" : {
+    "Cookie" : "a=b;"
   }
 }
