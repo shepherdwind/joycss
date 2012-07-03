@@ -1,8 +1,8 @@
 {
-  host    : '',
-  path    : '',
-  filekey : ''
-  headers : {
-    Cookie : ''
+  'host'    : '',
+  'path'    : '',
+  'filekey' : '',
+  'headers' : {
+    'Cookie' : ''
   }
 }
