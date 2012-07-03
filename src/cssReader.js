@@ -47,6 +47,7 @@
 var fs = require('fs');
 var path = require('path');
 var assert = require('assert').ok;
+var util = require('util');
 
 var StdClass = require('../lib/stdclass');
 
@@ -63,6 +64,7 @@ StdClass.extend(CssReader, StdClass, {
   attributes: {
     //file path
     file: '',
+    copyFile: '',
     //selector collections
     selectors : [],
     //property collections
@@ -118,6 +120,12 @@ StdClass.extend(CssReader, StdClass, {
 
     this.set('timeStart', (new Date()).getTime());
     var steam = fs.createReadStream(file);
+
+    if (this.get('copyFile') !== file){
+      var copyFile = fs.createWriteStream(this.get('copyFile'));
+      util.pump(steam, copyFile);
+    }
+
     this._steam = steam;
     this._bind();
   },

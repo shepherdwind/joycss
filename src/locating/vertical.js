@@ -97,7 +97,8 @@ Vertical.prototype = {
 
       if (this.layout == 'close' && !def['align'] && 
         def['repeat'] == 'no-repeat' && 
-        box.width < (def.width + def.spritepos_left)* 3){
+        box.width < (def.width + def.spritepos_left)* 3 &&
+        !('line' in params)){
 
         labels.close.push(img);
       } else {

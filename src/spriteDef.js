@@ -10,6 +10,7 @@ var util      = require('util');
 var fs        = require('fs');
 var Box       = require('../lib/box');
 var url       = require('url');
+var exists    = fs.existsSync || path.existsSync;
 var PARAMS    = {
   'nosprite'   : 'esc',
   'direction'  : 'way',
@@ -42,6 +43,8 @@ StdClass.extend(SpriteDef, StdClass, {
 
   attributes: {
     file: '',
+    //目标文件
+    destFile: '',
     basename: '',
     id: 0,
     ids: {},
@@ -51,7 +54,9 @@ StdClass.extend(SpriteDef, StdClass, {
     ruleIds: [],
     layout: 'auto',
     force8bit: true,
-    background: 'ffffff7f'
+    background: 'ffffff7f',
+    writeFile: false,
+    useImportant: false
   },
 
   CONSIT: {
@@ -61,7 +66,22 @@ StdClass.extend(SpriteDef, StdClass, {
     var file = this.get('file');
     if (!file) throw Error('file is not defined');
 
-    this.cssReader = new cssReader({file: file});
+    var cssFile = file;
+    var destFile = file;
+
+    if (this.get('writeFile')){
+      var sourceFile = file.replace('.css', '.source.css');
+      if (exists(sourceFile)){
+        cssFile = sourceFile;
+      } else {
+        cssFile = file;
+      }
+    } else {
+      destFile = file.replace('.css', '.sprite.css');
+    }
+
+    this.cssReader = new cssReader({file: cssFile, copyFile: sourceFile});
+    this.set('destFile', destFile);
 
     var basename = path.basename(file, '.css');
     this.set('basename', basename);
@@ -398,15 +418,15 @@ StdClass.extend(SpriteDef, StdClass, {
     data = JSON.parse(data);
     console.log(data.info.join(''));
 
-    var file = this.get('file');
-    var spriteFile = file.replace('.css', '.sprite.css');
-    var cssReader = this.cssReader;
-    var len = cssReader.getLen();
-    var indexs = Object.keys(this.images);
-    var index = indexs.shift();
-    var rule, img;
+    var file         = this.get('file');
+    var spriteFile   = this.get('destFile');
+    var cssReader    = this.cssReader;
+    var len          = cssReader.getLen();
+    var indexs       = Object.keys(this.images);
+    var index        = indexs.shift();
     var multSelector = {};
-    var ruleIds = this.get('ruleIds');
+    var ruleIds      = this.get('ruleIds');
+    var rule, img;
 
     forEach(ruleIds, function(i){
       rule = cssReader.getRule(i);
@@ -431,10 +451,11 @@ StdClass.extend(SpriteDef, StdClass, {
         selectors = selectors.concat(multSelector[img]);
       });
 
+      var important = _this.get('useImportant') ? '!important': '';
       var rule = {
         'selector': selectors,
         'property': ['background-image', 'background-repeat'],
-        'value': ['url(' + sprites['filename'] + ')!important', 'no-repeat']
+        'value': ['url(' + sprites['filename'] + ')' + important, 'no-repeat']
       };
       if (!sprites.force8bit){
         rule.property.push('_background-image');

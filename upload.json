@@ -1,0 +1,8 @@
+{
+  host    : '',
+  path    : '',
+  filekey : ''
+  headers : {
+    Cookie : ''
+  }
+}

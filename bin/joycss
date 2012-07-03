@@ -66,6 +66,20 @@ var args = argv.filter(function(arg){
       break;
     }
 
+    //重写文件名,使用source文件
+    case 's':
+    case 'source': {
+      config.writeFile = true;
+      break;
+    }
+
+    //重写文件名,使用source文件
+    case 'i':
+    case 'important': {
+      config.useImportant = true;
+      break;
+    }
+
     case 'v':
     case 'version': {
       var version = fs.readFileSync(path.resolve(__dirname, '../package.json'));
