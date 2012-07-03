@@ -120,9 +120,10 @@ StdClass.extend(CssReader, StdClass, {
 
     this.set('timeStart', (new Date()).getTime());
     var steam = fs.createReadStream(file);
+    var copyFileName = this.get('copyFile');
 
-    if (this.get('copyFile') !== file){
-      var copyFile = fs.createWriteStream(this.get('copyFile'));
+    if (copyFileName && copyFileName !== file){
+      var copyFile = fs.createWriteStream(copyFileName);
       util.pump(steam, copyFile);
     }
 

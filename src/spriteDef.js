@@ -44,24 +44,25 @@ function SpriteDef (){
 StdClass.extend(SpriteDef, StdClass, {
 
   attributes: {
-    file: '',
     //目标文件
-    destFile: '',
-    basename: '',
-    id: 0,
-    ids: {},
-    imgPath: '',
+    file         : '',
+    destFile     : '',
+    basename     : '',
+    id           : 0,
+    ids          : {},
+    imgPath      : '',
     //预处理数组
-    preParam: [],
-    ruleIds: [],
-    layout: 'auto',
-    force8bit: true,
-    background: 'ffffff7f',
-    writeFile: false,
-    useImportant: false,
-    uploadFile: false,
+    preParam     : [],
+    ruleIds      : [],
+    layout       : 'auto',
+    force8bit    : true,
+    background   : 'ffffff7f',
+    writeFile    : false,
+    useImportant : false,
+    uploadFile   : false,
+    nochange     : false,
     //需要等待的任务
-    task: -1
+    task         : -1
   },
 
   CONSIT: {
@@ -107,6 +108,23 @@ StdClass.extend(SpriteDef, StdClass, {
      */
     this.imagesDef = {};
     this.cssResult = '';
+
+    this.imagesMap = {};
+
+    if (this.get('nochange')){
+      var _this = this;
+      fs.readFile(file.replace('.css', '.json'), function(err, data){
+        if (!err) {
+          try {
+            var ret = JSON.parse(data);
+            _this.imagesMap = ret;
+            console.log(ret);
+          } catch(e){
+            console.log('Read json file failed!');
+          }
+        }
+      });
+    }
 
     this._bind();
   },
@@ -451,8 +469,17 @@ StdClass.extend(SpriteDef, StdClass, {
 
     this.once('change:task:0', function(){
       fs.writeFile(spriteFile, this.cssResult, function(err, data){
-        if (!err) console.log('success');
+        if (!err) console.log('sprite task finish');
       });
+
+      if (this.get('uploadFile')) {
+        var jsonFile = file.replace('.css', '.json');
+        fs.writeFile(jsonFile, JSON.stringify(this.imagesMap), 
+          function(err, data){
+            if (!err) console.log('write image upload backup file ' + 
+              path.basename(jsonFile));
+        });
+      }
     });
 
     this.writeAllSprite(multSelector);
@@ -496,7 +523,7 @@ StdClass.extend(SpriteDef, StdClass, {
         var upload1 = this._getUploader(filename, uploader);
 
         upload1.on('uploadEnd', function(e){
-          newImgUrl = this._uploadEnd(e) || filename;
+          newImgUrl = this._uploadEnd(e, filename) || filename;
           if (fileForIe) {
             if (newImgUrl2) this._writeAll(selectors, newImgUrl, newImgUrl2);
           } else {
@@ -510,7 +537,7 @@ StdClass.extend(SpriteDef, StdClass, {
           var newImgUrl2 = '';
 
           upload2.on('uploadEnd', function(e){
-            newImgUrl2 = this._uploadEnd(e) || fileForIe;
+            newImgUrl2 = this._uploadEnd(e, fileForIe) || fileForIe;
             if (newImgUrl) this._writeAll(selectors, newImgUrl, newImgUrl2);
             this.finishTask();
           }, this);
@@ -544,7 +571,8 @@ StdClass.extend(SpriteDef, StdClass, {
     this.set('task', task);
   },
 
-  _uploadEnd: function(e){
+  _uploadEnd: function(e, filename){
+
     var ret = false;
 
     if (e.success) {
@@ -553,18 +581,22 @@ StdClass.extend(SpriteDef, StdClass, {
         ret = JSON.parse(e.success);
         if (ret['url']){
           ret = ret['url'];
+          this.imagesMap[filename] = ret;
           console.log('upload file get url ' + ret + ' success');
         } else {
+          console.log('upload file fail');
           console.log(e.success.msg || e.success);
           ret = false;
         }
 
       } catch(e) {
+        console.log('upload file fail');
         console.log(e.success);
         ret = false;
       }
 
     } else {
+      console.log('upload file fail');
       console.log(e.err || e);
     }
 
@@ -574,6 +606,10 @@ StdClass.extend(SpriteDef, StdClass, {
 
   _writeAll: function(selectors, filename, fileForIe){
     var important = this.get('useImportant') ? '!important': '';
+    var imagesMap = this.imagesMap;
+
+    //使用缓存图片
+    filename = imagesMap[filename] || filename;
     var rule = {
       'selector': selectors,
       'property': ['background-image', 'background-repeat'],
@@ -581,6 +617,7 @@ StdClass.extend(SpriteDef, StdClass, {
     };
 
     if (fileForIe){
+      fileForIe = imagesMap[fileForIe] || fileForIe;
       rule.property.push('_background-image');
       rule.value.push('url(' + fileForIe + ')' + important);
     }

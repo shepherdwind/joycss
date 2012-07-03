@@ -13,6 +13,7 @@ Options:
   -i, --important      add !important for sprite css, make background-image will
                        not be replace by other css rule
   -u, --upload         upload image file
+  -n, --nochange       use backup image url, sprite image no change
   --config             config the upload image api, if after you css sprite, image
                        need upload to some other server, in you current dir, you
                        should have an file name upload.json
