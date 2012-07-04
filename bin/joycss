@@ -137,12 +137,6 @@ var args = argu.filter(function(arg){
       }
       process.exit(0);
     }
-
-    case 'update': {
-      var update = require('./update');
-      update();
-      break;
-    }
   }
 });
 
