@@ -8,7 +8,9 @@ var util   = require('util');
 var exists = fs.existsSync || path.existsSync;
 
 argv.forEach(function(arg){
-  if (arg[0] === '-' && arg.length > 2 && arg !== '--config'){
+  if (arg[0] === '-' && arg.length > 2 && 
+    arg !== '--config' && arg !== '--update' ){
+
     for (var i = 1; i < arg.length; i++) {
       argu.push('-' + arg[i]);
     }
@@ -133,10 +135,14 @@ var args = argu.filter(function(arg){
       } else {
         console.log('the upload.json file is not exists!');
       }
+      process.exit(0);
     }
 
-    process.exit(0);
-
+    case 'update': {
+      var update = require('./update');
+      update();
+      break;
+    }
   }
 });
 

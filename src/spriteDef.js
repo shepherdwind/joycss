@@ -118,7 +118,7 @@ StdClass.extend(SpriteDef, StdClass, {
           try {
             var ret = JSON.parse(data);
             _this.imagesMap = ret;
-            console.log(ret);
+            console.log('Read from json backup file');
           } catch(e){
             console.log('Read json file failed!');
           }

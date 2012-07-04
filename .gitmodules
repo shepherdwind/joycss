@@ -1,0 +1,3 @@
+[submodule "lib/adm-zip"]
+	path = lib/adm-zip
+	url = https://github.com/cthackers/adm-zip.git
