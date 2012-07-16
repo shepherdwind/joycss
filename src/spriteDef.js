@@ -16,7 +16,8 @@ var exists    = fs.existsSync || path.existsSync;
 var PARAMS    = {
   'nosprite'   : 'esc',
   'direction'  : 'way',
-  'horizontal' : 'h'
+  'horizontal' : 'h',
+  'force8bit'  : 'png24' 
 };
 
 var conf = {
@@ -545,10 +546,11 @@ StdClass.extend(SpriteDef, StdClass, {
 
       } else {
         this._writeAll(selectors, filename, fileForIe);
-        this.finishTask(true);
       }
 
     }, this);
+
+    if (!uploader) this.finishTask(true);
   },
 
   _getUploader: function(file, config){
