@@ -57,7 +57,9 @@ StdClass.extend(SpriteDef, StdClass, {
     background   : 'ffffff7f',
     cssReader    : {},
     changedRules : {},
-    extraRules   : []
+    extraRules   : [],
+    escImgs      : [],
+    spritesImgs  : []
   },
 
   CONSIT: {
@@ -167,7 +169,7 @@ StdClass.extend(SpriteDef, StdClass, {
    */
   _collectImages: function(css, imageIndex){
     var urlVal = css.value[imageIndex];
-    var image  = this._isSpriteImage(urlVal);
+    var image  = this._isSpriteImage(urlVal, imageIndex, css);
     var images = this.images;
 
     if (image){
@@ -183,7 +185,7 @@ StdClass.extend(SpriteDef, StdClass, {
    * @param val {string} css background 对应的value值，比如 url(a.png) left
    * right;
    */
-  _isSpriteImage: function(val){
+  _isSpriteImage: function(val, index, rule){
     //存在url，并且url不是http方式
     var isHttpUrl = val.indexOf('//') > -1;
     var ret = false;
@@ -193,9 +195,9 @@ StdClass.extend(SpriteDef, StdClass, {
         var imgurl = url.parse(uri[1], true);
         var params = imgurl.query;
         var id = params['id'] || 0;
+        ret = imgurl.pathname.replace(/\\+/g, '/');
         //过滤图片
         if (!(PARAMS['nosprite'] in params)){
-          ret = imgurl.pathname.replace(/\\+/g, '/');
           //设置第一个图片为sprite图片位置
           if (!this.get('imgPath')){
             this.set('imgPath', path.dirname(ret));
@@ -217,6 +219,11 @@ StdClass.extend(SpriteDef, StdClass, {
             if (isNewImg) preParam.push(params);
           }
           this.set('preParam', preParam);
+        } else {
+          var escImgs = this.get('escImgs');
+          escImgs.push(ret);
+          rule.value[index] = val.replace(imgurl.pathname, ret);
+          ret = false;
         }
       }
     }
@@ -302,9 +309,12 @@ StdClass.extend(SpriteDef, StdClass, {
 
   _setChangedRules: function(sprite){
     var imgBase = sprite.filename;
+    var imgBase8 = imgBase.replace('sprite.png', 'sprite8.png');
+    var imgPath = sprite['force8bit'] ? imgBase8 : imgBase;
     var changedRules = this.get('changedRules');
     var defs = this.imagesDef;
     var extraRules = this.get('extraRules');
+    var spritesImgs = this.get('spritesImgs');
     var selectors = [];
 
     forEach(sprite.images, function(imgInfo){
@@ -340,11 +350,14 @@ StdClass.extend(SpriteDef, StdClass, {
       selectors = selectors.concat(rule.selector);
     }, this);
 
-    extraRules.push({
-      selector: selectors,
+    var extraRule = {
       property: ['background-image', 'background-repeat'],
-      value: ['url(' + imgBase + ')', 'no-repeat']
-    });
+      value: ['url(' + imgPath + ')', 'no-repeat'],
+      selector: selectors
+    };
+
+    extraRules.push(extraRule);
+    spritesImgs.push(imgBase);
   },
 
   _setImageInfo: function(box, imageInfo){
@@ -366,19 +379,7 @@ StdClass.extend(SpriteDef, StdClass, {
    * @next writeCssBack 回写css样式，生成sprite样式
    */
   createSprite: function(){
-    var sprites = mixin(this.sprites, {});
-
-    forEach(sprites, function(sprite, name){
-      if (!sprite.force8bit){
-        var file = name + '-ie6';
-        var spriteForIe = mixin(sprite, {});
-        spriteForIe = mixin({
-          force8bit: true,
-          filename: sprite.filename.replace(name, file)
-        }, spriteForIe);
-        sprites[name + '-ie6'] = spriteForIe;
-      }
-    });
+    var sprites = this.sprites;
 
     var cfg = JSON.stringify(sprites);
     //拼图

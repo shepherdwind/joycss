@@ -5,11 +5,11 @@ var assert = require('assert').ok;
 
 var StdClass = require('./stdclass');
 
-function Composite(){
+function Commend(){
   StdClass.apply(this, arguments);
 }
 
-StdClass.extend(Composite, StdClass, {
+StdClass.extend(Commend, StdClass, {
 
   attributes: {
     name: ''
@@ -193,4 +193,4 @@ helper.Depth = function Depth (o, val) {
   o.depth = parseInt(val, 10);
 };
 
-module.exports = Composite;
+module.exports = Commend;

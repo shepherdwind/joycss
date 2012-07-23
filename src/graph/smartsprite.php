@@ -50,17 +50,10 @@ class SmartSprite
                 $fileEXT = substr($this->sprites[$spritekey]['filename'], -3);
 
                 // $this->_trueColor &&  
-                if ($this->sprites[$spritekey]['force8bit'] == false ) {
-                    $this->log->info[] = "using truecolor mode\n";
-                    if ( $fileEXT == 'png')  $image = imagecreatetruecolor($w, $h);
-                    if ( $fileEXT == 'gif')  $image = imagecreatetruecolor($w, $h);
-                    if ( $fileEXT == 'jpg')  $image =  imagecreatetruecolor($w, $h);
-                } else {
-                    $this->log->info[] = "using 8bit mode\n";
-                    if ( $fileEXT == 'png')  $image = imagecreate($w, $h);
-                    if ( $fileEXT == 'gif')  $image = imagecreate($w, $h);
-                    if ( $fileEXT == 'jpg')  $image =  imagecreate($w, $h);
-                }
+                //$this->log->info[] = "using truecolor mode\n";
+                if ( $fileEXT == 'png')  $image = imagecreatetruecolor($w, $h);
+                if ( $fileEXT == 'gif')  $image = imagecreatetruecolor($w, $h);
+                if ( $fileEXT == 'jpg')  $image =  imagecreatetruecolor($w, $h);
 
                 // spriteBG color to RGB:
                 $_colArr = sscanf($backgroundHEX, '%2x%2x%2x%2x');
@@ -143,7 +136,7 @@ class SmartSprite
             }	// if images exists
         }	// Sprite loop
 
-        $this->log->info[] = 'end';
+        $this->log->info[] = '[success] end';
         echo json_encode($this->log);
     }
     function safeImageToFile($imgres, $imgtype, $filename, $spritekey, $dataurl) {
@@ -179,8 +172,8 @@ class SmartSprite
         // dirname($this->_filename).'/'.
 
         //$dataurl 
-            //? $this->getImageDataURL($_optIMG, $_mime, $spritekey) 
-            //: $this->getImageJointBG($_optIMG, $spritekey);//'';
+        //? $this->getImageDataURL($_optIMG, $_mime, $spritekey) 
+        //: $this->getImageJointBG($_optIMG, $spritekey);//'';
     }
 
     function loadImageFromFile($imageInfo) {
