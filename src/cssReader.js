@@ -73,6 +73,7 @@ StdClass.extend(CssReader, StdClass, {
     values : [],
     //single line rules, such as {charset "UTF-8";}
     metas: {},
+    idList: [],
     //history of events
     history : [],
     //right now status
@@ -177,7 +178,8 @@ StdClass.extend(CssReader, StdClass, {
     if (!this.attributes.nest.length){
       var num = this.getLen() - ruleEnd.recode;
       ruleEnd.recode = 0;
-
+      var idList = this.get('idList');
+      idList.push(num);
       this.fire(this.get('RULE_END_EVT'), this.getRule(num));
     }
   },

@@ -143,6 +143,7 @@ class SmartSprite
             }	// if images exists
         }	// Sprite loop
 
+        $this->log->info[] = 'end';
         echo json_encode($this->log);
     }
     function safeImageToFile($imgres, $imgtype, $filename, $spritekey, $dataurl) {

@@ -147,10 +147,10 @@ if (!exists(config.file)){
   console.log('no css file input or you file is not exists!');
 } else {
   config.file = path.resolve(process.cwd(), config.file);
-  var parser = require('../src/spriteDef');
+  var parser = require('../src/');
 
   debugger;
-  new parser(config);
+  new parser(config.file, config);
 }
 
 /**

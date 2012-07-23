@@ -1,6 +1,5 @@
 "use strict";
 var path      = require('path');
-var cssReader = require('./cssReader');
 var StdClass  = require('../lib/stdclass');
 var Api       = require('./graph/api');
 var some      = require('../lib/utils').some;
@@ -10,7 +9,6 @@ var util      = require('util');
 var fs        = require('fs');
 var Box       = require('../lib/box');
 var url       = require('url');
-var post      = require('../lib/post');
 var exists    = fs.existsSync || path.existsSync;
 
 var PARAMS    = {
@@ -47,23 +45,19 @@ StdClass.extend(SpriteDef, StdClass, {
   attributes: {
     //目标文件
     file         : '',
-    destFile     : '',
     basename     : '',
     id           : 0,
     ids          : {},
     imgPath      : '',
-    //预处理数组
+    //预处理数组，处理id顺序关系
     preParam     : [],
     ruleIds      : [],
     layout       : 'auto',
     force8bit    : true,
     background   : 'ffffff7f',
-    writeFile    : false,
-    useImportant : false,
-    uploadFile   : false,
-    nochange     : false,
-    //需要等待的任务
-    task         : -1
+    cssReader    : {},
+    changedRules : {},
+    extraRules   : []
   },
 
   CONSIT: {
@@ -72,23 +66,6 @@ StdClass.extend(SpriteDef, StdClass, {
   _init: function(){
     var file = this.get('file');
     if (!file) throw Error('file is not defined');
-
-    var cssFile = file;
-    var destFile = file;
-
-    if (this.get('writeFile')){
-      var sourceFile = file.replace('.css', '.source.css');
-      if (exists(sourceFile)){
-        cssFile = sourceFile;
-      } else {
-        cssFile = file;
-      }
-    } else {
-      destFile = file.replace('.css', '.sprite.css');
-    }
-
-    this.cssReader = new cssReader({file: cssFile, copyFile: sourceFile});
-    this.set('destFile', destFile);
 
     var basename = path.basename(file, '.css');
     this.set('basename', basename);
@@ -111,21 +88,6 @@ StdClass.extend(SpriteDef, StdClass, {
     this.cssResult = '';
 
     this.imagesMap = {};
-
-    if (this.get('nochange')){
-      var _this = this;
-      fs.readFile(file.replace('.css', '.json'), function(err, data){
-        if (!err) {
-          try {
-            var ret = JSON.parse(data);
-            _this.imagesMap = ret;
-            console.log('Read from json backup file');
-          } catch(e){
-            console.log('Read json file failed!');
-          }
-        }
-      });
-    }
 
     this._bind();
   },
@@ -159,12 +121,12 @@ StdClass.extend(SpriteDef, StdClass, {
   },
 
   _bind: function(){
-    var cssReader = this.cssReader;
+    var cssReader = this.get('cssReader');
     //收集css规则
-    cssReader.on('ruleEnd', this.getRule, this);
+    cssReader.on('ruleEnd', this._getRule, this);
     //收集规则结束
-    cssReader.on('change:timeEnd', this.cssEnd, this);
-    this.on('change:imgPath', this.setImgPath);
+    cssReader.on('change:timeEnd', this._cssEnd, this);
+    this.on('change:imgPath', this._setImgPath);
   },
 
   /**
@@ -172,7 +134,7 @@ StdClass.extend(SpriteDef, StdClass, {
    * 成，前缀为css文件名，后缀是id，默认情况下id为空，其他id从1开始计数，imgPath
    * 是由第一个需要做拼图的图片地址决定的
    */
-  setImgPath: function(e){
+  _setImgPath: function(e){
     var path = e.now + '/';
     forEach(this.sprites, function(sprite, id){
       if (!sprite.filename) sprite['filename'] = path + id + '-sprite.png';
@@ -184,7 +146,7 @@ StdClass.extend(SpriteDef, StdClass, {
    * @param e {object} 一组css规则{selector: [], property: [], value: [], id: 0}
    * selector, property, value分别是css规则的选择器、属性和值，id是规则序号
    */
-  getRule: function(e){
+  _getRule: function(e){
     var property = e.property;
     var ruleIds = this.get('ruleIds');
     var imageIndex = property.indexOf('background');
@@ -193,7 +155,7 @@ StdClass.extend(SpriteDef, StdClass, {
 
     ruleIds.push(e.id);
     if (imageIndex > -1) {
-      this.collectImages(e, imageIndex);
+      this._collectImages(e, imageIndex);
     }
   },
 
@@ -203,7 +165,7 @@ StdClass.extend(SpriteDef, StdClass, {
    * @param css {object} css规则
    * @param imageIndex {number} 背景图属性所在的位置
    */
-  collectImages: function(css, imageIndex){
+  _collectImages: function(css, imageIndex){
     var urlVal = css.value[imageIndex];
     var image  = this._isSpriteImage(urlVal);
     var images = this.images;
@@ -264,9 +226,9 @@ StdClass.extend(SpriteDef, StdClass, {
 
   /**
    * 文件读取完毕
-   * @next Api.getImagesSize -> this.setDef
+   * @next Api.getImagesSize -> this._setDef
    */
-  cssEnd: function(e){
+  _cssEnd: function(e){
     var images  = this.images;
     var baseDir = path.dirname(this.get('file'));
     var files   = {};
@@ -279,16 +241,16 @@ StdClass.extend(SpriteDef, StdClass, {
     files = Object.keys(files);
 
     //获取图片大小
-    Api.getImagesSize(files, this.setDef, this);
+    Api.getImagesSize(files, this._setDef, this);
   },
 
   /**
    * 设置图片配置，Api.getImagesSize函数回调
    * @param {Error} err 错误信息
    * @param {string|json} data 读取图片大小接口返回数据，包括图片大小和图片类型
-   * @next this.setPos
+   * @next this._setPos
    */
-  setDef: function(err, data){
+  _setDef: function(err, data){
     if (err) throw Error(data.toString());
 
     var baseDir = path.dirname(this.get('file'));
@@ -301,13 +263,13 @@ StdClass.extend(SpriteDef, StdClass, {
       imagesDef[filePath] = def;
     });
 
-    this.setPos();
+    this._setPos();
   },
 
   /**
    * 设置背景图位置
    */
-  setPos: function(){
+  _setPos: function(){
     var imagesDef = this.imagesDef;
     //排序
     var imgs = Object.keys(imagesDef);
@@ -316,12 +278,12 @@ StdClass.extend(SpriteDef, StdClass, {
 
     forEach(imgs, function(img){
       var imageInfo = imagesDef[img];
-      var css = self.getCss(img);
+      var css = self._getCss(img);
       var box = new Box(css.property, css.value, css.line);
       imageInfo['file_location'] = img;
-      mixin(self.coords(box, imageInfo), imageInfo);
+      mixin(self._coords(box, imageInfo), imageInfo);
 
-      self.setImageInfo(box, imageInfo);
+      self._setImageInfo(box, imageInfo);
     });
 
     //拼图算法接口调用
@@ -331,12 +293,61 @@ StdClass.extend(SpriteDef, StdClass, {
       var Loc = new Locate(sprite.images, imagesDef, this.get('layout'));
       sprite.height = Loc.height;
       sprite.width = Loc.width;
+      this._setChangedRules(sprite);
+      debugger;
     }, this);
 
-    this.createSprite();
+    this.fire('finish:parser');
   },
 
-  setImageInfo: function(box, imageInfo){
+  _setChangedRules: function(sprite){
+    var imgBase = sprite.filename;
+    var changedRules = this.get('changedRules');
+    var defs = this.imagesDef;
+    var extraRules = this.get('extraRules');
+    var selectors = [];
+
+    forEach(sprite.images, function(imgInfo){
+      var img = imgInfo['file_location'];
+      var rule = this._getCss(img);
+      var def  = defs[img];
+      var value = [];
+      var property = [];
+      var filters = ['background', 'background-image', 
+        'background-repeat', 'background-position'];
+
+      property = rule.property.filter(function(prop, i){
+        var index = filters.indexOf(prop);
+        if (index === -1){
+          value.push(rule.value[i]);
+          return true;
+        }
+      });
+      if (def['repeat'] != 'no-repeat'){
+        property.push('background-repeat');
+        value.push(def['repeat']);
+      }
+
+      property.push('background-position');
+      value.push(def.position);
+
+      changedRules[rule.id] = {
+        selector: rule.selector,
+        property: property,
+        value: value,
+        id: rule.id
+      };
+      selectors = selectors.concat(rule.selector);
+    }, this);
+
+    extraRules.push({
+      selector: selectors,
+      property: ['background-image', 'background-repeat'],
+      value: ['url(' + imgBase + ')', 'no-repeat']
+    });
+  },
+
+  _setImageInfo: function(box, imageInfo){
     var id = this.get('id');
     var background = box.background;
     var params = background.params || {};
@@ -371,63 +382,19 @@ StdClass.extend(SpriteDef, StdClass, {
 
     var cfg = JSON.stringify(sprites);
     //拼图
-    Api.mergeImages([this.get('file'), cfg], this.writeCssBack, this);
+    Api.mergeImages([this.get('file'), cfg], this._finishMerge, this);
   },
 
-  writeCssBack: function(err, data){
+  _finishMerge: function(err, data){
     if (err) throw new Error(data);
 
     debugger;
     data = JSON.parse(data);
     console.log(data.info.join(''));
-
-    var file         = this.get('file');
-    var spriteFile   = this.get('destFile');
-    var cssReader    = this.cssReader;
-    var len          = cssReader.getLen();
-    var indexs       = Object.keys(this.images);
-    var index        = indexs.shift();
-    var multSelector = {};
-    var ruleIds      = this.get('ruleIds');
-    var rule, img;
-
-    forEach(ruleIds, function(i){
-      rule = cssReader.getRule(i);
-      if (index != i){
-        this.writeRule(rule);
-      } else {
-        img = this.images[index];
-
-        //合并selector，处理一个图片有多个selector的情况
-        multSelector[img] = multSelector[img] || [];
-        multSelector[img] = multSelector[img].concat(rule.selector);
-        this.writeSpriteRule(rule, this.imagesDef[img]);
-        index = indexs.shift();
-      }
-
-    }, this);
-
-    this.once('change:task:0', function(){
-      fs.writeFile(spriteFile, this.cssResult, function(err, data){
-        if (!err) console.log('sprite task finish');
-      });
-
-      if (this.get('uploadFile')) {
-        var jsonFile = file.replace('.css', '.json');
-        fs.writeFile(jsonFile, JSON.stringify(this.imagesMap), 
-          function(err, data){
-            if (!err) console.log('write image upload backup file ' + 
-              path.basename(jsonFile));
-        });
-      }
-    });
-
-    this.writeAllSprite(multSelector);
-
+    this.fire('finish:merge');
   },
 
-
-  coords: function(box, imageInfo){
+  _coords: function(box, imageInfo){
     var ret = {
       "repeat"         : 'no-repeat',
       "align"          : '',
@@ -477,8 +444,8 @@ StdClass.extend(SpriteDef, StdClass, {
    * @param img {string} img url
    * @return {object} css rules
    */
-  getCss: function(img){
-    var cssReader = this.cssReader;
+  _getCss: function(img){
+    var cssReader = this.get('cssReader');
     var images    = this.images;
     var imgId     = null;
 
