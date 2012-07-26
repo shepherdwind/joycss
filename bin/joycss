@@ -6,10 +6,14 @@ var fs     = require('fs');
 var argu   = [];
 var util   = require('util');
 var exists = fs.existsSync || path.existsSync;
+var contineRun = true;
 
+var commendList = [
+  'config', 'update', 'nochange', 'important', 'source',
+  'white', 'alpha', 'close', 'vertical', 'version', 'help'
+];
 argv.forEach(function(arg){
-  if (arg[0] === '-' && arg.length > 2 && 
-    arg !== '--config' && arg !== '--update' ){
+  if (arg[0] === '-' && arg.length > 2 && arg[1] !== '-'){
 
     for (var i = 1; i < arg.length; i++) {
       argu.push('-' + arg[i]);
@@ -19,13 +23,8 @@ argv.forEach(function(arg){
   }
 });
 
-if (argu.length === 1){
-  //如果没有输入任何信息
-  argu.push('-h');
-}
 var config = {
   file: '',
-  //布局方式
   layout: 'auto'
 };
 
@@ -40,12 +39,8 @@ var args = argu.filter(function(arg){
   switch (arg) {
     case 'h':
     case 'help': {
-      var help = fs.readFileSync(__dirname + '/help.txt');
-      var version = fs.readFileSync(path.resolve(__dirname, '../package.json'));
-      version = JSON.parse(version).version;
-      console.log(help.toString().replace('{version}', version).
-        replace('{filename}', __filename));
-      process.exit(0);
+      showHelp();
+      contineRun = false;
     }
 
     case 'y':
@@ -97,7 +92,7 @@ var args = argu.filter(function(arg){
     case 'u':
     case 'upload': {
       console.log('upload image file an sprite finish');
-      config.uploadFile = true;
+      config.uploadImgs = true;
       break;
     }
 
@@ -105,7 +100,7 @@ var args = argu.filter(function(arg){
     case 'i':
     case 'important': {
       console.log('add important for sprite rule, improve background-image level');
-      config.useImportant = true;
+      config.useImportant = tue;
       break;
     }
 
@@ -125,34 +120,85 @@ var args = argu.filter(function(arg){
     }
 
     case 'config': {
-      var json = 'upload.json';
-      var configFile = path.resolve(process.cwd(), json);
-      var dest = path.resolve(__dirname, '../' + json);
-      if (exists(configFile)){
-        var fileData = fs.readFileSync(configFile);
-        fs.writeFileSync(dest, fileData);
-        console.log('config file copy success!');
-      } else {
-        console.log('the upload.json file is not exists!');
-      }
-      process.exit(0);
+      var json = 'config.json';
+      var file = path.resolve(__dirname, '../' + json);
+      var cfg = fs.readFileSync(file);
+      setCookie(JSON.parse(cfg), path.resolve(__dirname, '../../' + json));
+      contineRun = false;
     }
   }
 });
 
+function showHelp(){
+  var help = fs.readFileSync(__dirname + '/help.txt');
+  var version = fs.readFileSync(path.resolve(__dirname, '../package.json'));
+  version = JSON.parse(version).version;
+  console.log(help.toString().replace('{version}', version).
+    replace('{filename}', __filename));
+  process.exit(0);
 
-config.file = args[1];
-
-if (!exists(config.file)){
-  console.log('no css file input or you file is not exists!');
-} else {
-  config.file = path.resolve(process.cwd(), config.file);
-  var parser = require('../src/');
-
-  debugger;
-  new parser(config.file, config);
 }
 
+function setCookie(config, file){
+  var readline = require('readline');
+  var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+  rl.question("Please config you use name in taobao.com: ", function(answer) {
+    config.upload.headers.Cookie = '_nk_:' + answer + ';';
+    var text = JSON.stringify(config.upload);
+    fs.writeFile(file, text, function(err){
+      if (err) {
+        console.log('write config false');
+        console.log(err);
+      } else {
+        console.log('write config success');
+        console.log(text);
+      }
+      process.exit(0);
+    });
+
+    rl.close();
+  });
+
+}
+
+function run(){
+  config.file = args[1];
+  var currentDir = process.cwd();
+  if (!exists(config.file)) {
+    config.file = autoFindFile(currentDir);
+    config.nochange = true;
+  }
+
+  if (!config.file){
+    showHelp();
+  } else {
+    config.file = path.resolve(process.cwd(), config.file);
+    var parser = require('../src/');
+    debugger;
+    new parser(config.file, config);
+  }
+
+}
+
+function autoFindFile(dir){
+  var files = fs.readdirSync(dir);
+  var ret = false;
+  files.some(function(file){
+    var basename = path.basename(file, '.css');
+    if (path.extname(file) === '.css' && 
+      files.indexOf(basename + '.json') !== -1) {
+      ret = file;
+      return true;
+    }
+  });
+
+  return ret;
+}
+
+if (contineRun) run();
 /**
  * vim: ft=javascript:tw=80:
  */

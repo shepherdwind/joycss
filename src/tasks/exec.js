@@ -25,9 +25,11 @@ StdClass.extend(Exec, StdClass, {
       var cmd = spawn(bin, option, {cwd: cwd});
       var ret = '';
       var err = false;
+      var str = '';
 
       cmd.stdout.on('data', function cmdSuccess(data){
-        ret += data.toString();
+        str = data.toString();
+        ret += str;
       });
       cmd.stderr.on('data', function cmdError(data){
         ret += data.toString();
@@ -36,7 +38,9 @@ StdClass.extend(Exec, StdClass, {
 
       cmd.on('exit', function(){
         if (err) {
-          console.log('[error]' + ret);
+          console.log('[error] happen on ' + _this.get('file'));
+        } else {
+          if (str) console.log(str);
         }
         _this.fire('finish', ret);
       });

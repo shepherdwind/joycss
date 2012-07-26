@@ -11,14 +11,10 @@ function cssWrite(){
 StdClass.extend(cssWrite, StdClass, {
 
   attributes: {
-    writeFile    : false,
-    uploadFile   : false,
     useImportant : false,
     destFile     : '',
-    nochange     : false,
     file         : '',
     cssText      : '',
-    rules        : {},
     extraRules   : {},
     changedRules : {},
     cssReader    : {}
@@ -27,23 +23,7 @@ StdClass.extend(cssWrite, StdClass, {
   CONSIT: {},
 
   _init: function(){
-    var file = this.get('file');
-    var cssFile = file;
-    var destFile = file;
-
-    if (this.get('writeFile')){
-      var sourceFile = file.replace('.css', '.source.css');
-      if (exists(sourceFile)){
-        cssFile = sourceFile;
-      } else {
-        cssFile = file;
-      }
-    } else {
-      destFile = file.replace('.css', '.sprite.css');
-    }
-
-    this.set('destFile', destFile);
-
+    this.cssText = '';
   },
 
   write: function(changedRules, extraRules, opt_fn){
@@ -60,6 +40,13 @@ StdClass.extend(cssWrite, StdClass, {
     }, this);
 
     opt_fn ? opt_fn(this.cssText) : this._writeFile();
+  },
+
+  replace: function(maps){
+    forEach(maps, function(fileurl, file){
+      this.cssText.replace(file, fileurl);
+    }, this);
+    this._writeFile();
   },
 
   _writeFile: function(){

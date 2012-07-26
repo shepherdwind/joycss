@@ -6,10 +6,8 @@ var some      = require('../lib/utils').some;
 var forEach   = require('../lib/utils').forEach;
 var mixin     = require('../lib/utils').mixin;
 var util      = require('util');
-var fs        = require('fs');
 var Box       = require('../lib/box');
 var url       = require('url');
-var exists    = fs.existsSync || path.existsSync;
 
 var PARAMS    = {
   'nosprite'   : 'esc',
@@ -58,7 +56,7 @@ StdClass.extend(SpriteDef, StdClass, {
     cssReader    : {},
     changedRules : {},
     extraRules   : [],
-    escImgs      : [],
+    cssImgs      : [],
     spritesImgs  : []
   },
 
@@ -220,8 +218,8 @@ StdClass.extend(SpriteDef, StdClass, {
           }
           this.set('preParam', preParam);
         } else {
-          var escImgs = this.get('escImgs');
-          escImgs.push(ret);
+          var cssImgs = this.get('cssImgs');
+          cssImgs.push(ret);
           rule.value[index] = val.replace(imgurl.pathname, ret);
           ret = false;
         }
@@ -308,14 +306,15 @@ StdClass.extend(SpriteDef, StdClass, {
   },
 
   _setChangedRules: function(sprite){
-    var imgBase = sprite.filename;
-    var imgBase8 = imgBase.replace('sprite.png', 'sprite8.png');
-    var imgPath = sprite['force8bit'] ? imgBase8 : imgBase;
+    var imgBase      = sprite.filename;
+    var imgBase8     = imgBase.replace('sprite.png', 'sprite8.png');
+    var imgPath      = sprite['force8bit'] ? imgBase8 : imgBase;
     var changedRules = this.get('changedRules');
-    var defs = this.imagesDef;
-    var extraRules = this.get('extraRules');
-    var spritesImgs = this.get('spritesImgs');
-    var selectors = [];
+    var defs         = this.imagesDef;
+    var extraRules   = this.get('extraRules');
+    var spritesImgs  = this.get('spritesImgs');
+    var cssImgs      = this.get('cssImgs');
+    var selectors    = [];
 
     forEach(sprite.images, function(imgInfo){
       var img = imgInfo['file_location'];
@@ -333,6 +332,7 @@ StdClass.extend(SpriteDef, StdClass, {
           return true;
         }
       });
+
       if (def['repeat'] != 'no-repeat'){
         property.push('background-repeat');
         value.push(def['repeat']);
@@ -358,6 +358,7 @@ StdClass.extend(SpriteDef, StdClass, {
 
     extraRules.push(extraRule);
     spritesImgs.push(imgBase);
+    cssImgs.push(imgPath);
   },
 
   _setImageInfo: function(box, imageInfo){
