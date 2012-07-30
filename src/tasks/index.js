@@ -17,7 +17,7 @@ function Tasks(tasks, cwd){
     var exec = require('./' + task.task);
     forEach(task.files, function(file){
       var cmd = new exec({'file': file, cwd: cwd});
-      console.log('[task ' + task.task + ' ] on file ' + file + ' begin');
+      console.log('[task ' + task.task + '] on file ' + file + ' begin');
       this.num = this.num + 1;
       cmd.on('finish', function(e){
         _this.emit('finish', {ret: e, file: file, task: task.task});

@@ -28,7 +28,7 @@ class SmartSprite
         if ($gdInfo) {
             $gdVersion = $gdInfo['GD Version'];
             if ($this->verbose)
-                $this->log->info[] = "Using: GD_lib $gdVersion \n";
+                $this->log->info[] = "[test gd]Using: GD_lib $gdVersion \n";
         } else die ( "ERROR: no GD Library found.\n" );
     }
 
@@ -40,7 +40,7 @@ class SmartSprite
 
             $DATAURL = $this->sprites[$spritekey]['dataurl'];
 
-            $this->log->info[] = "creating css-sprite-file: " .basename($filename). " \n";
+            $this->log->info[] = "[sprite create begin]creating sprite image: " .basename($filename). " \n";
             $backgroundHEX = $this->sprites[$spritekey]['background'];
 
             if ($_imagelocations) {
@@ -130,20 +130,21 @@ class SmartSprite
                     }
                 }	// image loop
 
-                $this->log->info[] = count($_imagelocations) . " images will merge to one image\n";
+                $this->log->info[] = '[sprite info]' .count($_imagelocations) . " images will merge to one image " 
+                    . basename($this->sprites[$spritekey]['filename']) . "[{$w}x{$h}]\n";
                 $this->safeImageToFile($image, $this->sprites[$spritekey]['imagetype'], 
                     $this->sprites[$spritekey]['filename'], $spritekey, $DATAURL ); 
             }	// if images exists
         }	// Sprite loop
 
-        $this->log->info[] = '[success] end';
+        $this->log->info[] = '[sprites success] end';
         echo json_encode($this->log);
     }
     function safeImageToFile($imgres, $imgtype, $filename, $spritekey, $dataurl) {
         $filename = dirname($this->_filename).'/'.$filename;
         //if ($this->verbose)
 
-        $this->log->info[] = "Writing smartsprite file: " .basename($filename)."  colors: $this->_maxColors  \n";
+        $this->log->info[] = "[sprite create end]Writing image: " .basename($filename)."  colors: $this->_maxColors  \n";
 
         $_result = 0;
         switch ($imgtype) {
@@ -197,8 +198,8 @@ class SmartSprite
         }
 
         $_colorCount = ImageColorsTotal($_result);
-        $this->log->info[] = 'testing image: '. basename($filelocation) . ' colors: '.$_colorCount . 
-            " size:[{$imageInfo['width']}x{$imageInfo['height']}]\n";
+        //$this->log->info[] = 'testing image: '. basename($filelocation) . ' colors: '.$_colorCount . 
+            //" size:[{$imageInfo['width']}x{$imageInfo['height']}]\n";
 
         if (  $this->_maxColors < $_colorCount ) $this->_maxColors = $_colorCount;
         if ($_colorCount  == 0) $this->_trueColor = true;

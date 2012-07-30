@@ -32,6 +32,7 @@ StdClass.extend(Exec, StdClass, {
         ret += str;
       });
       cmd.stderr.on('data', function cmdError(data){
+        var strOut = data.toString();
         ret += data.toString();
         err = true;
       });
@@ -39,6 +40,7 @@ StdClass.extend(Exec, StdClass, {
       cmd.on('exit', function(){
         if (err) {
           console.log('[error] happen on ' + _this.get('file'));
+          console.log(ret);
         } else {
           if (str) console.log(str);
         }

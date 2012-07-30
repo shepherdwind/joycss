@@ -51,7 +51,6 @@ function init (){
 
 }
 
-
 function matchArg(arg, key){
   key = key || 'global';
   if (!config[key]) config[key] = {};
@@ -129,6 +128,7 @@ function matchArg(arg, key){
       version = JSON.parse(version).version;
       console.log("version " + version);
       process.exit(0);
+      break;
     }
 
     case 'config': {
@@ -137,6 +137,7 @@ function matchArg(arg, key){
       var cfg = fs.readFileSync(file);
       setCookie(JSON.parse(cfg), path.resolve(__dirname, '../../' + json));
       contineRun = false;
+      break;
     }
 
     default: {
@@ -166,7 +167,7 @@ function setCookie(config, file){
     output: process.stdout
   });
   rl.question("Please config you use name in taobao.com: ", function(answer) {
-    config.upload.headers.Cookie = '_nk_:' + answer + ';';
+    config.upload.headers.Cookie = '_nk_=' + answer + ';';
     var text = JSON.stringify(config.upload);
     fs.writeFile(file, text, function(err){
       if (err) {
@@ -188,7 +189,7 @@ function run(){
   var currentDir = process.cwd();
   if (!config.file || !exists(config.file)) {
     config.file = autoFindFile(currentDir);
-    config.nochange = true;
+    config.global.nochange = true;
   }
 
   if (!config.file){

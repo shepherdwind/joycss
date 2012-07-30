@@ -37,7 +37,6 @@ Joycss.prototype = {
     this.config = utils.mixin(config, defaults);
     var file = this.file;
 
-    console.log(this.config);
     var cssFile = file;
     var destFile = file;
 
@@ -77,27 +76,35 @@ Joycss.prototype = {
     var spriteDef = this.spriteDef;
     var cssWrite  = this.cssWrite;
     var nochange = this.config.global.nochange;
+    var _this = this;
     spriteDef.on('finish:parser', function(){
       cssWrite.write(this.get('changedRules'), this.get('extraRules'));
-      if (!nochange) this.createSprite();
+      if (!nochange){ 
+        this.createSprite();
+      } else {
+        cssWrite.replace(_this.config.maps);
+      }
     });
 
     var cwd = path.dirname(this.file);
-    var _this = this;
 
     spriteDef.on('finish:merge', function(){
       var spritesImgs = this.get('spritesImgs');
       var cssImgs     = this.get('cssImgs');
-      console.log(cssImgs);
-      console.log(spritesImgs);
-      new Tasks([
-        {
-          files: spritesImgs,
-          task: 'quant'
-        }
-      ], cwd).on('success', function(){
+      var quantsImg = [];
+      var optis = [];
+      cssImgs.forEach(function(img){
+        var file = img.replace('sprite8.png', 'sprite.png');
+        file !== img ? quantsImg.push(file) : optis.push(file);
+      });
+
+      var tasks = [];
+      if (optis.length) tasks.push({files: optis, task: 'optipng'});
+      if (quantsImg.length) tasks.push({files: quantsImg, task: 'quant'});
+
+      new Tasks(tasks, cwd).on('success', function(){
         var config = _this.config;
-        if (config.uploadImgs){
+        if (config.global.uploadImgs){
           var task = Tasks.upload(config.upload, cssImgs);
           task.on('finish:upload', _this._uploadEnd.bind(_this));
         } else {
@@ -186,7 +193,7 @@ Joycss.prototype = {
         this.config = utils.mixin(localConfig, this.config);
       }
 
-      if (this.config.uploadImgs){
+      if (this.config.global.uploadImgs){
         this._getUploadConfig();
       }
     }

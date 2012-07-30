@@ -44,18 +44,18 @@ StdClass.extend(cssWrite, StdClass, {
 
   replace: function(maps){
     forEach(maps, function(fileurl, file){
-      this.cssText.replace(file, fileurl);
+      this.cssText = this.cssText.replace(file, fileurl);
     }, this);
     this._writeFile();
   },
 
   _writeFile: function(){
-    var destFile = this.get('destFile');
+    var destFile = path.basename(this.get('destFile'));
     fs.writeFile(destFile, this.cssText, function(err){
       if (err){
         console.log(err);
       } else {
-        console.log('write file ' + destFile + ' success');
+        console.log('[css write]write file ' + destFile + ' success');
       }
     });
   },
