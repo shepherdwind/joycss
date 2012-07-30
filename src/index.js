@@ -12,11 +12,14 @@ function Joycss(){
 }
 
 var defaults = {
+  global: {
     writeFile    : false,
     uploadImgs   : false,
     useImportant : false,
     nochange     : false,
-    layout : 'auto'
+    force8bit    : true,
+    layout       : 'auto'
+  }
 };
 
 Joycss.prototype = {
@@ -33,13 +36,14 @@ Joycss.prototype = {
   _init: function(config){
     this.config = utils.mixin(config, defaults);
     var file = this.file;
-    
+
+    console.log(this.config);
     var cssFile = file;
     var destFile = file;
 
     this._getConfig();
 
-    if (this.config.writeFile){
+    if (this.config.global.writeFile){
       var sourceFile = file.replace('.css', '.source.css');
       if (exists(sourceFile)){
         cssFile = sourceFile;
@@ -57,7 +61,9 @@ Joycss.prototype = {
     this.spriteDef = new SpriteDef({
       file: file,
       cssReader: this.cssReader,
-      layout: this.config.layout
+      layout: this.config.global.layout,
+      force8bit: this.config.global.force8bit,
+      config: this.config
     });
 
     this.cssWrite = new CssWrite({
@@ -70,7 +76,7 @@ Joycss.prototype = {
   _bind: function(){
     var spriteDef = this.spriteDef;
     var cssWrite  = this.cssWrite;
-    var nochange = this.config.nochange;
+    var nochange = this.config.global.nochange;
     spriteDef.on('finish:parser', function(){
       cssWrite.write(this.get('changedRules'), this.get('extraRules'));
       if (!nochange) this.createSprite();
@@ -81,7 +87,9 @@ Joycss.prototype = {
 
     spriteDef.on('finish:merge', function(){
       var spritesImgs = this.get('spritesImgs');
-      var cssImgs = this.get('cssImgs');
+      var cssImgs     = this.get('cssImgs');
+      console.log(cssImgs);
+      console.log(spritesImgs);
       new Tasks([
         {
           files: spritesImgs,
@@ -110,7 +118,7 @@ Joycss.prototype = {
   _writeConfig: function(){
 
     delete this.config.upload;
-    delete this.config.nochange;
+    delete this.config.global.nochange;
 
     var text = JSON.stringify(this.config);
     text = this.formatJson(text);
@@ -174,7 +182,7 @@ Joycss.prototype = {
     if (exists(localFile)){
       var localConfig = JSON.parse(fs.readFileSync(localFile));
 
-      if (this.config.nochange) {
+      if (this.config.global.nochange) {
         this.config = utils.mixin(localConfig, this.config);
       }
 
@@ -187,7 +195,7 @@ Joycss.prototype = {
   _getUploadConfig: function(){
     var uploadFile = path.resolve(__dirname, '../../config.json');
     if (exists(uploadFile)){
-      var upload = JSON.parse(fs.readFileSync(file));
+      var upload = JSON.parse(fs.readFileSync(uploadFile));
       this.config.upload = upload;
     } else {
       console.log('[Error] upload has not config, please run joycss --config first');

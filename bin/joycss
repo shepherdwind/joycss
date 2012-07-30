@@ -1,41 +1,61 @@
 #!/usr/bin/env node
 
-var argv   = process.argv.slice(1);
+var argv   = process.argv.slice(2);
 var path   = require('path');
 var fs     = require('fs');
-var argu   = [];
-var util   = require('util');
+var argu   = {global: []};
+var utils   = require('../lib/utils');
 var exists = fs.existsSync || path.existsSync;
 var contineRun = true;
-
-var commendList = [
-  'config', 'update', 'nochange', 'important', 'source',
-  'white', 'alpha', 'close', 'vertical', 'version', 'help'
-];
-argv.forEach(function(arg){
-  if (arg[0] === '-' && arg.length > 2 && arg[1] !== '-'){
-
-    for (var i = 1; i < arg.length; i++) {
-      argu.push('-' + arg[i]);
-    }
-  } else {
-    argu.push(arg);
-  }
-});
-
 var config = {
   file: '',
-  layout: 'auto'
+  global: {}
 };
 
-var args = argu.filter(function(arg){
-  var match = arg.match(/^--?([a-z][0-9a-z-]*)(?:=([^\s]+))?$/i);
-  if (match) { 
-    arg = match[1];
-  } else { 
-    return arg;
-  }
+function init (){
+  argv.forEach(function(arg){
+    if (arg[0] === '-'){
 
+      if (arg.length > 2){
+        var arg1 = arg[1];
+        if (arg1 !== '-'){
+
+          //-us
+          if (+arg1 != +arg1) {
+            for (var i = 1; i < arg.length; i++) argu.global.push(arg[i]);
+          } else {
+            //-0a -1c
+            argu[arg1] = [];
+            for (var i = 2; i < arg.length; i++) argu[arg1].push(arg[i]);
+          }
+
+        } else {
+          argu.global.push(arg.slice(2));
+        }
+      } else {
+        //--alpha
+        argu.global.push(arg[1]);
+      }
+
+    } else {
+      //filename
+      config.file = arg;
+    }
+  });
+
+  utils.forEach(argu, function(args, key){
+    args.forEach(function(arg){
+      matchArg(arg, key);
+    });
+  });
+
+}
+
+
+function matchArg(arg, key){
+  key = key || 'global';
+  if (!config[key]) config[key] = {};
+  var msg = '';
   switch (arg) {
     case 'h':
     case 'help': {
@@ -45,69 +65,61 @@ var args = argu.filter(function(arg){
 
     case 'y':
     case 'vertical': {
-      console.log('use layout vertical');
-      config.layout = 'vertical';
+      msg = ('use layout vertical');
+      config[key].layout = 'vertical';
       break;
     }
 
     case 'x':
     case 'horizontal': {
-      config.layout = 'horizontal';
+      config[key].layout = 'horizontal';
       break;
     }
 
     //全部使用紧凑拼图
     case 'c':
     case 'close': {
-      console.log('use layout close');
-      config.layout = 'close';
+      msg = ('use layout close');
+      config[key].layout = 'close';
       break;
     }
 
     //使用png24
     case 'a':
     case 'alpha': {
-      console.log('use alpha mode, sprite image will be truecolor image, eg:png24');
-      config.force8bit = false;
-      break;
-    }
-
-    //背景白色
-    case 'w':
-    case 'white': {
-      console.log('use white background for sprite image, no transpant');
-      config.background = 'ffffff00';
+      msg = ('use alpha mode, sprite image will be truecolor image, eg:png24');
+      config[key].force8bit = false;
       break;
     }
 
     //重写文件名,使用source文件
     case 's':
     case 'source': {
-      console.log('rewrite css file, use .source.css file as input');
-      config.writeFile = true;
+      msg = ('rewrite css file, use .source.css file as input');
+      config[key].writeFile = true;
       break;
     }
 
     //图片上传
     case 'u':
     case 'upload': {
-      console.log('upload image file an sprite finish');
-      config.uploadImgs = true;
+      msg = ('upload image file an sprite finish');
+      config[key].uploadImgs = true;
       break;
     }
 
     //重写文件名,使用source文件
     case 'i':
     case 'important': {
-      console.log('add important for sprite rule, improve background-image level');
-      config.useImportant = tue;
+      msg = ('add important for sprite rule, improve background-image level');
+      config[key].useImportant = true;
       break;
     }
 
     case 'n':
     case 'nochange':{
-      console.log('nochange for sprite image, use the backup url');
-      config.nochange = true;
+      msg = ('nochange for sprite image, use the backup url');
+      config[key].nochange = true;
       break;
     }
 
@@ -115,7 +127,7 @@ var args = argu.filter(function(arg){
     case 'version': {
       var version = fs.readFileSync(path.resolve(__dirname, '../package.json'));
       version = JSON.parse(version).version;
-      console.log("v" + version);
+      console.log("version " + version);
       process.exit(0);
     }
 
@@ -126,8 +138,16 @@ var args = argu.filter(function(arg){
       setCookie(JSON.parse(cfg), path.resolve(__dirname, '../../' + json));
       contineRun = false;
     }
+
+    default: {
+      console.log('[error]unknow option ' + arg);
+      showHelp();
+    }
   }
-});
+
+  if (msg) console.log('[config ' + key + ']' + msg);
+}
+
 
 function showHelp(){
   var help = fs.readFileSync(__dirname + '/help.txt');
@@ -165,9 +185,8 @@ function setCookie(config, file){
 }
 
 function run(){
-  config.file = args[1];
   var currentDir = process.cwd();
-  if (!exists(config.file)) {
+  if (!config.file || !exists(config.file)) {
     config.file = autoFindFile(currentDir);
     config.nochange = true;
   }
@@ -198,6 +217,7 @@ function autoFindFile(dir){
   return ret;
 }
 
+init();
 if (contineRun) run();
 /**
  * vim: ft=javascript:tw=80:

@@ -50,6 +50,8 @@ StdClass.extend(SpriteDef, StdClass, {
     //预处理数组，处理id顺序关系
     preParam     : [],
     ruleIds      : [],
+    //配置方式
+    config       : {},
     layout       : 'auto',
     force8bit    : true,
     background   : 'ffffff7f',
@@ -113,6 +115,9 @@ StdClass.extend(SpriteDef, StdClass, {
     if (dir && dir == PARAMS['horizontal']) {
       this.sprites[spriteId]['layout'] = 'horizontal';
     }
+
+    var config = this.get('config');
+    if (config[id]) mixin(config[id], this.sprites[spriteId]);
 
     ids[id] = spriteId;
     id++;
@@ -294,8 +299,10 @@ StdClass.extend(SpriteDef, StdClass, {
     //拼图算法接口调用
     forEach(this.sprites, function(sprite){
       var layout = sprite.layout;
-      var Locate = require('./locating/' + layout);
-      var Loc = new Locate(sprite.images, imagesDef, this.get('layout'));
+      var file = layout;
+      if (layout == 'close') file = 'vertical';
+      var Locate = require('./locating/' + file);
+      var Loc = new Locate(sprite.images, imagesDef, layout || this.get('layout'));
       sprite.height = Loc.height;
       sprite.width = Loc.width;
       this._setChangedRules(sprite);

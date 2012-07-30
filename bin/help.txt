@@ -2,21 +2,26 @@ Usage: joycss [ file.css ][options]
        joycss [options] [ file.css ]
 
 Options:
-  -h, --help           print help info
-  -v, --version        print joycss's version
   -y, --vertical       use vertical layout, do not use tight sprite images
   -c, --close          merge images as close as possable
   -a, --alpha          create sprite images use png24 formart
-  -w, --white          set sprite images background no transparent, white
   -s, --source         write the origin file and set .source file as a backup,
                        commend joycss a.css, use a.source.css as source file
   -i, --important      add !important for sprite css, make background-image will
                        not be replace by other css rule
   -u, --upload         upload image file
+  -h, --help           print help info
+  -d                   config single sprite, -d is id, such as -0ac -1c, which
+                       mean the first sprite image[-0] use alpha and close option,
+                       the secend sprite image[-1] use close option[-1c]
+  -v, --version        print joycss's version
   -n, --nochange       use backup image url, sprite image no change
-  --config             config the upload image api, if after you css sprite, image
-                       need upload to some other server, in you current dir, you
-                       should have an file name upload.json
+  --config             config the upload image api
+
+if nothing options and no file.css input, that mean only use commend `joycss`,
+then, first look up all files of current dir, if find a file named a.css, and 
+there is an other file named a.json, the commend equal to `joycss a.css -n`, if
+no such file, equal `joycss -h`.
 
 Environment require:
 php cli with gd lib
