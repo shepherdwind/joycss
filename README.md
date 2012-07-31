@@ -3,17 +3,29 @@ JoyCss
 
 ###什么是joycss
 
-
 joycss是一个基于nodejs和php的自动拼图工具。
 joycss的目标：*使用简单，功能强大* 。
 
 css生成后的效果：[test.css](https://github.com/shepherdwind/joycss/blob/master/demo/css/test.css) vs [tes.sprite.css](https://github.com/shepherdwind/joycss/blob/master/demo/css/test.sprite.css) 
-使用
+###使用
 
 ```
 npm install -g joycss
 joycss -h
+//nochange，只重重新编译css，不生成图片，当只修改css，不涉及图片修改时使用
+joycss -n a.css
+//-s source使用source文件，覆盖a.css，生成a.source.css
+//-0c第一张图片使用紧凑拼图(close), 第二张图使用alpah模式，png24
+joycss -s -0c -1a a.css
 ```
+
+###依赖
+
+* 使用php拼图，依赖gd库，要求PATH下能执行php
+* 使用[pngquant](http://pngquant.org/)转换png24为png8图
+* 使用[optipng](http://optipng.sourceforge.net)压缩png24图片
+* pngquant和optipng都是跨平台的命令行工具，在win平台下，exe文件已经和joycss打包
+  在一起，其他平台请自行安装、编译
 
 ###支持的特性
 
@@ -82,12 +94,15 @@ sprite css文件。然后，检查一下，以下的情况，可能导致拼图�
   repeat和没有repeat一样，这时候，默认设置为no-repeat，如果有些图片确实需要使用
   repeat，请不要省略。垂直布局支持repeat-x，水平布局支持repeat-y。
   
-* 图片拼合以后失真问题，使用png8拼图，颜色相近的图片可能会相互融合，比如橘红色
-  和黄色，如果页面很多黄色的图片，拼图以后，橘红色的图片也会变成黄色的了。混色的
-  问题，和图片所处的位置没有关系。如果使用png24模式拼图，就不会有问题，但ie6无法
-  识别， ie6只能继续回归到png8。png24 拼图使用命名`joycss xx.css -a`或者
-  `joycss xx.css --alpha`。或者，对图片进行分组，手动避免颜色混合，分组使用id作
-  为参数。
-
 好了，还有什么问题，可以查看[文档](http://git.shepherdwind.com/joycss.html) ，
 或者可以直接联系我，欢迎使用。
+
+###change
+
+####0.4.0
+
+- 完成css分析和css回写分离
+- 增加css背景图压缩功能
+- 优化css回写规则，在没有需要修改图片的时候，保存上一次命令参数
+- 优化url参数范围，png24和png8兼容处理优化
+- 增加命令行配置单个图片方式

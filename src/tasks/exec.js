@@ -1,5 +1,7 @@
 var spawn = require('child_process').spawn;
 var StdClass = require('../../lib/stdclass');
+var path = require('path');
+var isWin = !!process.platform.match(/^win/);
 
 function Exec(){
   this.init.apply(this, arguments);
@@ -17,10 +19,13 @@ StdClass.extend(Exec, StdClass, {
   _init: function(){
     var file = this.get('file');
     var bin = this.get('bin');
+
+    if (isWin) bin = path.resolve(__dirname, '../../bin') + '/' + bin + '.exe';
     var option = this.get('options');
     option.push(file);
     var _this = this;
     var cwd = this.get('cwd');
+    
     try {
       var cmd = spawn(bin, option, {cwd: cwd});
       var ret = '';
