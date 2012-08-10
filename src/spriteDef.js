@@ -106,6 +106,9 @@ StdClass.extend(SpriteDef, StdClass, {
 
     this.sprites[spriteId] = mixin(conf, {});
     this.sprites[spriteId]['images'] = {};
+    var config = this.get('config');
+    //合并全局配置
+    mixin(config['global'], this.sprites[spriteId]);
     if (imgPath) {
       this.sprites[spriteId]['filename'] = imgPath + '/' + 
                        spriteId + '-sprite.png';
@@ -116,7 +119,6 @@ StdClass.extend(SpriteDef, StdClass, {
       this.sprites[spriteId]['layout'] = 'horizontal';
     }
 
-    var config = this.get('config');
     if (config[id]) mixin(config[id], this.sprites[spriteId]);
 
     ids[id] = spriteId;
