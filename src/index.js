@@ -25,11 +25,40 @@ var defaults = {
 Joycss.prototype = {
   constructor: Joycss,
   init: function(file, config){
-    this.file = file;
     this.config = {};
+    var stats = fs.statSync(file);
+    var ext = path.extname(file);
+
+    if (!ext) {
+      if (exists(file + '.css')) {
+        file = file + '.css';
+      } else {
+        //目录生成sprite
+        if (stats.isDirectory()) {
+          this._readFromDir(file);
+        }
+      }
+    }
+
+    this.file = this.file || file;
     this._init(config);
 
     this._bind();
+  },
+
+  _readFromDir: function(file){
+    var files = fs.readdirSync(file);
+    var exts = ['.png', '.gif', '.jpg'];
+    var text = '';
+    files.forEach(function(file){
+      var ext = path.extname(file);
+      if (exts.indexOf(ext) !== -1){
+        text = text + '.' + path.basename(file, ext) + 
+               ' { background: url(' + file + ');}';
+      }
+    });
+    this.text = text;
+    this.file = file + '/' + path.basename(file) + '.css';
   },
 
   //初始化配置
@@ -42,20 +71,28 @@ Joycss.prototype = {
 
     this._getConfig();
 
-    if (this.config.global.writeFile){
-      var sourceFile = file.replace('.css', '.source.css');
-      if (exists(sourceFile)){
-        cssFile = sourceFile;
+    if (!this.text) {
+      if (this.config.global.writeFile){
+        var sourceFile = file.replace('.css', '.source.css');
+        if (exists(sourceFile)){
+          cssFile = sourceFile;
+        } else {
+          cssFile = file;
+        }
       } else {
-        cssFile = file;
+        destFile = file.replace('.css', '.sprite.css');
       }
-    } else {
-      destFile = file.replace('.css', '.sprite.css');
-    }
 
-    this.cssReader = new cssReader({
-      file: cssFile, copyFile: sourceFile
-    });
+      this.cssReader = new cssReader({
+        file: cssFile, copyFile: sourceFile
+      });
+
+    } else {
+      this.cssReader = new cssReader({
+        text: this.text
+      });
+      this.config.global.layout = 'close';
+    }
 
     this.spriteDef = new SpriteDef({
       file: file,
@@ -130,7 +167,7 @@ Joycss.prototype = {
     var text = JSON.stringify(this.config);
     text = this.formatJson(text);
 
-    var file = this.file.replace('.css', '.json');
+    var file = this.file.replace('.css', '.joy');
     fs.writeFile(file, text, function(err){
       if (err) {
         console.log('write config false');
@@ -184,7 +221,7 @@ Joycss.prototype = {
 
   _getConfig: function(){
 
-    var localFile = this.file.replace('.css', '.json');
+    var localFile = this.file.replace('.css', '.joy');
 
     if (exists(localFile)){
       var localConfig = JSON.parse(fs.readFileSync(localFile));

@@ -302,7 +302,7 @@ StdClass.extend(SpriteDef, StdClass, {
     forEach(this.sprites, function(sprite){
       var layout = sprite.layout;
       var file = layout;
-      if (layout == 'close') file = 'vertical';
+      if (layout == 'close' || layout == 'auto') file = 'vertical';
       var Locate = require('./locating/' + file);
       var Loc = new Locate(sprite.images, imagesDef, layout || this.get('layout'));
       sprite.height = Loc.height;

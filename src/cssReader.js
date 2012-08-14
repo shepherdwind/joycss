@@ -65,6 +65,7 @@ StdClass.extend(CssReader, StdClass, {
     //file path
     file: '',
     copyFile: '',
+    text: '',
     //selector collections
     selectors : [],
     //property collections
@@ -117,33 +118,46 @@ StdClass.extend(CssReader, StdClass, {
   _init: function init(){
 
     var file = this.get('file');
-    if (!file) return;
+    if (file) {
+      this.set('timeStart', (new Date()).getTime());
+      var steam = fs.createReadStream(file);
+      var copyFileName = this.get('copyFile');
 
-    this.set('timeStart', (new Date()).getTime());
-    var steam = fs.createReadStream(file);
-    var copyFileName = this.get('copyFile');
+      if (copyFileName && copyFileName !== file){
+        var copyFile = fs.createWriteStream(copyFileName);
+        util.pump(steam, copyFile);
+      }
 
-    if (copyFileName && copyFileName !== file){
-      var copyFile = fs.createWriteStream(copyFileName);
-      util.pump(steam, copyFile);
+      this._steam = steam;
+    } else {
+      var text = this.get('text');
+      if (!text) return;
     }
 
-    this._steam = steam;
     this._bind();
   },
 
   _bind: function bind(){
 
     this._addEvent('start');
-    this._steam.on('data', this._read.bind(this));
-    this._steam.on('end', this._readEnd.bind(this));
+    var text = this.get('text');
 
-    this.on('change:status:ruleStart', this._ruleStart);
-    this.on("change:status:selectorBreak", this._addSelector);
-    this.on("change:status:valueStart", this._addProperty);
-    this.on("change:status:valueEnd", this._addValue);
-    this.on("change:status:ruleEnd", this._ruleEnd);
+    this.on('change:status:ruleStart'     , this._ruleStart);
+    this.on("change:status:selectorBreak" , this._addSelector);
+    this.on("change:status:valueStart"    , this._addProperty);
+    this.on("change:status:valueEnd"      , this._addValue);
+    this.on("change:status:ruleEnd"       , this._ruleEnd);
 
+    if (!text){
+      this._steam.on('data', this._read.bind(this));
+      this._steam.on('end', this._readEnd.bind(this));
+    } else {
+      var _this = this;
+      setTimeout(function(){
+        _this._read(text);
+        _this._readEnd();
+      }, 10);
+    }
   },
 
   /**
@@ -331,10 +345,12 @@ StdClass.extend(CssReader, StdClass, {
     var code = data[0];
     var line = 1;
     var val;
+    var slice = data.asciiSlice ? 'asciiSlice' : 'slice';
     //console.log("one\n");
 
     while(code){
 
+      if (typeof code == 'string') code = code.charCodeAt();
       if (code === 10 || code === 13){
         var isoneLine = code === 10 && data[i - 1] === 13;
         //isoneLine = isoneLine || (code === 10 && data[i - 1] === 13);
@@ -364,7 +380,7 @@ StdClass.extend(CssReader, StdClass, {
           continue;
         }
 
-        val = data.asciiSlice(j, i).replace(this.get('TRIM_REG'), '');
+        val = data[slice](j, i).replace(this.get('TRIM_REG'), '');
         this._addEvent(dismember[code], val, line);
         j = i + 1;
       }
