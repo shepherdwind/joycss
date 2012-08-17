@@ -45,6 +45,8 @@ Tasks.upload = function(config, files){
   var posts = {};
   var maps = {};
   var ret = new EventEmitter();
+  //防止forEach出错
+  files = files || {};
 
   forEach(files, function(file){
     i ++;

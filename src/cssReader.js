@@ -355,12 +355,12 @@ StdClass.extend(CssReader, StdClass, {
         var isoneLine = code === 10 && data[i - 1] === 13;
         //isoneLine = isoneLine || (code === 10 && data[i - 1] === 13);
         if (!isoneLine) line = line + 1;
-      } else if (code === 42 && data[i + 1] === 47){
+      } else if (code === 42 && (data[i + 1] === 47 || data[i + 1] == '/')){
         //comment end 
         comment = false;
         i++;
         j = i + 1;
-      } else if (code === 47 && data[i + 1] === 42){
+      } else if (code === 47 && (data[i + 1] === 42 || data[i + 1] == '*')){
         //comment start
         comment = true;
         i++;

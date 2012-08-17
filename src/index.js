@@ -25,9 +25,10 @@ var defaults = {
 Joycss.prototype = {
   constructor: Joycss,
   init: function(file, config){
-    this.config = {};
+    this.config = config || {};
     var stats = fs.statSync(file);
     var ext = path.extname(file);
+    var inited = true;
 
     if (!ext) {
       if (exists(file + '.css')) {
@@ -38,12 +39,46 @@ Joycss.prototype = {
           this._readFromDir(file);
         }
       }
+    } else if (ext === '.less'){
+      inited = false;
+      this._readFromLess(file);
+      this.file = file.replace('.less', '.css');
     }
 
     this.file = this.file || file;
-    this._init(config);
 
+    if (inited) this.run();
+  },
+
+  run: function(){
+    this._init();
     this._bind();
+  },
+
+  _readFromLess: function(file){
+    var _this = this;
+    console.log('read file source form less');
+    try {
+      var less = require('less');
+      var parser = new(less.Parser)({
+        paths: [path.dirname(file)], 
+        filename: path.basename(file)
+      });
+      var css = fs.readFileSync(file);
+      parser.parse(css.toString(), function lessc(err, tree){
+        if (err){
+          console.log(err);
+          process.exit(0);
+        } else {
+          var text = tree.toCSS();
+          _this.text = text || true;
+          _this.run();
+        }
+      });
+    } catch(e){
+      console.log('please install lessc first, run npn install less -g');
+      process.exit(0);
+    }
   },
 
   _readFromDir: function(file){
@@ -52,18 +87,18 @@ Joycss.prototype = {
     var text = '';
     files.forEach(function(file){
       var ext = path.extname(file);
-      if (exts.indexOf(ext) !== -1){
+      if (exts.indexOf(ext) !== -1 && file.indexOf('-sprite') === -1){
         text = text + '.' + path.basename(file, ext) + 
                ' { background: url(' + file + ');}';
       }
     });
-    this.text = text;
+    this.text = text || true;
     this.file = file + '/' + path.basename(file) + '.css';
   },
 
   //初始化配置
-  _init: function(config){
-    this.config = utils.mixin(config, defaults);
+  _init: function(){
+    this.config = utils.mixin(this.config, defaults);
     var file = this.file;
 
     var cssFile = file;
@@ -91,7 +126,6 @@ Joycss.prototype = {
       this.cssReader = new cssReader({
         text: this.text
       });
-      this.config.global.layout = 'close';
     }
 
     this.spriteDef = new SpriteDef({
