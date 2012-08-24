@@ -251,6 +251,13 @@ StdClass.extend(SpriteDef, StdClass, {
     });
 
     files = Object.keys(files);
+    files.forEach(function(file){
+      var fs = require('fs');
+      var exists    = fs.existsSync;
+      if (!exists(file)){
+        console.log(file);
+      }
+    });
 
     //获取图片大小
     Api.getImagesSize(files, this._setDef, this);
