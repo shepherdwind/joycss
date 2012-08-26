@@ -1,0 +1,16 @@
+body {
+  font-size: 14px;
+  line-height: 2em;
+}
+
+.header-wrap {
+  width: 720px;
+}
+.content {
+  width: 680px;
+  padding: 30px 80px 30px 40px;
+}
+.J_run {
+  display: none;
+}
+

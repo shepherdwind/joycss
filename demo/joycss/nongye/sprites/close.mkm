@@ -1,0 +1,14 @@
+<MKM version="2.0" imageFileUrl="file:///Users/eward/code/shepherdwind/demo/joycss/nongye/sprites/close.png">
+  <Marks>
+    <TextMark defaultDirection="9" direction="5" color="16711680" x="232" y="130" textMaxWidth="100" offsetX="25" offsetY="10" text="1.紧凑拼图区域"/>
+    <LengthMark direction="3" color="16711680" length="10" x="37" y="40"/>
+    <LengthMark direction="12" color="16711680" length="10" x="209" y="34"/>
+    <LengthMark direction="3" color="16711680" length="20" x="15" y="288"/>
+    <TextMark defaultDirection="9" direction="9" color="16711680" x="74" y="46" textMaxWidth="100" offsetX="25" offsetY="10" text="3.默认间距10px"/>
+    <TextMark defaultDirection="9" direction="9" color="16711680" x="16" y="282" textMaxWidth="100" offsetX="25" offsetY="10" text="2.3 手动设置20px间距"/>
+    <TextMark defaultDirection="9" direction="5" color="16711680" x="259" y="316" textMaxWidth="100" offsetX="25" offsetY="10" text="2.1 右对齐部分"/>
+    <TextMark defaultDirection="9" direction="5" color="16711680" x="209" y="337" textMaxWidth="100" offsetX="25" offsetY="10" text="2.2 两个x轴方向重复"/>
+    <TextMark defaultDirection="9" direction="9" color="16711680" x="2" y="371" textMaxWidth="100" offsetX="25" offsetY="10" text="2.4 issuse"/>
+    <TextMark defaultDirection="9" direction="5" color="16711680" x="246" y="194" textMaxWidth="100" offsetX="25" offsetY="10" text="2.垂直布局区域"/>
+  </Marks>
+</MKM>

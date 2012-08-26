@@ -1,0 +1,103 @@
+.shop-tabs .tab-nav {
+  padding: 0 8px;
+  background: url(./img/tab-nav-line.png?line) 0 11px no-repeat;
+}
+.hd-aside .search {
+  height: 40px;
+  background: url(./img/search.png);
+}
+.hd-aside .search:hover {
+  background: url(./img/slice.png);
+}
+.hd-aside .dp-all .shop-info .arrow {
+  width: 9px;
+  height: 6px;
+  background: url(./img/dp.png) no-repeat;
+}
+.hd-aside .dp-all .ks-active .arrow {
+  background: url(./img/dp-active.png) no-repeat;
+}
+.hd-aside .dp-all .more-shop {
+  line-height: 20px;
+  margin-right: 10px;
+  padding-right: 8px;
+  margin-bottom: 6px;
+  background: url(./img/more.png) 100% 5px no-repeat;
+}
+.floors .line {
+  height: 3px;
+  background: url(./img/mid-line.png) repeat-x;
+}
+.fl-hd .fl-tips {
+  padding: 0 4px 0 10px;
+  background: url(./img/tab-nav-line1.png?line) 0 6px no-repeat;
+}
+.end-part .col-vote h3 {
+  background: url('./img/title1.png?line') no-repeat;
+}
+.end-part .col-vote .vote-detial .vote-line {
+  height: 1px;
+  background: url(./img/slice-08.png) repeat-x;
+}
+.end-part .col-vote .vote-detial .vote-info {
+  background: url(./img/slice-12.png?line&bottom=20) no-repeat 0 5px;
+  padding-left: 22px;
+  line-height: 20px;
+  min-height: 30px;
+}
+.end-part .col-vote .ks-triggers .prev {
+  background: url(./img/slice-04.png);
+}
+.end-part .col-vote .ks-triggers .prev:hover {
+  background: url(./img/slice-02.png);
+}
+.end-part .col-vote .ks-triggers .prev.ks-switchable-disable-btn {
+  background: url(./img/slice-06.png);
+}
+.end-part .col-vote .ks-triggers .next {
+  background: url(./img/slice-03.png);
+}
+.end-part .col-vote .ks-triggers .next:hover {
+  background: url(./img/slice-05.png);
+}
+.end-part .col-vote .ks-triggers .next.ks-switchable-disable-btn {
+  background: url(./img/slice-07.png);
+  _visibility: hidden;
+}
+.end-part .col-vote .vote-bar .vote-btn {
+  width: 57px;
+  height: 23px;
+  line-height: 23px;
+  background: url(./img/slice-17.png);
+}
+.end-part .col-review h3 {
+  background: url(./img/title2.png?line) no-repeat;
+}
+.end-part .col-review .review-arrow {
+  width: 15px;
+  height: 9px;
+  line-height: 9px;
+  background: url(./img/rewiew-arrow.png);
+}
+.end-part .col-weibo h3 {
+  background: url(./img/title3.png?line) no-repeat;
+}
+.end-part .wb-navs .prev {
+  background: url(./img/slice-13.png);
+}
+.end-part .wb-navs .prev:hover {
+  background: url(./img/slice-10.png);
+}
+.end-part .wb-navs .prev.disabled {
+  background: url(./img/slice-15.png);
+}
+.end-part .wb-navs .next {
+  background: url(./img/slice-11.png);
+}
+.end-part .wb-navs .next:hover {
+  background: url(./img/slice-14.png);
+}
+.end-part .wb-navs .next.disabled {
+  background: url(./img/slice-16.png);
+  _visibility: hidden;
+}

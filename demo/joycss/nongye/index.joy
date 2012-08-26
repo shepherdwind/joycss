@@ -1,0 +1,10 @@
+{
+  "global":{
+    "writeFile":false,
+    "uploadImgs":false,
+    "useImportant":false,
+    "force8bit":true,
+    "layout":"close"
+  },
+  "file":"/Users/eward/code/shepherdwind/demo/joycss/nongye/index.css"
+}

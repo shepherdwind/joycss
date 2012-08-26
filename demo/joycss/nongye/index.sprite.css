@@ -1,0 +1,135 @@
+.shop-tabs .tab-nav,
+.hd-aside .search,
+.hd-aside .search:hover,
+.hd-aside .dp-all .shop-info .arrow,
+.hd-aside .dp-all .ks-active .arrow,
+.hd-aside .dp-all .more-shop,
+.floors .line,
+.fl-hd .fl-tips,
+.end-part .col-vote h3,
+.end-part .col-vote .vote-detial .vote-line,
+.end-part .col-vote .vote-detial .vote-info,
+.end-part .col-vote .ks-triggers .prev,
+.end-part .col-vote .ks-triggers .prev:hover,
+.end-part .col-vote .ks-triggers .prev.ks-switchable-disable-btn,
+.end-part .col-vote .ks-triggers .next,
+.end-part .col-vote .ks-triggers .next:hover,
+.end-part .col-vote .ks-triggers .next.ks-switchable-disable-btn,
+.end-part .col-vote .vote-bar .vote-btn,
+.end-part .col-review h3,
+.end-part .col-review .review-arrow,
+.end-part .col-weibo h3,
+.end-part .wb-navs .prev,
+.end-part .wb-navs .prev:hover,
+.end-part .wb-navs .prev.disabled,
+.end-part .wb-navs .next,
+.end-part .wb-navs .next:hover,
+.end-part .wb-navs .next.disabled {
+  background-image: url(./img/index-sprite8.png);
+  background-repeat: no-repeat;
+}
+.shop-tabs .tab-nav {
+  padding: 0 8px;
+  background-position: 0 -336px;
+}
+.hd-aside .search {
+  height: 40px;
+  background-position: 0 0;
+}
+.hd-aside .search:hover {
+  background-position: 0 -50px;
+}
+.hd-aside .dp-all .shop-info .arrow {
+  width: 9px;
+  height: 6px;
+  background-position: -163px -100px;
+}
+.hd-aside .dp-all .ks-active .arrow {
+  background-position: -144px -100px;
+}
+.hd-aside .dp-all .more-shop {
+  line-height: 20px;
+  margin-right: 10px;
+  padding-right: 8px;
+  margin-bottom: 6px;
+  background-position: right -306px;
+}
+.floors .line {
+  height: 3px;
+  background-repeat: repeat-x;
+  background-position: 0 -332px;
+}
+.fl-hd .fl-tips {
+  padding: 0 4px 0 10px;
+  background-position: 0 -366px;
+}
+.end-part .col-vote h3 {
+  background-position: 0 -207px;
+}
+.end-part .col-vote .vote-detial .vote-line {
+  height: 1px;
+  background-repeat: repeat-x;
+  background-position: 0 -335px;
+}
+.end-part .col-vote .vote-detial .vote-info {
+  padding-left: 22px;
+  line-height: 20px;
+  min-height: 30px;
+  background-position: 0 -263px;
+}
+.end-part .col-vote .ks-triggers .prev {
+  background-position: -37px -133px;
+}
+.end-part .col-vote .ks-triggers .prev:hover {
+  background-position: -74px -133px;
+}
+.end-part .col-vote .ks-triggers .prev.ks-switchable-disable-btn {
+  background-position: -111px -133px;
+}
+.end-part .col-vote .ks-triggers .next {
+  background-position: -148px -133px;
+}
+.end-part .col-vote .ks-triggers .next:hover {
+  background-position: -220px 0;
+}
+.end-part .col-vote .ks-triggers .next.ks-switchable-disable-btn {
+  _visibility: hidden;
+  background-position: 0 -133px;
+}
+.end-part .col-vote .vote-bar .vote-btn {
+  width: 57px;
+  height: 23px;
+  line-height: 23px;
+  background-position: 0 -100px;
+}
+.end-part .col-review h3 {
+  background-position: 0 -178px;
+}
+.end-part .col-review .review-arrow {
+  width: 15px;
+  height: 9px;
+  line-height: 9px;
+  background-position: -119px -100px;
+}
+.end-part .col-weibo h3 {
+  background-position: 0 -236px;
+}
+.end-part .wb-navs .prev {
+  background-position: -220px -45px;
+}
+.end-part .wb-navs .prev:hover {
+  background-position: -220px -76px;
+}
+.end-part .wb-navs .prev.disabled {
+  background-position: -220px -107px;
+}
+.end-part .wb-navs .next {
+  background-position: -220px -138px;
+}
+.end-part .wb-navs .next:hover {
+  background-position: -67px -100px;
+}
+.end-part .wb-navs .next.disabled {
+  _visibility: hidden;
+  background-position: -93px -100px;
+}

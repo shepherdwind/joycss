@@ -1,0 +1,98 @@
+body {
+}
+#footer {
+  padding: 10px;
+  background-color: #393939;
+}
+
+header h2 {
+  display: inline-block;
+  font-size: 30px;
+  text-transform:uppercase;
+  color: #E1F0FA;
+  color: whiteSmoke;
+  text-shadow: -1px -2px 1px #504f4f;
+}
+header .main-nav {
+  display: inline-block;
+  float: right;
+}
+header ul {
+  background-color: transparent;
+  padding: 0;
+  border: none;
+}
+header ul .home,
+header ul a {
+  display: inline-block;
+  border: none;
+  height: 2em;
+  line-height: 2em;
+  margin-left: 4px;
+  border-bottom: 2px solid #ddd;
+  color: #ddd;
+  padding: 0 1.5em;
+}
+header ul a:hover {
+  opacity: 0.9;
+  
+}
+header ul .home {
+  color: #666;
+  background-color: whiteSmoke;
+}
+.copyright {
+  text-align: center;
+  color: #eee;
+  padding: 0;
+  margin: 0;
+}
+.copyright a {
+  color: #eee;
+  padding: 0 0.5em;
+}
+.content-nav {
+  max-height: 1000px;
+  background: rgba(57, 57, 57, 1);
+  /*background-color: #E1F0FA;*/
+}
+.content-nav ul li, .content-nav ol li {
+  max-width: 500px;
+}
+.content {
+  margin: 0 auto;
+}
+.content-nav {
+  margin-left: -360px;
+  /*margin-left: 200px;*/
+  padding: 10px 0;
+}
+.content-main {
+  padding-left: 210px;
+  /*padding-right: 340px;*/
+  width: 550px;
+}
+.content-nav .box-hd {
+  display: none;
+}
+.content-nav ol,
+.content-nav ul {
+  list-style: none;
+}
+.content-nav a {
+  display: block;
+  padding: 4px 20px 4px 10px;
+}
+.content-nav a:hover {
+  text-decoration: underline;
+}
+.content-nav .active {
+  background: #F8F8F8;
+  color: #666;
+}
+.maked,
+.close {
+  padding: 5px;
+  display: inline-block;
+  border: 1px dotted #777;
+}

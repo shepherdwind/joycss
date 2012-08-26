@@ -1,0 +1,59 @@
+.main-left {
+  width: 800px;
+  margin: 0 auto;
+  color: transparent;
+}
+#J_btn {
+  padding: 8px 1em;
+}
+.main-left p {
+  color: #000;
+  margin: 1em 0 0 0;
+}
+.main-left h2 {
+  height: 60px;
+  width: 100%;
+  margin: 0 0 10px;
+  border: 1px solid #124;
+}
+.main-left .fenlei h2 {
+  background: url(../img/fenlei.png?id=1&way=h) repeat-y 0 0;
+  width: 180px;
+  height: 180px;
+}
+.main-right .tese h2 {
+  background: url(../img/tese.png?id=1) no-repeat 0 10px;
+  width: 480px;
+}
+.main-left .zhuti h2 {
+  background: url(../img/zhuti.png?esc) no-repeat;
+  width: 148px;
+}
+.main-right .jieri h2 {
+  background: url(../img/jieri.png) no-repeat;
+  width: 80px;
+}
+.main-left .hunli h2 {
+  background: url(../img/hunli.png) no-repeat;
+  width: 80px;
+}
+.main-right .huabao h2 {
+  background: url(../img/huabao.png) no-repeat;
+  width: 80px;
+}
+.main-left .jiaju h2 {
+  background: url(../img/jiaju.png) no-repeat;
+  width: 80px;
+}
+.main-right .dapei h2 {
+  background: url(../img/dapei.png) no-repeat;
+  width: 120px;
+}
+.main-left .diy h2 {
+  background: url(../img/diy.png) no-repeat;
+  width: 106px;
+}
+.main-right .shenghuo h2 {
+  background: url(../img/shenghuo.png) no-repeat;
+  width: 80px;
+}
