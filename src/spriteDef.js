@@ -178,6 +178,8 @@ StdClass.extend(SpriteDef, StdClass, {
     var images = this.images;
 
     if (image){
+      image = path.relative('./', image);
+      image = image.replace(/\\+/g, '/');
       images[css.id] = image;
     }
   },
