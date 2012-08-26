@@ -5,6 +5,10 @@ body {
   background-color: #393939;
 }
 
+header {
+  position: relative;
+  z-index: 2;
+}
 header h2 {
   display: inline-block;
   font-size: 30px;
@@ -95,4 +99,34 @@ header ul .home {
   padding: 5px;
   display: inline-block;
   border: 1px dotted #777;
+}
+#ribbon {
+  position: absolute;
+  top: 7.8em;
+  left: -3.50em;
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  background-color: #393939;
+  padding: 1px 0;
+  overflow: hidden;
+  -moz-box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  -webkit-box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  -o-box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  -ms-box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+#ribbon:hover {
+  background-color: #292929;
+}
+#ribbon a {
+  color: #fff;
+  border: 1px solid #898989;
+  display: block;
+  margin: 0.05em 0;
+  padding: 0.5em 3.5em;
+  text-align: center;
+  text-decoration: none;
 }
