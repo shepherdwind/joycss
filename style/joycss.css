@@ -1,5 +1,8 @@
 body {
 }
+.header-wrap {
+  padding-top: 10px;
+}
 #footer {
   padding: 10px;
   background-color: #393939;
@@ -16,15 +19,21 @@ header h2 {
   color: #E1F0FA;
   color: whiteSmoke;
   text-shadow: -1px -2px 1px #504f4f;
+  margin-top: 0;
+  padding-right: 20px;
+  vertical-align: top;
 }
 header .main-nav {
   display: inline-block;
-  float: right;
+  vertical-align: bottom;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 header ul {
   background-color: transparent;
   padding: 0;
   border: none;
+  position: static;
 }
 header ul .home,
 header ul a {
@@ -102,7 +111,7 @@ header ul .home {
 }
 #ribbon {
   position: absolute;
-  top: 7.8em;
+  top: 7.5em;
   left: -3.50em;
   -webkit-transform: rotate(-45deg);
   -moz-transform: rotate(-45deg);
