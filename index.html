@@ -154,7 +154,7 @@ joycss执行命令是<code>joycss</code>，最简单使用方式是在命令行�
 片格式(png8/png24)等。下面是几个常用的参数举例：
 </p>
 
-<pre class="prettyprint linenums">
+<pre class="prettyprint linenums lang-sh">
 joycss file.css
 joycss file.less
 </pre>
@@ -166,7 +166,7 @@ joycss file.less
 过npm安装less。
 </p>
 
-<pre class="prettyprint linenums">
+<pre class="prettyprint linenums lang-sh">
 joycss file.css --source
 joycss file.css -s
 </pre>
@@ -177,7 +177,7 @@ joycss file.css -s
 source 文件。
 </p>
 
-<pre class="prettyprint linenums">
+<pre class="prettyprint linenums lang-sh">
 joycss -c file.less
 joycss -cu file.less
 
@@ -334,7 +334,7 @@ joycss --nochange file.less
 除了命令行参数外，css中还可以通过背景图url参数的方式，设置单个图片。
 </p>
 
-<pre class="prettyprint linenums css">
+<pre class="prettyprint linenums lang-css">
 .main-right .tese h2 {
   background: url(../img/fenlei.png?id=1&amp;way=h) repeat-y 0 0;
   width: 480px;
@@ -531,7 +531,7 @@ a.png?way=v
 joycss执行文件在<code>bin/joycss</code>，安装就是在path路径下可以找到joycss，最简单的方式，
 使用npm安装。
 </p>
-<pre class="prettyprint linenums">
+<pre class="prettyprint linenums lang-sh">
 npm install -g joycss
 </pre>
   
@@ -755,6 +755,8 @@ css中没有声明高度，这种情况下，top和left定位是可以通过back
    ©<a href="http://shepherdwind.com" target="_blank">shepherdwind</a>⋅ 2012</p>
    </div>
    <script src="js/prettify/prettify.js" type="text/javascript"></script>
+   <script src="js/prettify/lang-css.js" type="text/javascript"></script>
+   <script src="js/prettify/lang-sh.js" type="text/javascript"></script>
    <script type="text/javascript">prettyPrint();</script>
   </body>
 </html>
