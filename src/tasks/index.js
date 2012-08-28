@@ -47,6 +47,11 @@ Tasks.upload = function(config, files){
   var ret = new EventEmitter();
   //防止forEach出错
   files = files || {};
+  if (!config){
+    console.log('[error] pleace run joycss --config first, config your user name cookie');
+    console.log('[error] upload file fail!');
+    process.exit(0);
+  }
 
   forEach(files, function(file){
     i ++;
