@@ -1,30 +1,37 @@
-Usage: joycss [ file.css ][options]
-       joycss [options] [ file.css ]
+Usage: joycss [ file.css|file.less ][options]
+       joycss [options] [ file.css|file.less ]
 
 Options:
-  -y, --vertical       use vertical layout, do not use tight sprite images
-  -c, --close          merge images as close as possable
+  -h, --help           print help info
+  -v, --version        print joycss's version
+  -n, --nochange       use backup image url, sprite image no change
+
+  -c, --close          merge images as close as possable, use with `?line`
+  -y, --vertical       use vertical layout
+  -x, --horizontal     horizontal layout[not recommend to use]
   -a, --alpha          create sprite images use png24 formart
+
   -s, --source         write the origin file and set .source file as a backup,
                        commend joycss a.css, use a.source.css as source file
-  -i, --important      add !important for sprite css, make background-image will
-                       not be replace by other css rule
-  -u, --upload         upload image file
-  -h, --help           print help info
   -d                   config single sprite, -d is id, such as -0ac -1c, which
                        mean the first sprite image[-0] use alpha and close option,
                        the secend sprite image[-1] use close option[-1c]
-  -v, --version        print joycss's version
-  -n, --nochange       use backup image url, sprite image no change
+  -u, --upload         upload image file
   --config             config the upload image api
 
-if nothing options and no file.css input, that mean only use commend `joycss`,
+After run joycss on some file, joycss will create a config file, named by ext
+`.joy`, which recode the previous options input, when run joycss -n, joycss will
+use config from the config file.
+
+If nothing options and no file.css input, that mean only use commend `joycss`,
 then, first look up all files of current dir, if find a file named a.css, and 
 there is an other file named a.json, the commend equal to `joycss a.css -n`, if
 no such file, equal `joycss -h`.
 
+If the input file is less file, require less installed.
+
 Environment require:
 php cli with gd lib
 
-Documentation can be found at http://git.shepherdwind.com/joycss.html
+Documentation can be found at http://joycss.org
 joycss@{version} {filename}
