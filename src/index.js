@@ -25,6 +25,7 @@ var defaults = {
 Joycss.prototype = {
   constructor: Joycss,
   init: function(file, config){
+    debugger;
     this.config = config || {};
     var stats = fs.statSync(file);
     var ext = path.extname(file);
@@ -41,8 +42,8 @@ Joycss.prototype = {
       }
     } else if (ext === '.less'){
       inited = false;
-      this._readFromLess(file);
       this.file = file.replace('.less', '.css');
+      this._readFromLess(file);
     }
 
     this.file = this.file || file;
@@ -78,6 +79,7 @@ Joycss.prototype = {
     } catch(e){
       console.log('please install lessc first, run npn install less -g');
       process.exit(0);
+      throw e;
     }
   },
 
