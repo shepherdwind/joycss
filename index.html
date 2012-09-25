@@ -25,10 +25,20 @@
         </div>
       </div>
       <div class="content-main">
-<h3 id="toc_0.0.0">一张图</h3>
-        <p>
-          <a href="./joycss.png" title="查看大图"><img src="./joycss.png" alt="joycss基本介绍" width="550" height="1195"/></a>
-        </p>
+<h3 id="toc_0.0.2">快速入门·Tutorials</h3>
+
+<p>
+直接上图。下面实际中应用中生成的sprite图，线上地址<a href="http://ny.taobao.com/">生态农业</a>。
+</p>
+<p>
+          <a href="./joycss.png" title="查看大图"><img src="./joycss.png" alt="joycss基本介绍" width="550" height="945"/></a>
+</p>
+
+<p>上面的例子，css原始文件<a href="https://github.com/shepherdwind/shepherdwind.github.com/blob/master/demo/joycss/nongye/index.css">源文件</a>,生成后的文件
+<a href="https://github.com/shepherdwind/shepherdwind.github.com/blob/master/demo/joycss/nongye/index.sprite.css">sprite文件</a>。
+</p>
+
+
 <h3 id="toc_0.0.1">简介·About</h3>
 
 
@@ -87,68 +97,6 @@ png8完全支持，和ps生成效果一致，使用pngquant生成png8图片。
 
 </ul>
   
-<h3 id="toc_0.0.2">快速入门·Tutorials</h3>
-
-<p>
-上面讲了那么多，总不过是空对空，可能读者也没有什么印象，不知所云，还是，直接
-上实例，一看就基本明白了。下面是实际中应用过程中生成的sprite图，线上地址<a href="http://ny.taobao.com/">生态农业</a>。
-</p>
-
-<p>
-<img src="./demo/joycss/nongye/sprites/close.png" alt="close" class="close" />
-<img src="./demo/joycss/nongye/sprites/close_MarkMan.png" alt="marked" class="maked" />
-</p>
-
-<p>
-左边是生成的图片，右边是标注说明。从右图，可以看到，上面是紧凑拼图区块，下面是
-垂直布局区块。执行命令<code>joycss -c index.less</code>，一共27张背景图，使用紧凑拼图为默
-认拼图方式，对于那些需要使用垂直布局的图片，需要增加url参数<code>?line</code>。
-</p>
-
-<pre class="prettyprint linenums lang-css">
-.shop-tabs .tab-nav {
-  padding: 0 8px;
-  background: url(./img/tab-nav-line.png?line) 0 11px no-repeat;
-}
-...
-.end-part .col-vote .vote-detial .vote-info {
-  background: url(./img/slice-12.png?line&amp;bottom=20) no-repeat 0 5px;
-  padding-left: 22px;
-  line-height: 20px;
-}
-...
-</pre>
-  
-<p>
-第7行除了有<code>line</code>参数外，还有<code>bottom=20</code>，对应标注图中2.3，下面留白20px，默认情
-况，bottom和right都是10px间距，如果3. 部分。上图中，还包含了右对齐(2.1)，水平方向
-平铺(2.2)。加上紧凑拼图和垂直拼图两者方式的一起使用，基本上就是joycss完整的功能了。
-最后看看生成的样式，完整的代码比较长，只放出一部分，完整的代码<a href="https://github.com/shepherdwind/shepherdwind.github.com/blob/master/demo/joycss/nongye/index.css">源文件</a>,
-<a href="https://github.com/shepherdwind/shepherdwind.github.com/blob/master/demo/joycss/nongye/index.sprite.css">sprite文件</a>。
-</p>
-
-<pre class="prettyprint linenums lang-css">
-.shop-tabs .tab-nav,
-.hd-aside .search,
-.hd-aside .search:hover,
-.hd-aside .dp-all .shop-info .arrow,
-.hd-aside .dp-all .ks-active .arrow,
-.hd-aside .dp-all .more-shop,
-.floors .line,
-.fl-hd .fl-tips,
-.end-part .col-vote h3,
-...
-.end-part .wb-navs .next.disabled {
-  background-image: url(./img/index-sprite8.png);
-  background-repeat: no-repeat;
-}
-.shop-tabs .tab-nav {
-  padding: 0 8px;
-  background-position: 0 -336px;
-}
-...
-</pre>
-
 <h3 id="toc_0.0.3">使用·Usage</h3>
 
 <p>
