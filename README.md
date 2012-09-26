@@ -5,7 +5,11 @@ joycss是一个基于nodejs和php的自动拼图工具。
 
 joycss的目标：*使用简单，功能强大* 。
 
-[joycss.org](http://joycss.org)
+文档：[joycss.org](http://joycss.org)
+
+![joycss](http://joycss.org/joycss.png)
+
+
 
 ###使用
 
