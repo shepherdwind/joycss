@@ -49,9 +49,19 @@ css中第一个需要拼图的图片路径相同。css命名规则是，css文�
 
 ###作为node模块使用
 
+`require('joycss')`返回joycss对象，joycss上有两个对象，`joycss.Event`和`joycss.Mult`，
+Event对象用于事件发布，成功后，发布一个事件`run:end`。Mult用于处理一组队列，joycss
+使用php处理图片，如果一次执行多个请求需要使用Mult对象，`Mult.add`方法把一个拼图
+任务加入队列，add方法接受两个参数，`args, isAutoRun`。
+
 ```js
 var Joycss = require('path/to/joycss');
 new Joycss(filename, config, text);
+
+//处理多个任务队列
+config.each(function(){
+  Joycss.Mult.add([filename, config, text], isAutoRun);
+});
 ```
 
 第一个参数必须传递，后两个可以为空

@@ -231,11 +231,14 @@ Joycss.prototype = {
     var file = this.file.replace('.css', '.joy');
     fs.writeFile(file, text, function(err){
       if (err) {
-        console.log('write config false');
+        console.log('[joycss end]write config false');
         console.log(err);
       } else {
-        console.log('write config success');
+        console.log('[joycss end]write config success');
       }
+
+      console.log('');
+      Joycss.Event.emit('run:end');
     });
 
   },
@@ -309,5 +312,40 @@ Joycss.prototype = {
   }
 
 };
+
+var Mult = {
+  tasks: [],
+  isRuning: false,
+  isInited: false,
+  /**
+   * 加入任务
+   * @param args {array} 传递给joycss的参数
+   * @param autoRun {bool} 是否自动执行
+   */
+  add: function(args, autoRun){
+    this.tasks.push(args);
+    if (autoRun) this.run();
+  },
+
+  run: function(){
+    if (this.isRuning) return;
+    if (!this.tasks.length) return;
+    var task = this.tasks.shift();
+
+    this.isRuning = true;
+    new Joycss(task[0], task[1] || {}, task[2]);
+    var self = this;
+
+    if (!this.isInited) {
+      Joycss.Event.on('run:end', function run() {
+        self.isRuning = false;
+        self.run();
+      });
+      this.isInited = true;
+    }
+  }
+};
+
+Joycss.Mult = Mult;
 
 module.exports = Joycss;
