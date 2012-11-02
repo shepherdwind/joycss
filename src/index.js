@@ -6,32 +6,57 @@ var Tasks     = require('./tasks/');
 var path      = require('path');
 var fs        = require('fs');
 var exists    = fs.existsSync || path.existsSync;
+var EventEmitter = require('events').EventEmitter;
 
 function Joycss(){
   this.init.apply(this, arguments);
 }
 
+Joycss.Event = new EventEmitter();
+
 var defaults = {
   global: {
-    writeFile    : false,
-    uploadImgs   : false,
-    useImportant : false,
-    nochange     : false,
-    force8bit    : true,
-    layout       : 'auto'
+    /**
+     * 是否覆盖原有的图片
+     */
+    writeFile : false,
+    /**
+     * 是否上传图片
+     */
+    uploadImgs : false,
+    /**
+     * nochange 表示，只修改css，图片使用上一次拼图结果，拼图和图片本身不改变
+     */
+    nochange : false,
+    /**
+     * 使用png8模式，如果设置为false，生成png24图
+     */
+    force8bit : true,
+    /**
+     * 拼图算法，支持三种'auto | close | vertical | horizontal'
+     * auto自动拼图，如果知道图片所在的盒子大小，使用紧凑拼图，否则独占一行
+     * close: 紧凑拼图，搜有图片使用紧凑拼图
+     * vertical: 垂直布局
+     */
+    layout : 'auto'
   }
 };
 
 Joycss.prototype = {
   constructor: Joycss,
-  init: function(file, config){
+  init: function(file, config, text){
     debugger;
     this.config = config || {};
-    var stats = fs.statSync(file);
     var ext = path.extname(file);
     var inited = true;
 
-    if (!ext) {
+    if (text) {
+      this.text = text;
+    } else {
+      var stats = fs.statSync(file);
+    }
+
+    if (!ext && !text) {
       if (exists(file + '.css')) {
         file = file + '.css';
       } else {
@@ -178,7 +203,7 @@ Joycss.prototype = {
       new Tasks(tasks, cwd).on('success', function(){
         var config = _this.config;
         if (config.global.uploadImgs){
-          var task = Tasks.upload(config.upload, cssImgs);
+          var task = Tasks.upload(config.upload, cssImgs, _this.file);
           task.on('finish:upload', _this._uploadEnd.bind(_this));
         } else {
           _this._writeConfig();
@@ -266,9 +291,10 @@ Joycss.prototype = {
         this.config = utils.mixin(localConfig, this.config);
       }
 
-      if (this.config.global.uploadImgs){
-        this._getUploadConfig();
-      }
+    }
+
+    if (this.config.global.uploadImgs){
+      this._getUploadConfig();
     }
   },
 

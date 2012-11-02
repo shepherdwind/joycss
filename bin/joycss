@@ -4,7 +4,7 @@ var argv   = process.argv.slice(2);
 var path   = require('path');
 var fs     = require('fs');
 var argu   = {global: []};
-var utils   = require('../lib/utils');
+var utils  = require('../lib/utils');
 var exists = fs.existsSync || path.existsSync;
 var contineRun = true;
 var config = {
@@ -148,7 +148,6 @@ function matchArg(arg, key){
 
   if (msg) console.log('[config ' + key + ']' + msg);
 }
-
 
 function showHelp(){
   var help = fs.readFileSync(__dirname + '/help.txt');

@@ -2,6 +2,7 @@ var EventEmitter = require('events').EventEmitter;
 var forEach   = require('../../lib/utils').forEach;
 var mixin = require('../../lib/utils').mixin;
 var post = require('../../lib/post');
+var path = require('path');
 
 /**
  * var task = {
@@ -40,7 +41,7 @@ Tasks.prototype._bind = function(){
   });
 };
 
-Tasks.upload = function(config, files){
+Tasks.upload = function(config, files, basePath){
   var i = 0;
   var posts = {};
   var maps = {};
@@ -56,8 +57,9 @@ Tasks.upload = function(config, files){
   forEach(files, function(file){
     i ++;
     console.log('uploading file ' + file);
+    var _file = path.resolve(path.dirname(basePath), file);
     posts[file] = new post(mixin(config, {
-      file: file
+      file: _file
     }));
   });
 

@@ -46,3 +46,18 @@ css中第一个需要拼图的图片路径相同。css命名规则是，css文�
 输入源为less文件，则生产文件名+'.css'。或者使用，`joycss --source a.css`，生成文
 件为`a.css`，并且产生一个`a.source.css`文件，以后执行`joycss -s a.css`，读取css
 都是`a.source.css`，生成文件为`a.css`。
+
+###作为node模块使用
+
+```js
+var Joycss = require('path/to/joycss');
+new Joycss(filename, config, text);
+```
+
+第一个参数必须传递，后两个可以为空
+
+- `filename` {string} 文件名，绝对路径，css路径地址。
+- `config` 配置方式，参考`./src/index.js`中的defaults对象，用于配置拼图方式和是
+  否使用图片上传等。
+- `text` cssText，如果传入cssText，那么不从文件中读取，并且`filename`为生成的文
+  件名。如果不传递text参数，从filename中读取文件作为css输入。
