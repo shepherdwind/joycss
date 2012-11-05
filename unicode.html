@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>joycss 转换unicode</title>
+</head>
+<body>
+  <style type="text/css" media="screen">
+    .box {
+      font: 14px/2em arial;
+      width: 400px;
+      margin: 0 auto;
+    }
+  </style>
+  <div class="box">
+    <p>unicode转换，请输入用户名，把获得的unicode格式输入到终端。如果全部是英文名，可以不用转换。
+    <a href="index.html">回到首页</a>
+    </p>
+    <form action="#" method="get" id="J_form">
+      <input type="text" name="s" value="">
+      <input type="text" name="r" value="">
+      <input type="button" name="b" value="转换">
+    </form>
+  </div>
+  <script>
+    var form = document.getElementById('J_form');
+    form['b'].onclick = function(){
+      var val  = form['s'].value;
+      var ret =  escapeIt(val);
+      form['r'].value = ret;
+    };
+
+    function escapeIt(str){
+      //var str =  Buffer.isBuffer(buf) ? buf.toString(): buf;
+      var len = str.length;
+      var ret = '';
+      for (var i = 0; i < len; i++) {
+        var bit = str.charCodeAt(i);
+        if (bit < 0 || bit > 255){
+          ret += '\\u' + bit.toString(16);
+        } else {
+          ret += str[i];
+        }
+      }
+      return ret;
+    }
+  </script>
+</body>
+</html>	
