@@ -1,10 +1,8 @@
 {
-  "upload": {
-    "host": "tps.tms.taobao.com",
-    "path":"/photo/upload.htm",
-    "filekey":"photo",
-    "headers":{
-      "Cookie":"{{cookie}}"
-    }
+  "host": "tps.tms.taobao.com",
+  "path":"/photo/upload.htm",
+  "filekey":"photo",
+  "headers":{
+    "Cookie":"{{cookie}}"
   }
 }

@@ -274,17 +274,24 @@ StdClass.extend(SpriteDef, StdClass, {
   _setDef: function(err, data){
     if (err) throw Error(data.toString());
 
-    var baseDir = path.dirname(this.get('file'));
-    var filePath;
-    var imagesDef = this.imagesDef;
+    try {
+      var baseDir = path.dirname(this.get('file'));
+      var filePath;
+      var imagesDef = this.imagesDef;
+      var datas = JSON.parse(data);
 
-    forEach(JSON.parse(data), function(def, file){
-      filePath = path.relative(baseDir, file);
-      filePath = filePath.replace(/\\+/g, '/');
-      imagesDef[filePath] = def;
-    });
+      forEach(datas, function(def, file){
+        filePath = path.relative(baseDir, file);
+        filePath = filePath.replace(/\\+/g, '/');
+        imagesDef[filePath] = def;
+      });
 
-    this._setPos();
+      this._setPos();
+    } catch(e) {
+      console.log(e);
+      console.log('api get image size error.');
+      console.log(data);
+    }
   },
 
   /**
@@ -408,10 +415,15 @@ StdClass.extend(SpriteDef, StdClass, {
   _finishMerge: function(err, data){
     if (err) throw new Error(data);
 
-    debugger;
-    data = JSON.parse(data);
-    console.log(data.info.join(''));
-    this.fire('finish:merge');
+    try {
+      data = JSON.parse(data);
+      console.log(data.info.join(''));
+      this.fire('finish:merge');
+    } catch(e) {
+      console.log(e);
+      console.log(data);
+      console.log('[Error happen] Merge file fail. Please your php cli has gd lib installed.');
+    }
   },
 
   _coords: function(box, imageInfo){
@@ -433,7 +445,7 @@ StdClass.extend(SpriteDef, StdClass, {
           position.x = Math.floor((box.width - imageInfo.width) / 2);
         } else {
           console.log('[Error info @' + box.line + 
-            ']use 50% for background-position but not set ');
+                      ']use 50% for background-position but not set ');
         }
       }
 
@@ -442,7 +454,7 @@ StdClass.extend(SpriteDef, StdClass, {
           position.y = Math.floor((box.height - imageInfo.height) / 2);
         } else {
           console.log('[Error info @' + box.line + 
-            ']use 50% for background-position-y but not set height');
+                      ']use 50% for background-position-y but not set height');
         }
       }
 

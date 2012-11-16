@@ -166,8 +166,8 @@ function setCookie(config, file){
     output: process.stdout
   });
   rl.question("Please config you use name in taobao.com: ", function(answer) {
-    config.upload.headers.Cookie = '_nk_=' + answer + ';';
-    var text = JSON.stringify(config.upload);
+    config.headers.Cookie = '_nk_=' + answer + ';';
+    var text = JSON.stringify(config);
     fs.writeFile(file, text, function(err){
       if (err) {
         console.log('write config false');

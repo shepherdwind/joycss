@@ -28,7 +28,7 @@ win下自带了exe文件，无需处理。
 
 ###使用
 
-```sh
+```
 joycss -h
 
 //nochange，只重重新编译css，不生成图片，当只修改css，不涉及图片修改时使用
@@ -54,7 +54,7 @@ Event对象用于事件发布，成功后，发布一个事件`run:end`。Mult�
 使用php处理图片，如果一次执行多个请求需要使用Mult对象，`Mult.add`方法把一个拼图
 任务加入队列，add方法接受两个参数，`args, isAutoRun`。
 
-```js
+```
 var Joycss = require('path/to/joycss');
 new Joycss(filename, config, text);
 

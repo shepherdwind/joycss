@@ -15,10 +15,12 @@ var utils  = require('../lib/utils');
  * @param datas {array} 多个参数的数组
  * @return {Joycss} joycss对象
  **/
+var Joycss = require('./index');
 function Api(datas){
   datas.forEach(function(data){
     var config = getFromParam(data);
-    console.log(config);
+    var params = [config['file'], config];
+    Joycss.Mult.add(params, true);
   });
 }
 
