@@ -8,6 +8,11 @@ function cssWrite(){
   StdClass.apply(this, arguments);
 }
 
+var red, blue, reset;
+red   = '\033[31m';
+blue  = '\033[34m';
+reset = '\033[0m';
+
 StdClass.extend(cssWrite, StdClass, {
 
   attributes: {
@@ -39,27 +44,32 @@ StdClass.extend(cssWrite, StdClass, {
       this._writeRule(rule);
     }, this);
 
+    var imageUrlReg = /url\(['"]*([a-z0-9A-Z&?=_\-.,\[\]\/\\]+)['"]*\)/;
+    var images = [];
+    forEach(extraRules, function(rule){
+      var uri = imageUrlReg.exec(rule.value);
+      images.push( red + uri[1] + reset);
+    });
     opt_fn ? opt_fn(this.cssText) : this._writeFile();
+    console.log('[image sprited url] ' + images.join(','));
   },
 
   replace: function(maps){
     maps = maps || {};
+    var images = [];
     forEach(maps, function(fileurl, file){
       this.cssText = this.cssText.replace(file, fileurl);
+      images.push(red + fileurl + reset);
     }, this);
     this._writeFile();
+    console.log('[image url replaced] ' + images.join(','));
   },
 
   _writeFile: function(){
     //var destFile = path.basename(this.get('destFile'));
     var destFile = this.get('destFile');
-    fs.writeFile(destFile, this.cssText, function(err){
-      if (err){
-        console.log(err);
-      } else {
-        console.log('[css write]write file ' + destFile + ' success');
-      }
-    });
+    fs.writeFileSync(destFile, this.cssText);
+    console.log('[css write]write file ' + destFile + ' success');
   },
 
   /**

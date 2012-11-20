@@ -8,7 +8,13 @@ var fs        = require('fs');
 var exists    = fs.existsSync || path.existsSync;
 var EventEmitter = require('events').EventEmitter;
 
+var red, blue, reset;
+red   = '\033[31m';
+blue  = '\033[34m';
+reset = '\033[0m';
+
 function Joycss(){
+  this.timestart = Date.now();
   this.init.apply(this, arguments);
 }
 
@@ -228,16 +234,22 @@ Joycss.prototype = {
     var text = JSON.stringify(this.config);
     text = this.formatJson(text);
 
+    var self = this;
     var file = this.file.replace('.css', '.joy');
     fs.writeFile(file, text, function(err){
+      var time = 'cost time:' + red + (Date.now() - self.timestart) + reset + 'ms.';
+      var endPart = '[develop model]image is not upload';
+      if (self.config.maps) {
+        endPart = '[deploy model]image is uploaded.';
+      }
       if (err) {
-        console.log('[joycss end]write config false');
+        console.log('[joycss end]write config false. ' + time);
         console.log(err);
       } else {
-        console.log('[joycss end]write config success');
+        console.log('[joycss end]write config success. ' + time);
       }
 
-      console.log('');
+      console.log(red + endPart);
       Joycss.Event.emit('run:end');
     });
 
