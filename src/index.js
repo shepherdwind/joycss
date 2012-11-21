@@ -249,7 +249,7 @@ Joycss.prototype = {
         console.log('[joycss end]write config success. ' + time);
       }
 
-      console.log(red + endPart);
+      console.log(red + endPart + reset);
       Joycss.Event.emit('run:end');
     });
 
