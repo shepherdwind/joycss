@@ -246,11 +246,19 @@ StdClass.extend(SpriteDef, StdClass, {
     var images  = this.images;
     var baseDir = path.dirname(this.get('file'));
     var files   = {};
+    var equals = {};
 
-    forEach(images, function(file){
-      //去除重复
-      files[path.resolve(baseDir, file)] = 1;
+    forEach(images, function(file, id){
+      var fullPath = path.resolve(baseDir, file);
+      if (files[fullPath] !== undefined) {
+        equals[id] = files[fullPath];
+      } else {
+        //去除重复
+        files[fullPath] = id;
+      }
     });
+
+    this.equals = equals;
 
     files = Object.keys(files);
     files.forEach(function(file){
@@ -274,24 +282,25 @@ StdClass.extend(SpriteDef, StdClass, {
   _setDef: function(err, data){
     if (err) throw Error(data.toString());
 
+    var baseDir = path.dirname(this.get('file'));
+    var filePath;
+    var imagesDef = this.imagesDef;
     try {
-      var baseDir = path.dirname(this.get('file'));
-      var filePath;
-      var imagesDef = this.imagesDef;
       var datas = JSON.parse(data);
-
-      forEach(datas, function(def, file){
-        filePath = path.relative(baseDir, file);
-        filePath = filePath.replace(/\\+/g, '/');
-        imagesDef[filePath] = def;
-      });
-
-      this._setPos();
     } catch(e) {
-      console.log(e);
       console.log('api get image size error.');
+      console.log(e);
       console.log(data);
+      return;
     }
+
+    forEach(datas, function(def, file){
+      filePath = path.relative(baseDir, file);
+      filePath = filePath.replace(/\\+/g, '/');
+      imagesDef[filePath] = def;
+    });
+
+    this._setPos();
   },
 
   /**
@@ -332,6 +341,7 @@ StdClass.extend(SpriteDef, StdClass, {
 
   _setChangedRules: function(sprite){
     var imgBase      = sprite.filename;
+    var cssReader    = this.get('cssReader');
     var imgBase8     = imgBase.replace('sprite.png', 'sprite8.png');
     var imgPath      = sprite['force8bit'] ? imgBase8 : imgBase;
     var changedRules = this.get('changedRules');
@@ -341,10 +351,7 @@ StdClass.extend(SpriteDef, StdClass, {
     var cssImgs      = this.get('cssImgs');
     var selectors    = [];
 
-    forEach(sprite.images, function(imgInfo){
-      var img = imgInfo['file_location'];
-      var rule = this._getCss(img);
-      var def  = defs[img];
+    function setRule(def, rule, imgInfo){
       var value = [];
       var property = [];
       var filters = ['background', 'background-image', 
@@ -373,7 +380,32 @@ StdClass.extend(SpriteDef, StdClass, {
         id: rule.id
       };
       selectors = selectors.concat(rule.selector);
+
+    }
+
+    var equals = this.equals;
+    var eqInfos = {};
+    forEach(equals, function(key1){
+      eqInfos[key1] = '';
+    });
+
+    forEach(sprite.images, function(imgInfo){
+      var img = imgInfo['file_location'];
+      var rule = this._getCss(img);
+      var def  = defs[img];
+      if (eqInfos[rule.id] !== undefined) {
+        eqInfos[rule.id] = [imgInfo, def];
+      }
+      setRule(def, rule, imgInfo);
     }, this);
+
+    //规则重复的情况
+    forEach(equals, function(id1, id2){
+      var rule = cssReader.getRule(id2);
+      var def = eqInfos[id1][1];
+      var imgInfo = eqInfos[id1][0];
+      setRule(def, rule, imgInfo);
+    });
 
     var extraRule = {
       property: ['background-image', 'background-repeat'],
@@ -445,7 +477,7 @@ StdClass.extend(SpriteDef, StdClass, {
           position.x = Math.floor((box.width - imageInfo.width) / 2);
         } else {
           console.log('[Error info @' + box.line + 
-                      ']use 50% for background-position but not set ');
+            ']use 50% for background-position but not set ');
         }
       }
 
@@ -454,7 +486,7 @@ StdClass.extend(SpriteDef, StdClass, {
           position.y = Math.floor((box.height - imageInfo.height) / 2);
         } else {
           console.log('[Error info @' + box.line + 
-                      ']use 50% for background-position-y but not set height');
+            ']use 50% for background-position-y but not set height');
         }
       }
 
