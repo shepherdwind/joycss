@@ -192,7 +192,13 @@ Joycss.prototype = {
 
     var cwd = path.dirname(this.file);
 
-    spriteDef.on('finish:merge', function(){
+    spriteDef.on('finish:merge', function(e){
+
+      if (e.exit === true) {
+        Joycss.Event.emit('run:end');
+        return;
+      }
+
       var spritesImgs = this.get('spritesImgs');
       var cssImgs     = this.get('cssImgs');
       var quantsImg = [];

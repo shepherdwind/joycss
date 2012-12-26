@@ -440,11 +440,17 @@ StdClass.extend(SpriteDef, StdClass, {
     var sprites = this.sprites;
 
     var cfg = JSON.stringify(sprites);
-    //拼图
-    Api.mergeImages([this.get('file'), cfg], this._finishMerge, this);
+    if (cfg === '{}') {
+      console.log('[info]no image need merge');
+      this.fire('finish:merge', {exit: true});
+    } else {
+      //拼图
+      Api.mergeImages([this.get('file'), cfg], this._finishMerge, this);
+    }
   },
 
   _finishMerge: function(err, data){
+
     if (err) throw new Error(data);
 
     try {
