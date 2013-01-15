@@ -194,7 +194,7 @@ Joycss.prototype = {
 
     spriteDef.on('finish:merge', function(e){
 
-      if (e.exit === true) {
+      if (e && e.exit === true) {
         Joycss.Event.emit('run:end');
         return;
       }
