@@ -12,7 +12,7 @@ StdClass.extend(quant, Exec, {
   attributes: {
     file: '',
     bin: 'pngquant',
-    options: ['-ext', '8.png', '-f', '-iebug'],
+    options: ['--ext', '8.png', '-f', '--iebug'],
     cwd: './'
   }
 });
