@@ -30,7 +30,7 @@ function dateFormat (date, fstr, utc) {
   });
 }
 
-var VERSION = '0.4.8';
+var VERSION = '0.4.12';
 
 StdClass.extend(cssWrite, StdClass, {
 
