@@ -7,6 +7,7 @@ var path      = require('path');
 var fs        = require('fs');
 var exists    = fs.existsSync || path.existsSync;
 var EventEmitter = require('events').EventEmitter;
+var cssSource = require('./cssSource');
 
 var red, blue, reset;
 red   = '\033[31m';
@@ -51,7 +52,7 @@ var defaults = {
 Joycss.prototype = {
   constructor: Joycss,
   init: function(file, config, text){
-    debugger;
+
     this.config = config || {};
     var ext = path.extname(file);
     var inited = true;
@@ -71,10 +72,13 @@ Joycss.prototype = {
           this._readFromDir(file);
         }
       }
-    } else if (ext === '.less'){
+    } else if (cssSource.exts[ext]){
       inited = false;
-      this.file = file.replace('.less', '.css');
-      this._readFromLess(file);
+      this.file = file.replace(ext, '.css');
+      this._readFromSource(ext, file);
+    } else if (ext !== '.css') {
+      console.log('unknow file type ' + ext);
+      process.exit(1);
     }
 
     this.file = this.file || file;
@@ -87,31 +91,15 @@ Joycss.prototype = {
     this._bind();
   },
 
-  _readFromLess: function(file){
+  _readFromSource: function(ext, file){
     var _this = this;
-    console.log('read file source form less');
-    try {
-      var less = require('less');
-      var parser = new(less.Parser)({
-        paths: [path.dirname(file)], 
-        filename: path.basename(file)
-      });
-      var css = fs.readFileSync(file);
-      parser.parse(css.toString(), function lessc(err, tree){
-        if (err){
-          console.log(err);
-          process.exit(0);
-        } else {
-          var text = tree.toCSS();
-          _this.text = text || true;
-          _this.run();
-        }
-      });
-    } catch(e){
-      console.log('please install lessc first, run npn install less -g');
-      process.exit(0);
-      throw e;
-    }
+    console.log('read file source form ' + cssSource.exts[ext]);
+    cssSource.event.once('success', function(e){
+      _this.text = e.text || true;
+      _this.run();
+    });
+
+    cssSource.getCss(ext, file);
   },
 
   _readFromDir: function(file){
