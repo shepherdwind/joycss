@@ -7,7 +7,9 @@
   "version"       : "0.4.12",
   "bin"           : { "joycss": "./bin/joycss" },
   "dependencies"  : {
-    "less" : ">=1.3"
+    "shelljs": "~0.1.2",
+    "commander": "~1.1.1",
+    "osenv": "~0.0.3"
   },
   "main"          : "./src/index",
   "engines"       : { "node": ">=0.8" }

@@ -456,11 +456,11 @@ StdClass.extend(SpriteDef, StdClass, {
     try {
       data = JSON.parse(data);
       console.log(data.info.join(''));
+      console.log();
       this.fire('finish:merge');
     } catch(e) {
       console.log(e);
       console.log(data);
-      console.log('[Error happen] Merge file fail. Please your php cli has gd lib installed.');
     }
   },
 

@@ -19,17 +19,7 @@ class SmartSprite
         $this->log->filename = $filename;
 
         $this->sprites = $config;
-        $this->chkGDVersion();
         $this->createSpriteImages();
-    }
-
-    function chkGDVersion(){
-        $gdInfo = @gd_info();
-        if ($gdInfo) {
-            $gdVersion = $gdInfo['GD Version'];
-            if ($this->verbose)
-                $this->log->info[] = "[test gd]Using: GD_lib $gdVersion \n";
-        } else die ( "ERROR: no GD Library found.\n" );
     }
 
     function createSpriteImages() {
@@ -40,7 +30,6 @@ class SmartSprite
 
             $DATAURL = $this->sprites[$spritekey]['dataurl'];
 
-            $this->log->info[] = "[sprite create begin]creating sprite image: " .basename($filename). " \n";
             $backgroundHEX = $this->sprites[$spritekey]['background'];
 
             if ($_imagelocations) {
@@ -143,8 +132,7 @@ class SmartSprite
     function safeImageToFile($imgres, $imgtype, $filename, $spritekey, $dataurl) {
         $filename = dirname($this->_filename).'/'.$filename;
         //if ($this->verbose)
-
-        $this->log->info[] = "[sprite create end]Writing image: " .basename($filename)."  colors: $this->_maxColors  \n";
+        //$this->log->info[] = "[sprite create end]Writing image: " .basename($filename)."  colors: $this->_maxColors  \n";
 
         $_result = 0;
         switch ($imgtype) {

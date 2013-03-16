@@ -3,6 +3,6 @@
   "path":"/photo/upload.htm",
   "filekey":"photo",
   "headers":{
-    "Cookie":"{{cookie}}"
+    "Cookie":"%s"
   }
 }

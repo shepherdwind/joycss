@@ -71,6 +71,7 @@ StdClass.extend(cssWrite, StdClass, {
       images.push( red + uri[1] + reset);
     });
     opt_fn ? opt_fn(this.cssText) : this._writeFile();
+    console.log();
     console.log('[image sprited url] ' + images.join(','));
   },
 

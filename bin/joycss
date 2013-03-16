@@ -1,224 +1,146 @@
 #!/usr/bin/env node
 
-var argv   = process.argv.slice(2);
-var path   = require('path');
-var fs     = require('fs');
-var argu   = {global: []};
-var utils  = require('../lib/utils');
-var exists = fs.existsSync || path.existsSync;
-var contineRun = true;
-var config = {
-  file: '',
-  global: {}
-};
+var fs = require('fs');
+var path = require('path');
+var util = require('util');
+var config = require('../src/config');
+var version = config.system('version');
 
-function init (){
-  argv.forEach(function(arg){
-    if (arg[0] === '-'){
-
-      if (arg.length > 2){
-        var arg1 = arg[1];
-        if (arg1 !== '-'){
-
-          //-us
-          if (+arg1 != +arg1) {
-            for (var i = 1; i < arg.length; i++) argu.global.push(arg[i]);
-          } else {
-            //-0a -1c
-            argu[arg1] = [];
-            for (var i = 2; i < arg.length; i++) argu[arg1].push(arg[i]);
-          }
-
-        } else {
-          argu.global.push(arg.slice(2));
-        }
-      } else {
-        //--alpha
-        argu.global.push(arg[1]);
-      }
-
-    } else {
-      //filename
-      config.file = arg;
-    }
-  });
-
-  utils.forEach(argu, function(args, key){
-    args.forEach(function(arg){
-      matchArg(arg, key);
-    });
-  });
-
+if (!config.joyrc('isPass')) {
+  console.log();
+  console.log("  Well come to joycss.");
+  var check = require('../src/check').checkAll();
+  config.joyrc(null, check);
+  return false;
 }
 
-function matchArg(arg, key){
-  key = key || 'global';
-  if (!config[key]) config[key] = {};
-  var msg = '';
-  switch (arg) {
-    case 'h':
-    case 'help': {
-      showHelp();
-      contineRun = false;
-    }
+var program = require("commander");
 
-    case 'y':
-    case 'vertical': {
-      msg = ('use layout vertical');
-      config[key].layout = 'vertical';
-      break;
-    }
+program.
+  version(version).
+  usage('[option] <file.css|file.less|file.scss ...>').
+  option('-c, --close', 'use compact layout').
+  option('-y, --vertical', 'vertical layout').
+  option('-x, --horizontal', 'horizontal range').
+  option('-a, --alpha', 'use png24[default use png8]').
+  option('-s, --source', 'read file from .source.css').
+  option('-p, --pipe', 'read cssText from pipe, ie lessc').
+  option('-n, --nochange', 'nochange for image position, use the backup url').
+  option('--check', 'check environment dependence').
+  option('-u, --upload', 'upload image in css to tbcdn[only for taobao]').
+  option('--config', 'config upload user name');
 
-    case 'x':
-    case 'horizontal': {
-      config[key].layout = 'horizontal';
-      break;
-    }
+program.on('--help', function(){
+  console.log('  Examples:');
+  console.log('');
+  console.log('    $ joycss xx.css');
+  console.log('    $ joycss xx.less');
+  console.log('    $ joycss xxx/');
+  console.log('    $ lessc xx.less | joycss -p xx.css');
+  console.log('');
+  console.log('  joycss@%s %s', version, __filename);
+  console.log('  Documentation can be found at http://joycss.org');
+  console.log('');
+});
 
-    //全部使用紧凑拼图
-    case 'c':
-    case 'close': {
-      msg = ('use layout close');
-      config[key].layout = 'close';
-      break;
-    }
+program.parse(process.argv);
 
-    //使用png24
-    case 'a':
-    case 'alpha': {
-      msg = ('use alpha mode, sprite image will be truecolor image, eg:png24');
-      config[key].force8bit = false;
-      break;
-    }
+if(program.config) {
+  // 配置taobao登陆用户名
+  configUser();
+  return;
+}
 
-    //重写文件名,使用source文件
-    case 's':
-    case 'source': {
-      msg = ('rewrite css file, use .source.css file as input');
-      config[key].writeFile = true;
-      break;
-    }
 
-    //图片上传
-    case 'u':
-    case 'upload': {
-      msg = ('upload image file an sprite finish');
-      config[key].uploadImgs = true;
-      break;
-    }
+if (!program.args.length) {
 
-    //重写文件名,使用source文件
-    case 'i':
-    case 'important': {
-      msg = ('add important for sprite rule, improve background-image level');
-      config[key].useImportant = true;
-      break;
-    }
+  program.help();
 
-    case 'n':
-    case 'nochange':{
-      msg = ('nochange for sprite image, use the backup url');
-      config[key].nochange = true;
-      break;
-    }
+} else {
 
-    case 'v':
-    case 'version': {
-      var version = fs.readFileSync(path.resolve(__dirname, '../package.json'));
-      version = JSON.parse(version).version;
-      console.log("version " + version);
-      process.exit(0);
-      break;
-    }
-
-    case 'config': {
-      var json = 'config.json';
-      var file = path.resolve(__dirname, '../' + json);
-      var cfg = fs.readFileSync(file);
-      setCookie(JSON.parse(cfg), path.resolve(__dirname, '../../' + json));
-      contineRun = false;
-      break;
-    }
-
-    default: {
-      console.log('[error]unknow option ' + arg);
-      showHelp();
-    }
+  if (program.upload && !config.joyrc('upload')) {
+    program.outputHelp();
+    console.log('Error message: ');
+    console.log('You ars using -u, --upload options\nPlease run joycss --config set up use name first');
+    return;
   }
 
-  if (msg) console.log('[config ' + key + ']' + msg);
-}
+  var conf = {};
 
-function showHelp(){
-  var help = fs.readFileSync(__dirname + '/help.txt');
-  var version = fs.readFileSync(path.resolve(__dirname, '../package.json'));
-  version = JSON.parse(version).version;
-  console.log(help.toString().replace('{version}', version).
-    replace('{filename}', __filename));
-  process.exit(0);
+  if (program.upload) conf.uploadImgs = true;
+  if (program.horizontal) conf.layout = 'horizontal';
+  if (program.vertical) conf.layout = 'vertical';
+  if (program.close) conf.layout = 'close';
+  if (program.alpha) conf.force8bit = false;
+  if (program.source) conf.source = true;
+  if (program.nochange) conf.nochange = true;
 
-}
+  var Joycss = require('../src');
+  var cwd = process.cwd();
 
-function setCookie(config, file){
-  var readline = require('readline');
-  var rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-  rl.question("Please config you use name in taobao.com: ", function(answer) {
-    config.headers.Cookie = '_nk_=' + answer + ';';
-    var text = JSON.stringify(config);
-    fs.writeFile(file, text, function(err){
-      if (err) {
-        console.log('write config false');
-        console.log(err);
-      } else {
-        console.log('write config success');
-        console.log(text);
-      }
-      process.exit(0);
-    });
-
-    rl.close();
-  });
-
-}
-
-function run(){
-  var currentDir = process.cwd();
-  if (!config.file || !exists(config.file)) {
-    config.file = autoFindFile(currentDir);
-    config.global.nochange = true;
+  if (!conf.nochange) {
+    conf.layout = conf.layout || 'auto';
+    console.log('[option]use layout %s', conf.layout);
   }
 
-  if (!config.file){
-    showHelp();
+  // 通过管道获取css字符串
+  if (program.pipe) {
+
+    console.log('read steam from pipe');
+    var file = path.join(cwd, program.args[0]);
+    readFromPipe(function(text){
+      new Joycss(file, {global: conf}, text);
+    });
+
   } else {
-    config.file = path.resolve(process.cwd(), config.file);
-    var parser = require('../src/');
-    debugger;
-    new parser(config.file, config);
+    var Mult = Joycss.Mult;
+    program.args.forEach(function(file){
+      Mult.add([path.join(cwd, file), {global: conf}], true);
+    });
   }
 
 }
 
-function autoFindFile(dir){
-  var files = fs.readdirSync(dir);
-  var ret = false;
-  files.some(function(file){
-    var basename = path.basename(file, '.css');
-    if (path.extname(file) === '.css' && 
-      files.indexOf(basename + '.json') !== -1) {
-      ret = file;
-      return true;
-    }
-  });
+function readFromPipe(callback){
 
+  var stdin = '';
+
+  process.stdin.resume();
+  process.stdin.on('data', function (chunk) {  
+    stdin += chunk;
+  });  
+
+  process.stdin.on('end', function (chunk) {  
+    callback(stdin);
+  });
+}
+
+function configUser(){
+  program.prompt('Input you taobao login user name: ', function(name){
+    name = util.format("_nk_=%s;", escapeIt(name));
+    var headers = config.getJSON('../config.json', __dirname);
+    headers['headers']['Cookie'] = name;
+    config.joyrc('upload', headers);
+    console.log('config success');
+    console.log(JSON.stringify(headers, null, 2));
+    process.stdin.destroy();
+  });
+}
+
+function escapeIt(str){
+  var len = str.length;
+  var ret = '';
+  for (var i = 0; i < len; i++) {
+    var bit = str.charCodeAt(i);
+    if (bit < 0 || bit > 255){
+      ret += '\\u' + bit.toString(16);
+    } else {
+      ret += str[i];
+    }
+  }
   return ret;
 }
 
-init();
-if (contineRun) run();
 /**
  * vim: ft=javascript:tw=80:
  */

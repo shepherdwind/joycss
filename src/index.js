@@ -175,6 +175,7 @@ Joycss.prototype = {
         this.createSprite();
       } else {
         cssWrite.replace(_this.config.maps);
+        Joycss.Event.emit('run:end');
       }
     });
 
@@ -339,6 +340,7 @@ var Mult = {
     var task = this.tasks.shift();
 
     this.isRuning = true;
+    console.log();
     new Joycss(task[0], task[1] || {}, task[2]);
     var self = this;
 
@@ -353,5 +355,4 @@ var Mult = {
 };
 
 Joycss.Mult = Mult;
-
 module.exports = Joycss;

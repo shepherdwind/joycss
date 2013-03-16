@@ -28,3 +28,4 @@ demo/upload.sh
 demo/tarcefie
 test/post.js
 upload.json
+node_modules/
