@@ -56,6 +56,7 @@ class SmartSprite
                         imagealphablending($image,false);
                         imagesavealpha($image,true);
                         $transparent = imagecolorallocatealpha($image,$BG_R, $BG_G, $BG_B, $BG_A);
+                        $this->log->info[] = $transparent;
                         imagecolortransparent($image,$transparent);
                     } else {
                         $transparent = imagecolorallocate($image,$BG_R, $BG_G, $BG_B);

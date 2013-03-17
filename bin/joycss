@@ -3,13 +3,13 @@
 var fs = require('fs');
 var path = require('path');
 var util = require('util');
-var config = require('../src/config');
+var config = require('../lib/common/config');
 var version = config.system('version');
 
 if (!config.joyrc('isPass')) {
   console.log();
   console.log("  Well come to joycss.");
-  var check = require('../src/check').checkAll();
+  var check = require('../lib/check').checkAll();
   config.joyrc(null, check);
   return false;
 }
@@ -75,7 +75,7 @@ if (!program.args.length) {
   if (program.source) conf.source = true;
   if (program.nochange) conf.nochange = true;
 
-  var Joycss = require('../src');
+  var Joycss = require('../lib');
   var cwd = process.cwd();
 
   if (!conf.nochange) {
@@ -118,7 +118,7 @@ function readFromPipe(callback){
 function configUser(){
   program.prompt('Input you taobao login user name: ', function(name){
     name = util.format("_nk_=%s;", escapeIt(name));
-    var headers = config.getJSON('../config.json', __dirname);
+    var headers = config.getJSON('./config.json', __dirname);
     headers['headers']['Cookie'] = name;
     config.joyrc('upload', headers);
     console.log('config success');
