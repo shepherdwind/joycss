@@ -1,12 +1,11 @@
 Joycss
 --------
 
-joycss是一个基于nodejs和php的自动拼图工具。
+joycss是一个基于nodejs的自动拼图工具。
 
-joycss的目标：*使用简单，功能强大* 。
+joycss的目标：<strong>使用简单，功能强大</strong> 。
 
-文档：[joycss.org](http://joycss.org)，github托管似乎会被墙，或者访问http://shepherdwind.com/joycss/ 。
-![joycss](http://joycss.org/joycss.png)
+文档：[joycss.org](http://joycss.org) 。
 
 ###安装
 
@@ -18,27 +17,34 @@ npm update joycss -g
 
 ####依赖
 
-joycss依赖php cli，请在cmd或者shell中运行`php -v`确定php cli在PATH下可以执行，并
-且，需要安装gd库，php的依赖，只是为了处理图片——获取图片大小，并且拼图，这些操
-作在nodejs还是很麻烦的。joycss把这一块对立在`src/graph/api.js`中，方便以后引进
-其他方式，暂时只支持php。
+每次运行时，joycss会自动检测依赖是否满足，如果检测通过，则没有问题，如果没有通过，
+会提示需要安装相关的依赖。
 
-此外，在非win下，需要自行安装pngquant和optipng两个命令行工具，brew或者apt-get就行。
-win下自带了exe文件，无需处理。
+joycss使用php cli或者node-gd处理图片，两个随便有一个都行。php安装需要有gd库，默认
+情况下，php是自带安装gd的。
+
+####node-gd安装
+
+以mac为例：
+
+```sh
+brew install gd
+npm install node-gyp -g
+npm install -g node-gd
+```
+
+linux下差不多，不过把brew换成apt-get即可。win下还在研究中，可能有点麻烦，还是装
+php来来的简单得多。
 
 ###使用
 
-```
-joycss -h
-
-//nochange，只重重新编译css，不生成图片，当只修改css，不涉及图片修改时使用
-joycss -n a.css
-
-//-s source使用source文件，覆盖a.css，生成a.source.css
-joycss a.less
-
-//-0c第一张图片使用紧凑拼图(close), 第二张图使用alpah模式，png24
-joycss -s -0c -1a a.css
+```sh
+$ joycss -h
+$ joycss a.css
+$ joycss a.less
+$ joycss a.scss
+$ lessc a.less | joycss -p a.css
+$ joycss *.less
 ```
 
 拼图后，生成一个图片文件，图片文件命名规则是css文件名+'-sprite8.png'，文件位置由
@@ -60,8 +66,9 @@ new Joycss(filename, config, text);
 
 //处理多个任务队列
 config.each(function(){
-  Joycss.Mult.add([filename, config, text], isAutoRun);
+  Joycss.Mult.add([filename, config, text]);
 });
+Joycss.Mult.run();
 ```
 
 第一个参数必须传递，后两个可以为空
@@ -71,3 +78,5 @@ config.each(function(){
   否使用图片上传等。
 - `text` cssText，如果传入cssText，那么不从文件中读取，并且`filename`为生成的文
   件名。如果不传递text参数，从filename中读取文件作为css输入。
+
+![joycss](http://joycss.org/joycss.png)
