@@ -1,0 +1,21 @@
+ *             { color: red; }
+ li            { color: red; }
+ li:first-line { color: red; }
+ ul li         { color: red; }
+ ul ol+li      { color: red; }
+ h1 + *[rel=up]{ color: red; }
+ ul ol li.red  { color: red; }
+ li.red.level  { color: red; }
+ #x34y         { color: red; }
+ menuitem > .menu-left[checked="true"] { font-size: 12px; }
+ @font-face {
+   font-family: "Bitstream Vera Serif Bold";
+   src: url("http://developer.mozilla.org/@api/deki/files/2934/=VeraSeBd.ttf");
+ }
+ @font-face {
+     font-family: MyHelvetica;
+     src: local("Helvetica Neue Bold"),
+     local("HelveticaNeue-Bold"),
+     url(MgOpenModernaBold.ttf);
+     font-weight: bold;
+ }
