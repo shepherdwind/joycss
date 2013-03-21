@@ -1,9 +1,8 @@
-Joycss
---------
+joycss 
+======
+[![NPM version](https://badge.fury.io/js/joycss.png)](http://badge.fury.io/js/joycss)
 
-joycss是一个基于nodejs的自动拼图工具。
-
-joycss的目标：<strong>使用简单，功能强大</strong> 。
+joycss是一个基于nodejs的自动拼图工具, 目标：<strong>使用简单，功能强大</strong> 。
 
 文档：[joycss.org](http://joycss.org) 。
 
