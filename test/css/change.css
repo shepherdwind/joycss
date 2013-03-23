@@ -1,0 +1,20 @@
+a {color: red;}
+body {
+  color: blue;
+}
+.shop-tabs .tab-link .news {
+  background: url(a.png);
+}
+.shop-tabs .tab-link .hots {
+  background: url(c.png);
+}
+.shop-tabs .tab-link .mail {
+  background: url(d.png);
+}
+.shop-tabs .tab-link .tab-img {
+  position: absolute;
+  bottom: 0;
+}
+.change {
+  position: relative;
+}

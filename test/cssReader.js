@@ -34,21 +34,21 @@ describe("csslib/cssReader test", function(){
       assert.equal(num, reader.getLen());
 
       var reader1 = new CssReader().parse(getfile('p'));
-      assert.equal(6, reader1.getLen());
+      assert.equal(8, reader1.getLen());
     });
 
     it("@import should in the metas", function(){
       var meta = '@import url("booya.css") print, screen'
       var cssText = util.format('a {color: red}\n%s; body {font-size: 12px}', meta);
       var reader = new CssReader({text: cssText}).parse();
-      assert.equal(reader.get("metas")[2][0], meta);
+      assert.equal(reader.get("metas")[1][0], meta);
     });
 
     it("css selector support level2", function(){
       var reader = new CssReader().parse(getfile('selector'));
       var selectors = reader.get('selectors');
       var font = reader.getRule(10);
-      assert.equal(11, reader.getLen());
+      assert.equal(12, reader.getLen());
       assert.equal('*', selectors[0][0]);
       assert.equal('h1 + *[rel=up]', selectors[5][0]);
     });

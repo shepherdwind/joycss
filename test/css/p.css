@@ -1,9 +1,9 @@
 /* From the user's style sheet */
-p { text-indent: 1em ! important }
-p { font-style: italic ! important }
-p { font-size: 18pt }
+p { text-indent: 1em ! important; }
+p { font-style: italic ! important; }
+p { font-size: 18pt; }
 
 /* From the author's style sheet */
-p { text-indent: 1.5em !important }
-p { font: normal 12pt sans-serif !important }
-p { font-size: 24pt }
+p { text-indent: 1.5em !important; }
+p { font: normal 12pt sans-serif !important; }
+p { font-size: 24pt; }
