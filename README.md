@@ -19,8 +19,10 @@ npm update joycss -g
 每次运行时，joycss会自动检测依赖是否满足，如果检测通过，则没有问题，如果没有通过，
 会提示需要安装相关的依赖。
 
-joycss使用php cli或者node-gd处理图片，两个随便有一个都行。php安装需要有gd库，默认
+<strong>joycss使用php cli或者node-gd处理图片，两个随便有一个都行</strong>。php安装需要有gd库，默认
 情况下，php是自带安装gd的。
+
+<strong>通常情况下，php加上gd库比较简单</strong>，在mac下php和gd组合是默认有的，其他平台安装php 还是非常容易的。
 
 ####node-gd安装
 
