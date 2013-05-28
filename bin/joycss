@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
+var configUser = require('./config').configUser;
 var fs = require('fs');
 var path = require('path');
 var util = require('util');
 var config = require('../lib/common/config');
+var Log = require('../lib/common/log');
 var version = config.system('version');
 
 if (!config.joyrc('isPass')) {
@@ -28,6 +30,7 @@ program.
   option('-n, --nochange', 'nochange for image position, use the backup url').
   option('--check', 'check environment dependence').
   option('-u, --upload', 'upload image in css to tbcdn[only for taobao]').
+  option('--debug', 'show debug info').
   option('--config', 'config upload user name');
 
 program.on('--help', function(){
@@ -51,6 +54,8 @@ if(program.config) {
   return;
 }
 
+
+if (program.debug) Log.DEBUG = true;
 
 if (!program.args.length) {
 
@@ -113,32 +118,6 @@ function readFromPipe(callback){
   process.stdin.on('end', function (chunk) {  
     callback(stdin);
   });
-}
-
-function configUser(){
-  program.prompt('Input you taobao login user name: ', function(name){
-    name = util.format("_nk_=%s;", escapeIt(name));
-    var headers = config.getJSON('./config.json', __dirname);
-    headers['headers']['Cookie'] = name;
-    config.joyrc('upload', headers);
-    console.log('config success');
-    console.log(JSON.stringify(headers, null, 2));
-    process.stdin.destroy();
-  });
-}
-
-function escapeIt(str){
-  var len = str.length;
-  var ret = '';
-  for (var i = 0; i < len; i++) {
-    var bit = str.charCodeAt(i);
-    if (bit < 0 || bit > 255){
-      ret += '\\u' + bit.toString(16);
-    } else {
-      ret += str[i];
-    }
-  }
-  return ret;
 }
 
 /**

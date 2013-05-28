@@ -56,7 +56,6 @@ class SmartSprite
                         imagealphablending($image,false);
                         imagesavealpha($image,true);
                         $transparent = imagecolorallocatealpha($image,$BG_R, $BG_G, $BG_B, $BG_A);
-                        $this->log->info[] = $transparent;
                         imagecolortransparent($image,$transparent);
                     } else {
                         $transparent = imagecolorallocate($image,$BG_R, $BG_G, $BG_B);
@@ -120,14 +119,14 @@ class SmartSprite
                     }
                 }	// image loop
 
-                $this->log->info[] = '[sprite info]' .count($_imagelocations) . " images will merge to one image " 
+                $this->log->info[] = count($_imagelocations) . " images will merge to one image " 
                     . basename($this->sprites[$spritekey]['filename']) . "[{$w}x{$h}]\n";
                 $this->safeImageToFile($image, $this->sprites[$spritekey]['imagetype'], 
                     $this->sprites[$spritekey]['filename'], $spritekey, $DATAURL ); 
             }	// if images exists
         }	// Sprite loop
 
-        $this->log->info[] = '[sprites success] end';
+        //$this->log->info[] = '[sprites success] end';
         echo json_encode($this->log);
     }
     function safeImageToFile($imgres, $imgtype, $filename, $spritekey, $dataurl) {
