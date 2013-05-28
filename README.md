@@ -54,6 +54,45 @@ css中第一个需要拼图的图片路径相同。css命名规则是，css文�
 件为`a.css`，并且产生一个`a.source.css`文件，以后执行`joycss -s a.css`，读取css
 都是`a.source.css`，生成文件为`a.css`。
 
+### [grunt-joycss](https://github.com/shepherdwind/grunt-joycss)使用
+
+继承到grunt中，作为grunt的一个插件，使用：
+
+```js
+$ npm install grunt-joycss --save-dev
+```
+
+```js
+grunt.initConfig({
+  joycss: {
+    index: {
+      //紧凑拼图
+      options: { layout: 'close' },
+      src: ['test/less/index.less']
+    },
+
+    detail: {
+      //水平布局
+      options: { layout: 'horizontal' },
+      src: ['test/less/detials.less']
+    }
+  }
+});
+grunt.loadNpmTasks('grunt-joycss');
+```
+
+执行，`grunt joycss`即可，使用`grunt --config`进行配置用户名，使用
+`grunt joycss --debug`查看更多debug信息。
+
+其他参数，和joycss命令行保持一直，不过需要注意的是，多个参数的时候，grunt需要这
+样使用：
+
+```sh
+grunt joycss --debug=1 --nochange
+```
+
+如果使用`grunt --debug --nonchage`则被解释为`grunt --debug=--nonchange`。
+
 ###作为node模块使用
 
 `require('joycss')`返回joycss对象，joycss上有两个对象，`joycss.Event`和`joycss.Mult`，
