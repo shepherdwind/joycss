@@ -31,7 +31,8 @@ program.
   option('--check', 'check environment dependence').
   option('-u, --upload', 'upload image in css to tbcdn[only for taobao]').
   option('--debug', 'show debug info').
-  option('--config', 'config upload user name');
+  option('--config', 'config upload user name').
+  option('--prefix [prefix]', 'config classname prefix');
 
 program.on('--help', function(){
   console.log('  Examples:');
@@ -79,6 +80,7 @@ if (!program.args.length) {
   if (program.alpha) conf.force8bit = false;
   if (program.source) conf.source = true;
   if (program.nochange) conf.nochange = true;
+  if (program.prefix) conf.prefix = program.prefix;
 
   var Joycss = require('../lib');
   var cwd = process.cwd();
