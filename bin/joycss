@@ -27,12 +27,12 @@ program.
   option('-a, --alpha', 'use png24[default use png8]').
   option('-s, --source', 'read file from .source.css').
   option('-p, --pipe', 'read cssText from pipe, ie lessc').
-  option('-n, --nochange', 'nochange for image position, use the backup url').
-  option('--check', 'check environment dependence').
   option('-u, --upload', 'upload image in css to tbcdn[only for taobao]').
   option('--debug', 'show debug info').
   option('--config', 'config upload user name').
-  option('--prefix [prefix]', 'config classname prefix');
+  option('--prefix [prefix]', 'config classname prefix').
+  option('--dest [dest]', 'dest file path').
+  option('--imgPath [image path]', 'image output path');
 
 program.on('--help', function(){
   console.log('  Examples:');
@@ -40,6 +40,7 @@ program.on('--help', function(){
   console.log('    $ joycss xx.css');
   console.log('    $ joycss xx.less');
   console.log('    $ joycss xxx/');
+  console.log('    $ joycss editor.less --dest build/editor.css --imgPath build/img');
   console.log('    $ lessc xx.less | joycss -p xx.css');
   console.log('');
   console.log('  joycss@%s %s', version, __filename);
@@ -90,19 +91,33 @@ if (!program.args.length) {
     console.log('[option]use layout %s', conf.layout);
   }
 
+  if (program.dest) {
+    var dest = path.join(cwd, program.dest);
+    conf.imgPath = path.dirname(program.dest);
+  }
+
+  if (program.imgPath) {
+    conf.imgPath = program.imgPath;
+  }
+
+  if (conf.imgPath) {
+    conf.relative = path.relative(path.dirname(dest),
+        path.join(cwd, conf.imgPath)) || '.';
+  }
+
   // 通过管道获取css字符串
   if (program.pipe) {
 
     console.log('read steam from pipe');
     var file = path.join(cwd, program.args[0]);
     readFromPipe(function(text){
-      new Joycss(file, {global: conf}, text);
+      new Joycss(file, {global: conf}, text, dest);
     });
 
   } else {
     var Mult = Joycss.Mult;
     program.args.forEach(function(file){
-      Mult.add([path.join(cwd, file), {global: conf}], true);
+      Mult.add([path.join(cwd, file), {global: conf}, null, dest], true);
     });
   }
 
@@ -113,11 +128,11 @@ function readFromPipe(callback){
   var stdin = '';
 
   process.stdin.resume();
-  process.stdin.on('data', function (chunk) {  
+  process.stdin.on('data', function (chunk) {
     stdin += chunk;
-  });  
+  });
 
-  process.stdin.on('end', function (chunk) {  
+  process.stdin.on('end', function (chunk) {
     callback(stdin);
   });
 }
