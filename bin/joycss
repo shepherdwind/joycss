@@ -91,9 +91,10 @@ if (!program.args.length) {
     console.log('[option]use layout %s', conf.layout);
   }
 
+  var file = program.args[0];
   if (program.dest) {
     var dest = path.join(cwd, program.dest);
-    var file = program.args[0];
+    // 图片位置: 图片位置是源css位置与图片目标位置的相对值
     conf.imgPath = path.relative(path.dirname(file), path.dirname(program.dest));
   }
 
@@ -102,8 +103,9 @@ if (!program.args.length) {
   }
 
   if (conf.imgPath) {
+    // css中图片url路径: css目标位置和图片目标位置的相对值
     conf.relative = path.relative(path.dirname(dest),
-        path.join(cwd, conf.imgPath)) || '.';
+        path.join(cwd, path.dirname(program.dest))) || '.';
   }
 
   // 通过管道获取css字符串
