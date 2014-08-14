@@ -93,7 +93,8 @@ if (!program.args.length) {
 
   if (program.dest) {
     var dest = path.join(cwd, program.dest);
-    conf.imgPath = path.dirname(program.dest);
+    var file = program.args[0];
+    conf.imgPath = path.relative(path.dirname(file), path.dirname(program.dest));
   }
 
   if (program.imgPath) {
