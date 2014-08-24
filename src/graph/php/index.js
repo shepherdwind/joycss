@@ -28,11 +28,16 @@ var graph = function(base) {
  */
 graph.prototype.size = function* (files){
 
-  Logger.debug('开始读取图片大小信息');
-
   // php size.php a.png b.png c.gif
   var cmd = util.format('%s %s %s', PHP_CMD, SIZE_CMD, files.join(' '));
-  var stdout = yield exec(cmd, {cwd: this.base});
+  Logger.debug('开始读取图片大小信息, 执行命令：\n    %s', cmd);
+
+  try {
+    var stdout = yield exec(cmd, {cwd: this.base});
+  } catch (e) {
+    Logger.error('读取图片大小数据出现错误, 错误信息: %s', e.stack);
+    return;
+  }
 
   Logger.debug('读取图片大小信息完成');
 
@@ -40,7 +45,7 @@ graph.prototype.size = function* (files){
   try {
     ret = JSON.parse(stdout);
   } catch (e) {
-    Logger.error('读取图片大小数据出现错误, 错误信息:\n %s', stdout);
+    Logger.error('读取图片大小数据出现错误, 错误信息: %s', stdout);
     return undefined;
   }
 

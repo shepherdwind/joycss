@@ -11,7 +11,7 @@
 }
 
 
-@media handheld and (min-width: 20em), screen and (min-width: 20em) { 
+@media handheld and (min-width: 20em), screen and (min-width: 20em) {
   body {
     width: 200px;
   }

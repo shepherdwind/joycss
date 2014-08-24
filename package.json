@@ -19,7 +19,8 @@
     "co": "^3.1.0",
     "thunkify": "^2.1.2",
     "co-fs": "^1.2.0",
-    "co-exec": "^1.1.0"
+    "co-exec": "^1.1.0",
+    "css": "^2.1.0"
   },
   "main": "./lib/index",
   "engines": {

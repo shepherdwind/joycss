@@ -16,4 +16,11 @@ describe('read file', function(){
     }
     error.should.be.true;
   }));
+
+  it('should read css file ok', co(function*(){
+    var file = path.join(__dirname, './css/a.css');
+    var css = yield read(file);
+    css.should.containEql('.hello');
+    css.should.be.type('string');
+  }));
 });

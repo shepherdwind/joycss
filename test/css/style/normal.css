@@ -3,23 +3,15 @@ body {
   font: 12px/1.8 arial;
 }
 .shop-tabs .tab-link .news {
-  background: url(a.png);
+  background: url('../../icons/justify-center.png');
 }
 .shop-tabs .tab-link .hots {
-  background: url(c.png);
+  background: url('../../icons/justify-left.png');
 }
 .shop-tabs .tab-link .mail {
-  background: url(d.png);
+  background: url('../../icons/justify-right.png');
 }
 .shop-tabs .tab-link .tab-img {
   position: absolute;
   bottom: 0;
-}
-.shop-tabs .tab-link .mask {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  width: 144px;
-  height: 144px;
 }

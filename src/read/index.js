@@ -38,11 +38,18 @@ var sass = require('./sass');
 var readDir = require('./dir');
 
 var avilable = {
-  '.css': thunkify(fs.readFile),
+  '.css': readFile,
   '.less': lessc,
   //'.styl': stylus,
   '.scss': sass
 };
+
+function* readFile(file){
+  Logger.debug('开始读取css文件%s', file);
+  var buf = yield fs.readFile(file);
+  Logger.debug('读取css文件%s完成', file);
+  return buf.toString();
+}
 
 function* read(file) {
   var ext = path.extname(file);

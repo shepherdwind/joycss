@@ -1,6 +1,10 @@
 var co = require('co');
 var thunkify = require('thunkify');
 var should = require('should');
+var fs = require('co-fs');
+var path = require('path');
+
+var css = require('css');
 
 function* read(){
   function A(name) {
@@ -24,10 +28,11 @@ describe('co context', function(){
     var name = yield read();
     name.should.be.eql('hanwen');
   }));
-});
 
-function wait(ms) {
-  return function (done) {
-    setTimeout(done, ms)
-  }
-}
+  it('test css read', co(function* (){
+    var file = path.join(__dirname, '../examples/simple/base.css');
+    var simple = yield fs.readFile(file);
+    var asts = css.parse(simple.toString())
+    console.log(JSON.stringify(asts));
+  }));
+});

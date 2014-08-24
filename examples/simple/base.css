@@ -9,9 +9,17 @@
 	border: 1px #999 solid;
 	width: 30px;
 	height: 30px;
+  *height: 10px;
 	background: url(./img/2.png);
 }
 
 .test3{
 	background-image: url(./img/3.png);
+}
+
+.foo {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=#ffffff00, endColorstr=#000fffff,GradientType=0 );
+}
+@media screen and (min-width:1024px) and (max-width:1280px){
+	body{font-size:medium;}
 }
