@@ -4,9 +4,12 @@
  * Time: 14:03
  * Desc: 图片处理api，包括读取图片大小，拼图过程
  */
-
+'use strict';
 var path = require('path');
 var exec = require('co-exec');
+var spawn = require('child_process').spawn;
+var thunkify = require('thunkify');
+
 var Logger = require('../../common/logger');
 
 var PHP_CMD = 'php';
@@ -32,8 +35,9 @@ graph.prototype.size = function* (files){
   var cmd = util.format('%s %s %s', PHP_CMD, SIZE_CMD, files.join(' '));
   Logger.debug('开始读取图片大小信息, 执行命令：\n    %s', cmd);
 
+  var stdout;
   try {
-    var stdout = yield exec(cmd, {cwd: this.base});
+    stdout = yield exec(cmd, {cwd: this.base});
   } catch (e) {
     Logger.error('读取图片大小数据出现错误, 错误信息: %s', e.stack);
     return;
@@ -57,27 +61,47 @@ graph.prototype.size = function* (files){
  * 图片合并操作
  * @param {object} conf 图片合并描述json数据
  */
-graph.prototype.merge = function* (conf){
+graph.prototype.merge = thunkify(function(filename, conf, done){
   // php combine.php {conf}
   var str = JSON.stringify(conf);
-  var cmd = util.format('%s %s %s', PHP_CMD, COMBINE_CMD, str);
+  //var cmd = util.format('%s %s %s %s', PHP_CMD, COMBINE_CMD, filename, str);
+  var args = [COMBINE_CMD, filename, str];
+  var cmd = spawn(PHP_CMD, [COMBINE_CMD, filename, str], {cwd: this.base});
 
-  Logger.debug('拼图操作开始执行, 根目录%s', this.base);
-  var stdout = yield exec(cmd, {cwd: this.base});
+  Logger.debug('拼图操作开始执行, 根目录%s, 执行命令:\n  %s', this.base);
+  //var stdout = yield exec(cmd, {cwd: this.base});
 
-  var ret;
-  try {
-    // 解决libpng在1.6.2下报错的问题，蛋疼
-    stdout = stdout.replace(/libpng warning: iCCP: known incorrect sRGB profile\s+/g, '');
-    ret = JSON.parse(stdout);
-  } catch(e) {
-    Logger.error('拼图操作失败, 错误信息: %s', stdout);
-    return undefined;
-  }
+  var ret = '';
+  var err = false;
 
-  Logger.success('拼图操作开始完成', this.base);
-  return ret;
+  cmd.stdout.on('data', function cmdSuccess(data){
+    ret += data.toString();
+  });
 
-};
+  cmd.stderr.on('data', function cmdError(data){
+    ret += data.toString();
+    err = true;
+  });
+
+  cmd.on('exit', function(){
+    if (!err) {
+      ret  = JSON.parse(ret);
+      done(null, ret);
+      Logger.success('拼图操作完成');
+    } else {
+      var len = ret.length;
+      // 解决libpng在1.6.2下报错的问题，蛋疼
+      ret = ret.replace(/libpng warning: iCCP: known incorrect sRGB profile\s+/g, '');
+      if (ret.length < len) {
+        done(null, JSON.parse(ret));
+        Logger.success('拼图操作完成');
+      } else {
+        console.log(ret);
+        done(err, ret);
+      }
+    }
+  });
+
+});
 
 module.exports = graph;

@@ -1,13 +1,13 @@
+'use strict';
 var forEach = require('../common/utils').forEach;
 var GrowingPacker = require('./packer');
 /**
  * 垂直布局算法，计算图片位置spritepos_left和spritepos_top，大图的宽度高度
  * @param {object} images 图片对象，记录align, height, width, repeat
- * @param {object} spriteDef 图片对应的css规则
+ * @param {object} spriteConfig 图片对应的css规则
  */
-function Vertical(images, spriteDef, layout){
-  this.images = images;
-  this.spriteDef = spriteDef;
+function Vertical(spriteConfig, layout){
+  this.spriteConfig = spriteConfig;
   this.layout = layout;
   this.width = 0;
   this.height = 0;
@@ -28,10 +28,10 @@ function Vertical(images, spriteDef, layout){
 Vertical.prototype = {
   constructor: Vertical,
   init: function(){
-    var spriteDef = this.spriteDef;
+    var spriteConfig = this.spriteConfig;
     var labels = this.labels;
 
-    forEach(this.images, this.setLables, this);
+    spriteConfig.forEach(this.setLables, this);
 
     this.sortImgs(labels.line);
     this.sortImgs(labels.close);
@@ -57,8 +57,8 @@ Vertical.prototype = {
   },
 
   setBlocks: function(img){
-    var spriteDef = this.spriteDef;
-    var def = spriteDef[img];
+    var spriteConfig = this.spriteConfig;
+    var def = spriteConfig[img];
     var box = def.box;
     var blocks = this.blocks;
     var params = box.background.params;
@@ -75,40 +75,39 @@ Vertical.prototype = {
     blocks.push({w: width, h: height});
   },
 
-  closeSiteImg: function(img, i){
+  closeSiteImg: function(imageInfo, i){
     var fit = this.blocks[i].fit;
-    this.spriteDef[img]['coods'] = [fit.x, fit.y];
-    this.siteImg(img, i);
+    imageInfo.coods = [fit.x, fit.y];
+    this.siteImg(imageInfo);
   },
 
-  setLables: function(val, img){
+  setLables: function(imageInfo){
     var labels = this.labels;
-    var def = this.spriteDef[img];
-    var box = def.box;
+    //var def = this.spriteConfig[img];
+    var box = imageInfo.box;
     var params = box.background.params;
     if ('base' in params){
-      labels.fix.push(img);
+      labels.fix.push(imageInfo);
     } else if ('end' in params) {
-      labels.end.push(img);
+      labels.end.push(imageInfo);
     } else if (this.layout === 'auto' && box.hasWidth && 
-      box.width < (def.width + def.spritepos_left)* 3){//盒子宽度小于图片的3倍
-      labels.close.push(img);
+      box.width < (imageInfo.width + imageInfo.spritepos_left)* 3){//盒子宽度小于图片的3倍
+      labels.close.push(imageInfo);
     } else {
 
-      if (this.layout == 'close' && !def['align'] && 
-        def['repeat'] == 'no-repeat' && 
-        box.width < (def.width + def.spritepos_left)* 3 &&
+      if (this.layout === 'close' && !imageInfo['align'] && 
+        imageInfo['repeat'] === 'no-repeat' && 
+        box.width < (imageInfo.width + imageInfo.spritepos_left)* 3 &&
         !('line' in params)){
 
-        labels.close.push(img);
+        labels.close.push(imageInfo);
       } else {
-        labels.line.push(img);
+        labels.line.push(imageInfo);
       }
     }
   },
 
-  siteImg: function(img, i){
-    var imageInfo = this.spriteDef[img];
+  siteImg: function(imageInfo){
     var width = this.width;
     var height = this.height;
     var box = imageInfo.box;
@@ -119,6 +118,7 @@ Vertical.prototype = {
 
     //设置固定的坐标
     var coods = imageInfo.coods || params.coods || '';
+    var left, top;
 
     if (!coods) {
       //position计算
@@ -132,7 +132,7 @@ Vertical.prototype = {
       }
 
       //repeat时候必须是整数倍宽度
-      if (imageInfo['repeat'] == 'repeat-x'){
+      if (imageInfo['repeat'] === 'repeat-x'){
         var ceil = Math.ceil(width / imageInfo.width);
         if (ceil < 2) ceil = 2;
         width = imageInfo['width'] * ceil;
@@ -164,22 +164,14 @@ Vertical.prototype = {
       left = left ? '-' + left + 'px': left;
     }
 
-    this.images[img]['spritepos_top'] = imageInfo['spritepos_top'];
-    this.images[img]['spritepos_left'] = imageInfo['spritepos_left'];
     imageInfo.position = left + ' ' + top;
     this.width = width;
     this.height = height;
   },
 
-  sortImgs: function(imgsList){
-    var imagesDef = this.spriteDef;
-    var images = this.images;
-
-    imgsList.sort(function(img1, img2){
-      var imageInfo1 = imagesDef[img1];
+  sortImgs: function(images){
+    images.sort(function(imageInfo1, imageInfo2){
       var params1 = imageInfo1.box.background.params;
-
-      var imageInfo2 = imagesDef[img2];
       var params2 = imageInfo2.box.background.params;
 
       //base参数，强制放在前面
@@ -188,7 +180,7 @@ Vertical.prototype = {
       } else if('base' in params2) {
         return 1;
       } else {
-        return images[img2]['width'] - images[img1]['width'];
+        return imageInfo2.width - imageInfo1.width;
       }
     });
   }

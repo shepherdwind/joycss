@@ -1,3 +1,4 @@
+'use strict';
 var co = require('co');
 var path = require('path');
 var should = require('should');
@@ -11,6 +12,7 @@ describe('postion', function(){
     var file = path.join(__dirname, './style/normal.css');
     var css = yield read(file);
     var pieces = slice(css);
-    yield position(pieces, file);
+    var config = yield position(pieces, file);
+    console.log(config);
   }));
 });
