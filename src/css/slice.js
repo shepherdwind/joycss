@@ -7,19 +7,14 @@
  * Authors:
  *   Eward <eward.song@gmail.com> (http://shepherdwind.com)
  */
+'use strict';
 
 var util = require('util');
-var css = require('css');
 
 var walk = require('./walk');
 
-function slice(cssText){
-
-  if (!cssText || typeof cssText !== 'string') {
-    return;
-  }
-
-  var asts = css.parse(cssText, {});
+function slice(asts){
+  //var asts = css.parse(cssText, {});
   return walk(asts, collect);
 }
 
@@ -40,7 +35,7 @@ function collect(ast){
     return;
   }
   var props = ['background', 'background-image'];
-  rules.forEach(function(rule){
+  rules.forEach(function(rule, i){
     if (props.indexOf(rule.property) === -1) {
       return;
     }
@@ -48,7 +43,7 @@ function collect(ast){
     var value = rule.value;
     var uri = IMG_URL_REG.exec(value);
     if (uri && uri[1]) {
-      ret = { img: uri[1], ast: ast };
+      ret = { img: uri[1], ast: ast, index: i };
     }
   });
 

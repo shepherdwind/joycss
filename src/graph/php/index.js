@@ -87,16 +87,16 @@ graph.prototype.merge = thunkify(function(filename, conf, done){
     if (!err) {
       ret  = JSON.parse(ret);
       done(null, ret);
-      Logger.success('拼图操作完成');
+      Logger.success('拼图操作完成: %s', ret.info);
     } else {
       var len = ret.length;
       // 解决libpng在1.6.2下报错的问题，蛋疼
       ret = ret.replace(/libpng warning: iCCP: known incorrect sRGB profile\s+/g, '');
       if (ret.length < len) {
         done(null, JSON.parse(ret));
-        Logger.success('拼图操作完成');
+        Logger.success('拼图操作完成: %s', ret.info);
       } else {
-        console.log(ret);
+        Logger.error('拼图操作失败:Error %s', err);
         done(err, ret);
       }
     }
