@@ -1,0 +1,13 @@
+.fl-tips {
+  color: #999;
+  padding: 0 4px 0 10px;
+  background: url(./tab-nav-line.png) 0 6px no-repeat;
+}
+.tab-nav {
+  float: left;
+  padding: 0 8px;
+  position: relative;
+  bottom: -1px;
+  cursor: pointer;
+  background: url(./tab-nav-line.png) 0 11px no-repeat;
+}

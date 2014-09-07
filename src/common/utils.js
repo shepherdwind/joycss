@@ -8,7 +8,10 @@ var utils = {};
     if (arr[fnName]){
       return arr[fnName](fn, context);
     } else {
-      var keys = Object.keys(arr);
+      //var keys = Object.keys(arr);
+      var keys = [];
+      for (var x in arr)
+        arr.hasOwnProperty(x) && keys.push(x);
       return keys[fnName](function(key, i){
         return fn.call(context, arr[key], key, arr);
       }, context);

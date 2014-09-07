@@ -56,17 +56,16 @@ Vertical.prototype = {
     forEach(labels.end, this.siteImg, this);
   },
 
-  setBlocks: function(img){
+  setBlocks: function(imageInfo){
     var spriteConfig = this.spriteConfig;
-    var def = spriteConfig[img];
-    var box = def.box;
+    var box = imageInfo.box;
     var blocks = this.blocks;
     var params = box.background.params;
     //设置默认右边距
-    var width = def.width + def['spritepos_left'];
+    var width = imageInfo.width + imageInfo['spritepos_left'];
     width += params.right ? params.right : 10;
 
-    var height = def.height + def['spritepos_top'];
+    var height = imageInfo.height + imageInfo['spritepos_top'];
     height += params.bottom ? params.bottom : 10;
 
     width = box.width > width ? box.width : width;

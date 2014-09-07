@@ -8,6 +8,7 @@
  * Authors:
  *   Eward <eward.song@gmail.com> (http://shepherdwind.com)
  */
+'use strict';
 
 var util = require('util');
 

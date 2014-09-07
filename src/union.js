@@ -12,6 +12,8 @@
 
 var path = require('path');
 var css = require('css');
+var mkdirp = require('mkdirp');
+var thunkify = require('thunkify');
 
 var read = require('./read/index');
 var slice = require('./css/slice');
@@ -23,14 +25,23 @@ var rework = require('./rework-sprite');
  * 拼图操作
  *
  */
-function* merge(file, destImg, destCss){
-  var cssText = yield read(file);
+function* merge(file, option){
+
+  var cssText = option.cssText;
+  if (!cssText) cssText = yield read(file);
+
+  var destImg = option.destImg;
+  var destCss = option.destCss;
+
   var asts = css.parse(cssText, {});
   var pieces = slice(asts);
-  var config = yield position(pieces, file);
+  var config = yield position(pieces, file, option.layout);
 
   // 执行拼图操作
   var graph = new Graph(path.dirname(file));
+
+  // 生成图片目标路径
+  yield thunkify(mkdirp)(path.dirname(destImg));
   var cli = yield graph.merge(destImg, config);
 
   var imagePath = getReltivePath(destCss, destImg);
@@ -39,7 +50,6 @@ function* merge(file, destImg, destCss){
   asts.stylesheet.rules.unshift(rules);
 
   var resultCSS = css.stringify(asts);
-  console.log(resultCSS);
 
   return resultCSS;
 }

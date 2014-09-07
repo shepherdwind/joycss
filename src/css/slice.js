@@ -14,7 +14,6 @@ var util = require('util');
 var walk = require('./walk');
 
 function slice(asts){
-  //var asts = css.parse(cssText, {});
   return walk(asts, collect);
 }
 

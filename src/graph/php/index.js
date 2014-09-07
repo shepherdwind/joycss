@@ -10,7 +10,7 @@ var exec = require('co-exec');
 var spawn = require('child_process').spawn;
 var thunkify = require('thunkify');
 
-var Logger = require('../../common/logger');
+var logger = require('../../common/logger');
 
 var PHP_CMD = 'php';
 var SIZE_CMD = path.join(__dirname, '/size.php');
@@ -31,29 +31,30 @@ var graph = function(base) {
  */
 graph.prototype.size = function* (files){
 
+  files = files.map(trimQuery);
   // php size.php a.png b.png c.gif
   var cmd = util.format('%s %s %s', PHP_CMD, SIZE_CMD, files.join(' '));
-  Logger.debug('开始读取图片大小信息, 执行命令：\n    %s', cmd);
+  logger.debug('开始读取图片大小信息, 根路径:%s, 执行命令：\n    %s', this.base, cmd);
 
   var stdout;
   try {
     stdout = yield exec(cmd, {cwd: this.base});
   } catch (e) {
-    Logger.error('读取图片大小数据出现错误, 错误信息: %s', e.stack);
+    logger.error('读取图片大小数据出现错误, 错误信息: %s', e.stack);
     return;
   }
 
-  Logger.debug('读取图片大小信息完成');
+  logger.debug('读取图片大小信息完成');
 
   var ret;
   try {
     ret = JSON.parse(stdout);
   } catch (e) {
-    Logger.error('读取图片大小数据出现错误, 错误信息: %s', stdout);
+    logger.error('读取图片大小数据出现错误, 错误信息: %s', stdout);
     return undefined;
   }
 
-  Logger.success('读取图片大小成功');
+  logger.success('读取图片大小成功');
   return ret;
 };
 
@@ -68,7 +69,7 @@ graph.prototype.merge = thunkify(function(filename, conf, done){
   var args = [COMBINE_CMD, filename, str];
   var cmd = spawn(PHP_CMD, [COMBINE_CMD, filename, str], {cwd: this.base});
 
-  Logger.debug('拼图操作开始执行, 根目录%s, 执行命令:\n  %s', this.base);
+  logger.debug('拼图操作开始执行, 根目录%s', this.base);
   //var stdout = yield exec(cmd, {cwd: this.base});
 
   var ret = '';
@@ -87,21 +88,27 @@ graph.prototype.merge = thunkify(function(filename, conf, done){
     if (!err) {
       ret  = JSON.parse(ret);
       done(null, ret);
-      Logger.success('拼图操作完成: %s', ret.info);
+      logger.success('拼图操作完成: %s', ret.info);
     } else {
       var len = ret.length;
       // 解决libpng在1.6.2下报错的问题，蛋疼
       ret = ret.replace(/libpng warning: iCCP: known incorrect sRGB profile\s+/g, '');
       if (ret.length < len) {
         done(null, JSON.parse(ret));
-        Logger.success('拼图操作完成: %s', ret.info);
+        logger.success('拼图操作完成: %s', ret.info);
       } else {
-        Logger.error('拼图操作失败:Error %s', err);
+        logger.error('拼图操作失败:Error %s', err);
         done(err, ret);
       }
     }
   });
 
 });
+
+var url = require('url');
+// 去掉图片中query部分，比如a.png?line => a.png
+function trimQuery(uri){
+  return url.parse(uri).pathname;
+}
 
 module.exports = graph;

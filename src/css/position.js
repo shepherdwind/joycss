@@ -15,6 +15,7 @@ var Graph = require('../graph/index')();
 var Box = require('./value/box');
 var Logger = require('../common/logger');
 var mixin = require('../common/utils').mixin;
+var forEach = require('../common/utils').forEach;
 
 function* position(slices, file, layout){
   var graph = new Graph(path.dirname(file));
@@ -22,8 +23,7 @@ function* position(slices, file, layout){
   var sizes = yield graph.size(images);
 
   var config = [];
-  Object.keys(sizes).forEach(function(img){
-    var imageInfo = sizes[img];
+  forEach(sizes, function(imageInfo, img){
     var css = getCSS(img, slices);
     var box = new Box(css.property, css.value, css.line);
     imageInfo['file_location'] = img;
@@ -56,8 +56,9 @@ function* position(slices, file, layout){
 
 function getCSS(img, slices){
   var ast;
+
   slices.some(function(slice){
-    if (slice.img === img) {
+    if (slice.img.indexOf(img) === 0){
       ast = slice.ast;
       return true;
     }

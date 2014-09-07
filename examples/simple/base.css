@@ -1,15 +1,10 @@
 .test{
-	width :100px;
-	height: 100px;
 	background: url(./img/1.png) no-repeat;
 }
 
 .test2{
 	color: #8c8;
 	border: 1px #999 solid;
-	width: 30px;
-	height: 30px;
-  *height: 10px;
 	background: url(./img/2.png);
 }
 

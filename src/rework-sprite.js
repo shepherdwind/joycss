@@ -21,7 +21,10 @@ function rework(slices, images, url){
     var index = slice.index;
     var rule = slice.ast.declarations[index];
     rule.property = 'background-position';
-    rule.value = images[i].position;
+
+    // 通过slice.img路径找到对应的图片定位信息
+    var imageInfo = getImageConfig(slice.img, images);
+    rule.value = imageInfo.position;
 
     selectors = selectors.concat(slice.ast.selectors);
   });
@@ -47,7 +50,7 @@ function rework(slices, images, url){
 function getImageConfig(image, images){
   var ret;
   images.some(function(config){
-    if (config.file_location === image) {
+    if (image.indexOf(config.file_location) === 0) {
       ret = config;
       return true;
     }

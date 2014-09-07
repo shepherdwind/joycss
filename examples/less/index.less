@@ -1,0 +1,38 @@
+@import "index/mixins.less";
+.content {
+  margin-top: 26px;
+}
+.floors,
+.end-part,
+.main-top {
+  width: 990px;
+  .center-block();
+  .clearfix();
+}
+@import "index/hd.less";
+@import "index/floors.less";
+@import "index/ft.less";
+@import "index/srcoll.less";
+.login-overlay .ks-ext-close,
+.favorite-overlay .ks-ext-close,
+.ui-box-login .ks-ext-close {
+  background: none repeat scroll 0 0 #CCCCCC;
+  color: #FFFFFF;
+  cursor: pointer;
+  height: 25px;
+  line-height: 25px;
+  position: absolute;
+  right: 0;
+  text-align: center;
+  top: 0;
+  width: 45px;
+}
+.ui-overlay {
+  border: 5px solid #ccc;
+  background-color: #FAFAFA;
+}
+.fav_overlay {
+  border: 5px solid #ccc;
+  background-color: #fff;
+  padding: 1em;
+}
