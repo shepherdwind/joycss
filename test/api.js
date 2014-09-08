@@ -6,7 +6,7 @@ var readdir = require('fs').readdirSync;
 var rmrf = require('rimraf').sync;
 var fs = require('fs');
 
-var Joycss = require('../lib/index');
+var Joycss = require('..');
 var Graph = require('../lib/graph/index')();
 
 /**
@@ -139,7 +139,7 @@ describe('Joycss#api', function(){
   }));
 
   afterEach(function(){
-    //cleanup();
+    cleanup();
   });
 });
 

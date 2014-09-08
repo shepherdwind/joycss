@@ -21,14 +21,17 @@
     "co-fs": "^1.2.0",
     "co-exec": "^1.1.0",
     "css": "^2.1.0",
-    "mkdirp": "^0.5.0"
+    "mkdirp": "^0.5.0",
+    "gnode": "0.0.8",
+    "unyield": "0.0.1"
   },
-  "main": "./lib/index",
   "engines": {
-    "node": ">=0.8"
+    "node": ">=0.10"
   },
   "devDependencies": {
     "should": "^4.0.4",
-    "rimraf": "^2.2.8"
+    "rimraf": "^2.2.8",
+    "mocha": "^1.21.4",
+    "co-mocha": "^1.0.1"
   }
 }

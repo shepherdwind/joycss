@@ -1,3 +1,4 @@
+'use strict';
 var co = require('co');
 var thunkify = require('thunkify');
 var should = require('should');
@@ -15,7 +16,7 @@ function* read(){
     setTimeout(function(){
       callback(null, name || self.name);
     }, 20);
-  }
+  };
 
   var a = new A("hanwen");
   a.say = thunkify(a.say);
@@ -27,12 +28,5 @@ describe('co context', function(){
     //yield wait(100);
     var name = yield read();
     name.should.be.eql('hanwen');
-  }));
-
-  it('test css read', co(function* (){
-    var file = path.join(__dirname, '../examples/simple/base.css');
-    var simple = yield fs.readFile(file);
-    var asts = css.parse(simple.toString())
-    console.log(JSON.stringify(asts));
   }));
 });
