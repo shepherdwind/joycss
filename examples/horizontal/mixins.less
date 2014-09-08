@@ -1,0 +1,102 @@
+  .ui-box-inline {
+    .inline-block;
+  }
+  .ui-box-img {
+    display: block;
+    img { display: block; }
+  }
+  .ui-text-hide {
+    .hide-text;
+  }
+  .ui-box-img {
+    display: block;
+    .img {
+      display: block;
+    }
+  }
+  .inline-block() {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+  }
+  .hide-text() {
+    font: 0/0 a;
+    color: transparent;
+    text-shadow: none;
+    background-color: transparent;
+    border: 0;
+  }
+  .text-hide() {
+    text-indent: -9999em;
+  }
+  .center-block() {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .text-overflow() {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .border-radius(@radius) {
+    -webkit-border-radius: @radius;
+    -moz-border-radius: @radius;
+    border-radius: @radius;
+  }
+  .opacity(@opacity) {
+    opacity: @opacity / 100;
+    filter: ~"alpha(opacity=@{opacity})";
+  }
+  //背景透明.bgfade(#fff, 0.4);
+  .bgfade(@color, @fade){
+    background-color: fadeout(@color, 100-@fade*100);
+    @rgbahex: ~`function(color, fade){var t = (Math.round(255*fade)).toString(16).toUpperCase();t=t.length==1?'0'+t:t;return '#'+t+color.substr(1)}("@{color}","@{fade}")`;
+    filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr=@{rgbahex}, endColorstr=@{rgbahex},GradientType=0)";
+  }
+  // Transitions
+  .transition(@transition) {
+    -webkit-transition: @transition;
+    -moz-transition: @transition;
+    -ms-transition: @transition;
+    -o-transition: @transition;
+    transition: @transition;
+  }
+
+  .fontHead(){
+    font-family:"\5FAE\8F6F\96C5\9ED1", arial;
+  }
+
+  //border实现三角
+  #arrow {
+    .common(){
+      width: 0;
+      height: 0;
+      font-size: 0;
+      line-height: 0;
+    }
+    .top(@w, @h, @color) {
+      border-left: @w dashed transparent;
+      border-right: @w dashed transparent;
+      border-bottom: @h solid @color;
+    }
+
+    .bottom(@w, @h, @color) {
+      border-left: @w dashed transparent;
+      border-right: @w dashed transparent;
+      border-top: @h solid @color;
+    }
+
+    .left(@w, @h, @color) {
+      border-top: @w dashed transparent;
+      border-bottom: @w dashed transparent;
+      border-right: @h solid @color;
+    }
+
+    .right(@w, @h, @color) {
+      border-top: @w dashed transparent;
+      border-bottom: @w dashed transparent;
+      border-left: @h solid @color;
+    }
+  }

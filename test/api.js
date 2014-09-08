@@ -6,8 +6,8 @@ var readdir = require('fs').readdirSync;
 var rmrf = require('rimraf').sync;
 var fs = require('fs');
 
-var Joycss = require('../src/index');
-var Graph = require('../src/graph/index')();
+var Joycss = require('../lib/index');
+var Graph = require('../lib/graph/index')();
 
 /**
  * Tests
@@ -81,14 +81,61 @@ describe('Joycss#api', function(){
     size.height.should.be.eql(410);
   }));
 
-  // 同一个文件被两次使用
-  it('when one image used twice', co(function*(){
+  // 同一个文件被两次使用，这种情况不好处理，暂时只支持每个图片使用相同的方式
+  it.skip('when one image used twice', co(function*(){
     var file = path.join(__dirname, '../examples/namesake/index.css');
     var joycss = Joycss(file);
     var result = yield joycss.run();
     var option = joycss.option;
     fs.existsSync(option.destImg).should.be.true;
     fs.existsSync(option.destCss).should.be.true;
+  }));
+
+  // repeat-x支持
+  it('repeat-x support', co(function*(){
+    var file = path.join(__dirname, '../examples/repeat-x/repeat.css');
+    var destCss = path.join(path.dirname(file), 'build/repeat.css');
+    var joycss = Joycss(file, {
+      destCss: destCss
+    });
+    var result = yield joycss.run();
+    var option = joycss.option;
+    fs.existsSync(option.destImg).should.be.true;
+    fs.existsSync(destCss).should.be.true;
+    result.should.containEql('background-repeat: repeat-x');
+  }));
+
+  // 水平布局支持
+  it('horizontal support', co(function*(){
+    var file = path.join(__dirname, '../examples/horizontal/detials.less');
+    var destCss = path.join(path.dirname(file), 'build/index.css');
+    var joycss = Joycss(file, {
+      destCss: destCss,
+      // 水平布局
+      layout: 'horizontal'
+    });
+    var result = yield joycss.run();
+    var option = joycss.option;
+    fs.existsSync(option.destImg).should.be.true;
+    fs.existsSync(destCss).should.be.true;
+
+    var size = yield getSize(option.destImg);
+    size.width.should.be.eql(253);
+    size.height.should.be.eql(50);
+  }));
+
+  // 水平布局支持
+  it('dir to css support', co(function*(){
+    var file = path.join(__dirname, '../examples/dir/icons/');
+    var destCss = path.join(path.dirname(file), 'build/icons.css');
+    var joycss = Joycss(file, {
+      destCss: destCss,
+      layout: 'close'
+    });
+    var result = yield joycss.run();
+    var option = joycss.option;
+    fs.existsSync(option.destImg).should.be.true;
+    fs.existsSync(destCss).should.be.true;
   }));
 
   afterEach(function(){

@@ -1,0 +1,11 @@
+.vote-line {
+  margin-top: 1px;
+  display: block;
+  height: 1px;
+  font-size: 0;
+  line-height: 0;
+  background: url(./slice-08.png) repeat-x;
+}
+h3 {
+  background: url(./title2.png) no-repeat;
+}
