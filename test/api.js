@@ -138,6 +138,24 @@ describe('Joycss#api', function(){
     fs.existsSync(destCss).should.be.true;
   }));
 
+  it('only png24 support', co(function*() {
+    var file = path.join(__dirname, '../examples/simple/base.css');
+    var destCss = path.join(__dirname, '../examples/simple/build/base.css');
+    var joycss = Joycss(file, { destCss: destCss, force8bit: false });
+    var result = yield joycss.run();
+    result.should.not.containEql('url(base-sprite8.png)');
+    fs.existsSync(joycss.option.destImg.replace(/\.png$/, '8.png')).should.be.false;
+  }));
+
+  it('png8 support', co(function*() {
+    var file = path.join(__dirname, '../examples/simple/base.css');
+    var destCss = path.join(__dirname, '../examples/simple/build/base.css');
+    var joycss = Joycss(file, { destCss: destCss });
+    var result = yield joycss.run();
+    result.should.be.containEql('url(base-sprite8.png)');
+    fs.existsSync(joycss.option.destImg.replace(/\.png$/, '8.png')).should.be.true;
+  }));
+
   afterEach(function(){
     cleanup();
   });

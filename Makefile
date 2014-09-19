@@ -2,12 +2,14 @@ BIN := ./node_modules/.bin
 REPORTER ?= spec
 SRC = $(wildcard index.js lib/*.js)
 TESTS = $(wildcard test/*.js)
+MOCA_OPT = ''
 
-test: clean node_modules
+test:
 	@$(BIN)/gnode $(BIN)/_mocha \
 		--reporter $(REPORTER) \
 		--require co-mocha \
-		--timeout 5s
+		--timeout 5s \
+		$(MOCA_OPT)
 
 node_modules: package.json
 	@npm install
