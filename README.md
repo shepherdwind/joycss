@@ -1,6 +1,8 @@
 joycss 
 ======
-[![NPM version](https://badge.fury.io/js/joycss.png)](http://badge.fury.io/js/joycss)
+
+[![NPM version][npm-image]][npm-url]
+[![build status][travis-image]][travis-url]
 
 joycss是一个基于nodejs的自动拼图工具, 目标：<strong>使用简单，功能强大</strong> 。
 

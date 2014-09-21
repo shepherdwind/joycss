@@ -7,7 +7,7 @@
   ],
   "author": "Eward Song<hanwen.sah@taobao.com>",
   "contributors": [],
-  "version": "0.6.0",
+  "version": "0.6.1",
   "repository": "git://github.com/shepherdwind/joycss.git",
   "bin": {
     "joycss": "./bin/joycss"
