@@ -2,17 +2,20 @@
 var co = require('co');
 var path = require('path');
 var should = require('should');
+var css = require('css');
 
-var position = require('../../src/css/position');
-var slice = require('../../src/css/slice');
-var read = require('../../src/read/index');
+var position = require('../../lib/css/position');
+var slice = require('../../lib/css/slice');
+var read = require('../../lib/read/index');
 
 describe('postion', function(){
   it('simple', co(function*(){
     var file = path.join(__dirname, './style/normal.css');
-    var css = yield read(file);
-    var pieces = slice(css);
+    var style = yield read(file);
+    var pieces = slice(css.parse(style));
     var config = yield position(pieces, file);
-    console.log(config);
+    config.width.should.eql(16);
+    config.height.should.eql(78);
+    config.images.length.should.eql(3);
   }));
 });

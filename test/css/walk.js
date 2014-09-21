@@ -1,10 +1,11 @@
+'use strict';
 var co = require('co');
 var path = require('path');
 var should = require('should');
 var css = require('css');
 
-var walk = require('../../src/css/walk');
-var read = require('../../src/read/index');
+var walk = require('../../lib/css/walk');
+var read = require('../../lib/read/index');
 
 describe('css语法树遍历', function(){
   it('@media、@keyframes嵌套情况', co(function*(){

@@ -1,15 +1,16 @@
 BIN := ./node_modules/.bin
 REPORTER ?= spec
-SRC = $(wildcard index.js lib/*.js)
-TESTS = $(wildcard test/*.js)
-MOCA_OPT = ''
+SRC = $(wildcard lib/*.js)
+TESTS = $(wildcard test/*.js test/**/*.js)
+MOCA_OPT =
 
 test:
 	@$(BIN)/gnode $(BIN)/_mocha \
 		--reporter $(REPORTER) \
 		--require co-mocha \
 		--timeout 5s \
-		$(MOCA_OPT)
+		$(MOCA_OPT) \
+		$(TESTS)
 
 node_modules: package.json
 	@npm install
@@ -20,7 +21,8 @@ coverage: $(SRC) $(TESTS)
 	  $(BIN)/_mocha -- \
 	    --reporter $(REPORTER) \
 	    --require co-mocha \
-	    --timeout 5s
+	    --timeout 5s \
+			$(TESTS)
 
 clean:
 	@rm -rf coverage test/fixtures/*/{components,deps,out,build.js}

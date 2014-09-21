@@ -156,6 +156,25 @@ describe('Joycss#api', function(){
     fs.existsSync(joycss.option.destImg.replace(/\.png$/, '8.png')).should.be.true;
   }));
 
+  it('base param support', co(function*() {
+    var file = path.join(__dirname, '../examples/base/base.css');
+    var destCss = path.join(__dirname, '../examples/base/build/base.css');
+    var joycss = Joycss(file, { destCss: destCss });
+    var result = yield joycss.run();
+    result.should.be.containEql('background-image-inval');
+  }));
+
+  it('base param support in horizontal', co(function*() {
+    var file = path.join(__dirname, '../examples/base/base.css');
+    var destCss = path.join(__dirname, '../examples/base/build/base.css');
+    var joycss = Joycss(file, {
+      destCss: destCss,
+      layout: 'horizontal'
+    });
+    var result = yield joycss.run();
+    result.should.be.containEql('background-image-inval');
+  }));
+
   afterEach(function(){
     cleanup();
   });

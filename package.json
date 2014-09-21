@@ -29,9 +29,10 @@
     "node": ">=0.10"
   },
   "devDependencies": {
-    "should": "^4.0.4",
-    "rimraf": "^2.2.8",
+    "co-mocha": "^1.0.1",
+    "istanbul": "^0.3.2",
     "mocha": "^1.21.4",
-    "co-mocha": "^1.0.1"
+    "rimraf": "^2.2.8",
+    "should": "^4.0.4"
   }
 }

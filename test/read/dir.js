@@ -1,5 +1,6 @@
+'use strict';
 var co = require('co');
-var read = require('../../src/read/index');
+var read = require('../../lib/read/index');
 var path = require('path');
 var should = require('should');
 
