@@ -164,6 +164,20 @@ describe('Joycss#api', function(){
     result.should.be.containEql('background-image-inval');
   }));
 
+  it('cssText support', co(function*() {
+    var file = path.join(__dirname, '../examples/simple/');
+    var destCss = path.join(__dirname, '../examples/simple/build/base.css');
+
+    var cssText = fs.readFileSync(file + 'base.css').toString();
+    var joycss = Joycss(file, {
+      destCss: destCss,
+      cssText: cssText
+    });
+
+    var result = yield joycss.run();
+    fs.existsSync(joycss.option.destImg).should.be.true;
+  }));
+
   it('base param support in horizontal', co(function*() {
     var file = path.join(__dirname, '../examples/base/base.css');
     var destCss = path.join(__dirname, '../examples/base/build/base.css');
@@ -176,7 +190,7 @@ describe('Joycss#api', function(){
   }));
 
   afterEach(function(){
-    cleanup();
+    //cleanup();
   });
 });
 
