@@ -1,0 +1,202 @@
+.floors .line {
+  height: 3px;
+  font-size: 0;
+  line-height: 0;
+  background: url(./img/mid-line.png) repeat-x;
+  margin-top: 22px;
+  margin-bottom: 20px;
+}
+.floor {
+  padding-bottom: 20px;
+  min-height: 425px;
+
+  .banner {
+    margin-bottom: 15px;
+  }
+}
+.fl-hd {
+  text-align: right;
+  padding-bottom: 4px;
+  .fl-tips {
+    .inline-block;
+    color: #999;
+    padding: 0 4px 0 10px;
+    background: url(./img/tab-nav-line1.png?line) 0 6px no-repeat;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  .first {
+    background: none;
+  }
+}
+
+.col-aside {
+  float: left;
+  width: 190px;
+  height: 425px;
+  overflow: hidden;
+  position: relative;
+  h3 {
+    display: none;
+  }
+  .text-desc {
+    display: block;
+    .transition(all 0.3s ease-out);
+    .opacity(0);
+    position: absolute;
+    width: 164px;
+    left: 12px;
+    top: 262px;
+    font: bold 14px/24px arial;
+    color: #602A2A;
+    p {
+      padding: 4px 15px 4px 20px;
+    }
+  }
+  .col-aside-a:hover {
+    *zoom: 1;
+    text-decoration: none;
+    .text-desc {
+      .opacity(100);
+      .bgfade(#fff, 0.8);
+    }
+  }
+}
+.col-container {
+  .col-wrap {
+    padding: 20px 0 15px;
+  }
+  float: left;
+  width: 780px;
+  height: 425px;
+  overflow: hidden;
+  .tab-link {
+    float: left;
+    overflow: hidden;
+    height: 190px;
+    width: 190px;
+    color: #555;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    *margin-bottom: -15px;
+    text-decoration: none;
+    position: relative;
+    background-color: #fff;
+    .tab-img {
+      position: absolute;
+      bottom: 0;
+      /*.transition(all 0.2s linear);*/
+    }
+    .mask {
+      position: absolute;
+      display: block;
+      top: 0;
+      left: 0;
+      height: 190px;
+      width: 190px;
+
+      .transition(all 0.3s ease-out);
+    }
+    .icon {
+      display: block;
+      .size(32px, 26px);
+      position: absolute;
+      top: 0;
+      right: 5px;
+    }
+    .news { background: url(./img/news.png); }
+    .hots { background: url(./img/hot.png); }
+    .mail { background: url(./img/mail.png); }
+
+    .mask-wrap {
+      padding: 10px;
+      display: block;
+    }
+
+    .J_farm_info {
+      display: none;
+      /*height: 0;*/
+      /*.transition(all 0.3s ease-out);*/
+    }
+    .farm-title,
+    .renzh {
+      display: block;
+    }
+    .farm-title {
+      font-weight: bold;
+      color: #555555;
+    }
+    .price-old { font-family: verdana; color: #999; }
+    .old-nu { font-family: arial; padding-right: 6px; }
+    .over-text { display: none; }
+    .item-title {
+      width: 100%;
+      display: block;
+      .text-overflow();
+      /*padding-top: 5px;*/
+    }
+    .farm-title,
+    span {
+      width: 95%;
+      .text-overflow;
+    }
+    .price .num {
+      font-weight: bold;
+      font-family: arial, verdana;
+      color: #F36D2E;
+    }
+    .price .price-sign {
+      color: #999;
+      font-weight: normal;
+      padding-right: 4px;
+    }
+    .renzh-img {
+      display: inline;
+      vertical-align: middle;
+    }
+    .renzh {
+      line-height: 24px;
+      margin-bottom: 5px;
+    }
+
+    &:hover {
+      *zoom: 1;
+      color: #555;
+      text-decoration: none;
+      .mask {
+        .bgfade(#fff, 0.9);
+      }
+      .J_farm_info {
+        display: block;
+        /*height: 55px;*/
+      }
+
+      .farm-title,
+      .renzh,
+      .price,
+      .item-title {
+        display: block;
+      }
+
+      .over-text { display: inline; }
+    }
+  }
+
+  .ui-box-w {
+    width: 385px;
+    .mask {
+      width: 385px;
+    }
+  }
+  .ui-box-h {
+    height: 385px;
+    .mask {
+      height: 385px;
+    }
+  }
+  .ui-box-r {
+    float: right;
+  }
+
+}

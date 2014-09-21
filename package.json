@@ -1,17 +1,38 @@
 {
-  "name"          : "joycss",
-  "description"   : "wise css sprite tool by node and gd",
-  "keywords"      : ["css", "sprite"],
-  "author"        : "Eward Song<hanwen.sah@taobao.com>",
-  "contributors"  : [],
-  "version"       : "0.5.12",
-  "repository" : "git://github.com/shepherdwind/joycss.git",
-  "bin"           : { "joycss": "./bin/joycss" },
-  "dependencies"  : {
+  "name": "joycss",
+  "description": "wise css sprite tool by node and gd",
+  "keywords": [
+    "css",
+    "sprite"
+  ],
+  "author": "Eward Song<hanwen.sah@taobao.com>",
+  "contributors": [],
+  "version": "0.6.0",
+  "repository": "git://github.com/shepherdwind/joycss.git",
+  "bin": {
+    "joycss": "./bin/joycss"
+  },
+  "dependencies": {
     "shelljs": "~0.1.2",
     "commander": "~1.1.1",
-    "osenv": "~0.0.3"
+    "osenv": "~0.0.3",
+    "co": "^3.1.0",
+    "thunkify": "^2.1.2",
+    "co-fs": "^1.2.0",
+    "co-exec": "^1.1.0",
+    "css": "^2.1.0",
+    "mkdirp": "^0.5.0",
+    "gnode": "0.0.8",
+    "unyield": "0.0.1"
   },
-  "main"          : "./lib/index",
-  "engines"       : { "node": ">=0.8" }
+  "engines": {
+    "node": ">=0.10"
+  },
+  "devDependencies": {
+    "co-mocha": "^1.0.1",
+    "istanbul": "^0.3.2",
+    "mocha": "^1.21.4",
+    "rimraf": "^2.2.8",
+    "should": "^4.0.4"
+  }
 }

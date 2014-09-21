@@ -1,0 +1,39 @@
+.test {
+  background-position: 0 0;
+}
+
+.test2 {
+  color: #8c8;
+  border: 1px #999 solid;
+  padding: 10% 10px;
+  background-position: 0 -26px;
+}
+
+.test3 {
+  padding: 10px;
+  background-position: 0 -52px;
+}
+
+.foo {
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=#ffffff00, endColorstr=#000fffff,GradientType=0 );
+}
+
+.justify-left {
+  background-image: url('./img/justify-left.png');
+}
+.justify-right {
+  background-image: url('./img/justify-right.png');
+}
+
+.test,
+.test2,
+.test3 {
+  background-image: url(./img/base-sprite.png?base);
+  background-repeat: no-repeat;
+}
+
+@media screen and (min-width:1024px) and (max-width:1280px) {
+  body {
+    font-size: medium;
+  }
+}

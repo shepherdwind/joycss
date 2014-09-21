@@ -14,7 +14,7 @@ foreach ($files as $file)
     {
         $ret[$file] = array(
             'width' => $size[0],
-            'height' => $size[1], 
+            'height' => $size[1],
             'type' => $size[2]
         );
     }
