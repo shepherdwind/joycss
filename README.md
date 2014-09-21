@@ -55,7 +55,7 @@ out
 
 ### API使用
 
-```
+```js
 var Joycss = require('joycss');
 var options = {
   destCss: __dirname + '/build/base.css'
@@ -63,13 +63,13 @@ var options = {
 
 new Joycss(__dirname + '/base.css', options)
   .run(function(err, result){
-  if (err) {
-    throw new Error(err);
-  }
+    if (err) {
+      throw new Error(err);
+    }
 
-  // result is the result of cssText
-  console.log('build success');
-});
+    // result is the result of cssText
+    console.log('build success');
+  });
 
 // or
 var joycss = new Joycss(__dirname + '/base.css', options);
