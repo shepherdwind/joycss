@@ -25,7 +25,7 @@ coverage: $(SRC) $(TESTS)
 			$(TESTS)
 
 clean:
-	@rm -rf coverage test/fixtures/*/{components,deps,out,build.js}
-	@rm -rf examples/*/{components,build*}
+	@rm -rf coverage
+	@rm -rf examples/*/build
 
 .PHONY: test clean

@@ -1,63 +1,46 @@
 #!/usr/bin/env node
 
-var configUser = require('./config').configUser;
+'use strict';
+
 var fs = require('fs');
 var path = require('path');
 var util = require('util');
-var config = require('../lib/common/config');
-var Log = require('../lib/common/log');
-var version = config.system('version');
-
-if (!config.joyrc('isPass')) {
-  console.log();
-  console.log("  Well come to joycss.");
-  var check = require('../lib/check').checkAll();
-  config.joyrc(null, check);
-  return false;
-}
-
 var program = require("commander");
 
+var pkg = require('../package.json');
+
 program.
-  version(version).
+  version(pkg.version).
   usage('[option] <file.css|file.less|file.scss ...>').
   option('-c, --close', 'use compact layout').
   option('-y, --vertical', 'vertical layout').
   option('-x, --horizontal', 'horizontal range').
   option('-a, --alpha', 'use png24[default use png8]').
-  option('-s, --source', 'read file from .source.css').
-  option('-p, --pipe', 'read cssText from pipe, ie lessc').
-  option('-u, --upload', 'upload image in css to tbcdn[only for taobao]').
-  option('--debug', 'show debug info').
-  option('--config', 'config upload user name').
-  option('--prefix [prefix]', 'config classname prefix').
-  option('--dest [dest]', 'dest file path').
-  option('--imgPath [image path]', 'image output path');
+  option('-o, --output [value]', 'output dirname, default `build`').
+  option('--debug', 'show debug info');
 
 program.on('--help', function(){
   console.log('  Examples:');
   console.log('');
   console.log('    $ joycss xx.css');
   console.log('    $ joycss xx.less');
+  console.log('    $ joycss xx.less -o out');
   console.log('    $ joycss xxx/');
-  console.log('    $ joycss editor.less --dest build/editor.css --imgPath build/img');
-  console.log('    $ lessc xx.less | joycss -p xx.css');
   console.log('');
-  console.log('  joycss@%s %s', version, __filename);
+  console.log('  joycss@%s %s', pkg.version, __filename);
   console.log('  Documentation can be found at http://joycss.org');
   console.log('');
 });
 
 program.parse(process.argv);
 
-if(program.config) {
-  // 配置taobao登陆用户名
-  configUser();
-  return;
+if (program.debug) {
+  process.env.DEBUG = 'joycss:*';
+} else {
+  process.env.DEBUG = 'joycss:Success';
 }
 
-
-if (program.debug) Log.DEBUG = true;
+var Joycss = require('../index');
 
 if (!program.args.length) {
 
@@ -65,79 +48,30 @@ if (!program.args.length) {
 
 } else {
 
-  if (program.upload && !config.joyrc('upload')) {
-    program.outputHelp();
-    console.log('Error message: ');
-    console.log('You ars using -u, --upload options\nPlease run joycss --config set up use name first');
-    return;
-  }
-
   var conf = {};
 
-  if (program.upload) conf.uploadImgs = true;
   if (program.horizontal) conf.layout = 'horizontal';
   if (program.vertical) conf.layout = 'vertical';
   if (program.close) conf.layout = 'close';
   if (program.alpha) conf.force8bit = false;
-  if (program.source) conf.source = true;
-  if (program.nochange) conf.nochange = true;
-  if (program.prefix) conf.prefix = program.prefix;
 
-  var Joycss = require('../lib');
+  var filename = program.args[0];
   var cwd = process.cwd();
+  var output = program.output || 'build';
 
-  if (!conf.nochange) {
-    conf.layout = conf.layout || 'auto';
-    console.log('[option]use layout %s', conf.layout);
-  }
+  conf.destCss = path.join(cwd, getName(filename, output));
 
-  var file = program.args[0];
-  if (program.dest) {
-    var dest = path.join(cwd, program.dest);
-    // 图片位置: 图片位置是源css位置与图片目标位置的相对值
-    conf.imgPath = path.relative(path.dirname(file), path.dirname(program.dest));
-  }
-
-  if (program.imgPath) {
-    conf.imgPath = program.imgPath;
-  }
-
-  if (conf.imgPath) {
-    // css中图片url路径: css目标位置和图片目标位置的相对值
-    conf.relative = path.relative(path.dirname(dest),
-        path.join(cwd, path.dirname(program.dest))) || '.';
-  }
-
-  // 通过管道获取css字符串
-  if (program.pipe) {
-
-    console.log('read steam from pipe');
-    var file = path.join(cwd, program.args[0]);
-    readFromPipe(function(text){
-      new Joycss(file, {global: conf}, text, dest);
+  new Joycss(path.join(cwd, filename), conf).
+    run(function(err, result){
+      if (err) throw new Error(err);
     });
-
-  } else {
-    var Mult = Joycss.Mult;
-    program.args.forEach(function(file){
-      Mult.add([path.join(cwd, file), {global: conf}, null, dest], true);
-    });
-  }
-
 }
 
-function readFromPipe(callback){
-
-  var stdin = '';
-
-  process.stdin.resume();
-  process.stdin.on('data', function (chunk) {
-    stdin += chunk;
-  });
-
-  process.stdin.on('end', function (chunk) {
-    callback(stdin);
-  });
+function getName(name, output){
+  var basename = path.basename(name);
+  var dest = path.join(name, '../', output, basename);
+  // 后缀改为.css
+  return dest.replace(/\.[\w]+$/, '.css');
 }
 
 /**

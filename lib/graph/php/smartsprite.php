@@ -122,7 +122,7 @@ class SmartSprite
                 }
             }	// image loop
 
-            $this->log->info = count($_imagelocations) . " images will merge to one image " 
+            $this->log->info = count($_imagelocations) . " images merge to " 
                 . $filename . "[{$w}x{$h}]";
             $this->safeImageToFile($image, $this->sprites['imagetype'], $filename);
         }	// if images exists
