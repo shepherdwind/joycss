@@ -9,6 +9,8 @@ var fs = require('fs');
 var Joycss = require('..');
 var Graph = require('../lib/graph/index')();
 
+var IS_TRAVIS = process.env.TRAVIS;
+
 /**
  * Tests
  */
@@ -54,11 +56,12 @@ describe('Joycss#api', function(){
     fs.existsSync(destImg).should.be.true;
 
     var size = yield getSize(destImg);
-    size.width.should.be.eql(210);
-    size.height.should.be.eql(953);
+    size.width.should.be.eql(IS_TRAVIS ? 30: 210);
+    size.height.should.be.eql(IS_TRAVIS ? 30: 953);
 
     rmrf(destCss);
     rmrf(destImg);
+    rmrf(destImg.replace(/\.png$/, '8.png'));
   }));
 
   it('layout close support', co(function*(){
@@ -77,8 +80,8 @@ describe('Joycss#api', function(){
     fs.existsSync(destImg).should.be.true;
 
     var size = yield getSize(destImg);
-    size.width.should.be.eql(260);
-    size.height.should.be.eql(410);
+    size.width.should.be.eql(IS_TRAVIS ? 30: 260);
+    size.height.should.be.eql(IS_TRAVIS ? 30: 410);
   }));
 
   // 同一个文件被两次使用，这种情况不好处理，暂时只支持每个图片使用相同的方式
@@ -120,8 +123,8 @@ describe('Joycss#api', function(){
     fs.existsSync(destCss).should.be.true;
 
     var size = yield getSize(option.destImg);
-    size.width.should.be.eql(253);
-    size.height.should.be.eql(50);
+    size.width.should.be.eql(IS_TRAVIS ? 30: 253);
+    size.height.should.be.eql(IS_TRAVIS ? 30: 50);
   }));
 
   // 水平布局支持
@@ -190,7 +193,7 @@ describe('Joycss#api', function(){
   }));
 
   afterEach(function(){
-    //cleanup();
+    cleanup();
   });
 });
 
