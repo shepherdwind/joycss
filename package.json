@@ -13,16 +13,18 @@
     "joycss": "./bin/joycss"
   },
   "dependencies": {
-    "shelljs": "~0.1.2",
-    "commander": "~1.1.1",
-    "osenv": "~0.0.3",
     "co": "^3.1.0",
-    "thunkify": "^2.1.2",
-    "co-fs": "^1.2.0",
     "co-exec": "^1.1.0",
+    "co-fs": "^1.2.0",
+    "commander": "~1.1.1",
     "css": "^2.1.0",
+    "debug": "^2.0.0",
+    "gnode": "0.1.0",
+    "less": "^1.7.5",
     "mkdirp": "^0.5.0",
-    "gnode": "0.0.8",
+    "osenv": "~0.0.3",
+    "shelljs": "~0.1.2",
+    "thunkify": "^2.1.2",
     "unyield": "0.0.1"
   },
   "engines": {

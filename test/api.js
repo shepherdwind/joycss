@@ -190,7 +190,7 @@ describe('Joycss#api', function(){
   }));
 
   afterEach(function(){
-    //cleanup();
+    cleanup();
   });
 });
 
