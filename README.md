@@ -1,8 +1,8 @@
 joycss 
 ======
 
-[![NPM version][npm-image]][npm-url]
-[![build status][travis-image]][travis-url]
+[![NPM version](https://img.shields.io/npm/v/joycss.svg?style=flat)](https://www.npmjs.org/package/joycss)
+[![Build Status](https://img.shields.io/travis/shepherdwind/joycss.svg?style=flat)](https://travis-ci.org/shepherdwind/joycss)
 
 joycss是一个基于nodejs的自动拼图工具, 目标：<strong>使用简单，功能强大</strong> 。
 
