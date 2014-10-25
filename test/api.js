@@ -1,13 +1,18 @@
 'use strict';
 var co = require('co');
 var path = require('path');
-var should = require('should');
+require('should');
 var readdir = require('fs').readdirSync;
 var rmrf = require('rimraf').sync;
 var fs = require('fs');
 
 var Joycss = require('..');
 var Graph = require('../lib/graph/index')();
+
+var logger = require('../lib/common/logger');
+logger.error = function(err, msg){
+  console.log(err, msg);
+};
 
 var IS_TRAVIS = process.env.TRAVIS;
 
