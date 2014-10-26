@@ -17,6 +17,7 @@ program.
   option('-x, --horizontal', 'horizontal range').
   option('-a, --alpha', 'use png24[default use png8]').
   option('-o, --output [value]', 'output dirname, default `build`').
+  option('--api [value]', 'api for image merge, support java and php, default php').
   option('--debug', 'show debug info');
 
 program.on('--help', function(){
@@ -62,7 +63,7 @@ if (!program.args.length) {
   conf.destCss = path.join(cwd, getName(filename, output));
 
   new Joycss(path.join(cwd, filename), conf).
-    run(function(err, result){
+    run(function(err){
       if (err) throw new Error(err);
     });
 }
