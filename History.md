@@ -1,3 +1,8 @@
+## 0.6.4 / 2014-10-27
+
+1. 增加java图片处理包，通过`joycss xx --api java`使用, 或者通过`option.api = 'java'`
+   在js api中调用
+
 ## 0.6.0 / 2014-09-21
 
 1. cssReader使用css包，简化很多css兼容问题

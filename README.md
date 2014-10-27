@@ -32,6 +32,7 @@ $ joycss a.less -o out
 |-x| --horizontal	| 水平布局 |
 |-a| --alpha | 只生成png24图片(默认情况同时png8和png24)|
 |-o| --output| 输出文件夹, 默认是`build` |
+|| --api| 调用拼图api，支持php和java，默认使用php(java图片处理要慢3倍的样子) |
 || --debug| 输出debug信息 |
 
 上面参数中，`-o,--output`，用于存放输出的文件，包括图片和css，生成文件命名规则
@@ -111,6 +112,9 @@ var destImg = joycss.options.destImg;
   layout : 'auto',
 
   // 是否保存css文件到destCss
-  save: true
+  save: true,
+
+  // 图片命令行工具，支持php或者java，如果没有尝试执行php和java，自动选择
+  api: 'auto'
 }
 ```
