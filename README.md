@@ -6,6 +6,15 @@ joycss
 
 joycss是一个基于nodejs的自动拼图工具, 目标：<strong>使用简单，功能强大</strong> 。
 
+### 图片处理
+
+图片处理部分，现在有两种方案可以使用
+
+1. php, 需要命令行有php命令，并且php需要开启gd库扩展(默认是开启的)
+2. java 需要有jre就可以了，java图片处理比php要慢不少，默认使用的是php
+
+没有采用node c++扩展的方式，主要考虑到跨平台编译c++扩展，尤其是windows，太麻烦了。
+
 ###安装
 
 ```sh
@@ -14,7 +23,7 @@ npm install -g joycss
 npm update joycss -g
 ```
 
-如果有问，查看[安装指南](https://github.com/shepherdwind/joycss/wiki/how-to-install)
+如果依赖有问题，查看[安装指南](https://github.com/shepherdwind/joycss/wiki/how-to-install)
 
 ###使用
 
