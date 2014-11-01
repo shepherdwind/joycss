@@ -1,0 +1,18 @@
+.test{
+  padding: 10px 10%;
+	background: url(./img/1.png?esc) no-repeat red;
+}
+
+.test2{
+	color: #8c8;
+	border: 1px #999 solid;
+  padding: 10px;
+	background: url(./img/2.png) #ffffff;
+}
+
+.test3{
+  padding: 10px 12px 13px;
+	background: url(./img/3.png) #fff;
+  width: 20px;
+  height: 20px;
+}
