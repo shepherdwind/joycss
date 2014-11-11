@@ -1,0 +1,741 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="./style/default.css" />
+    <link rel="stylesheet" type="text/css" href="./style/article.css" />
+    <link rel="stylesheet" type="text/css" href="./style/joycss.css" />
+    <title>joycss.org</title>
+  </head>
+  <body>
+  <div id="ribbon"><a href="https://github.com/shepherdwind/joycss">Fork me on GitHub</a></div>
+    <header>
+    <div class="header-wrap">
+      <h2>joycss.org</h2>
+      <ul class="main-nav">
+        <li><span class="home">Home</span></li>
+        <li class="blog"><a href="http://shepherdwind.com">Blog</a></li>
+        <li><a href="http://git.shepherdwind.com/plum/">Plum</a></li>
+      </ul>
+    </div>
+    </header>
+    <div class="content">
+      <div class="content-nav" id="J_nav">
+        <div class="box-hd">目录导航
+        </div>
+      </div>
+      <div class="content-main">
+<h3 id="toc_0.0.2">快速入门·Tutorials</h3>
+
+<p>
+直接上图。下面实际中应用中生成的sprite图，线上地址<a href="http://ny.taobao.com/">生态农业</a>。
+</p>
+<p>
+          <a href="./joycss.png" title="查看大图"><img src="./joycss.png" alt="joycss基本介绍" width="550" height="945"/></a>
+</p>
+
+<p>上面的例子，css原始文件<a href="https://github.com/shepherdwind/shepherdwind.github.com/blob/master/demo/joycss/nongye/index.css">源文件</a>,生成后的文件
+<a href="https://github.com/shepherdwind/shepherdwind.github.com/blob/master/demo/joycss/nongye/index.sprite.css">sprite文件</a>。
+</p>
+
+
+<h3 id="toc_0.0.1">简介·About</h3>
+
+
+<p>
+joycss是基于node的命令行工具，执行过程中，通过分析css文件样式规则，定位背景图位
+置，sprite图全局配置使用命令行参数配置，单个图片位置信息通过图片url参数进行补充
+说。
+</p>
+
+<p>
+joycss将自动拼图过程中，分为css输入、图片位置计算、图片生成、css生成几个过程，其
+中图片生成过程可以不执行，在图片生成后，可以对图片进行后续操作，并重新执行css 写
+入过程。
+</p>
+
+<p>
+使用场景：
+</p>
+<ul>
+<li>
+一个css文件，文件中图片都是单独的，需要把css中的文件合并成sprite图
+
+<li>
+一个css文件，需要修改其中某个sprite图，或者需要在css中增加一个图片，并且，把
+  增加的图片合并到原来的sprite中，这种模式现在还不是很稳定，估计使用的场景也不多
+
+</ul>
+
+<p>
+支持的特性
+</p>
+<ul>
+<li>
+支持紧凑拼图，垂直水平排列拼图，和三者的拼图方式的混合使用。
+
+<li>
+支持只编译css，不修改图片。这种模式，在只有css有修改的情况下，可以快速生成css
+  文件，并且保持图片不变。
+
+<li>
+png8完全支持，和ps生成效果一致，使用pngquant生成png8图片。
+
+<li>
+配置方式简单，使用命令行参数和css中url参数的方式配置，最简单的情况下，可以无
+  任何配置。命令行参数对真个sprite图全局配置，url参数中的url是源文件中背景图的url。
+
+<li>
+支持背景图右对齐，支持自定义位置间距
+
+<li>
+支持x方向或者y方向图片平铺
+
+<li>
+支持生成sprite图片后，图片的一些其他操作，现在支持的有对png24图片的无损压缩，
+  对sprite图片上传到淘宝服务器，并且替换url地址。
+
+</ul>
+  
+<h3 id="toc_0.0.3">使用·Usage</h3>
+
+<p>
+joycss执行命令是<code>joycss</code>，最简单使用方式是在命令行下执行<code>joycss file.css</code>，通过
+<code>joycss -h</code>查看命令行参数。命令行参数用于说明sprite图全局配置，比如拼图方式，图
+片格式(png8/png24)等。下面是几个常用的参数举例：
+</p>
+
+<pre class="prettyprint linenums lang-sh">
+joycss file.css
+joycss file.less
+</pre>
+<p>
+这种方式，使用默认配置，拼图方式为自动布局模式，默认情况下是垂直布局和水平布局同
+时使用，当可以确定一个图片所在的box的宽度的时候，使用紧凑拼图，不能确定的，独占
+一行，垂直布局。生成png8的sprite图，对于css文件，生成 <code>file.sprite.css</code>的css，对
+于less文件，调用less模块，生成 <code>file.css</code>，joycss本身不包含less模块，需要自行通
+过npm安装less。
+</p>
+
+<pre class="prettyprint linenums lang-sh">
+joycss file.css --source
+joycss file.css -s
+</pre>
+<p>
+<code>--source|-s</code>参数表示读取<code>file.source.css</code>作为输入源，生成<code>file.css</code>文件，第一次
+执行时，如果没有 <code>file.source.css</code>，joycss会把<code>file.css</code>复制为 <code>file.source.css</code>
+，编译后，写入文件<code>file.css</code>，如果当前目录中存在 <code>file.source.css</code>，直接读取
+source 文件。
+</p>
+
+<pre class="prettyprint linenums lang-sh">
+joycss -c file.less
+joycss -cu file.less
+
+joycss -n file.less
+joycss --nochange file.less
+</pre>
+<p>
+上面的使用，<code>--close|-c</code>参数，表示使用紧凑拼图，紧凑拼图使用紧凑拼图为主，通常和
+单个图片url参数<code>?line|?a&amp;line</code>配合使用，line参数用于说明紧凑拼图说，单独占一行的
+图片。这样的组合，既可以尽可能紧凑拼图，同时兼容一些图片宽度不固定的情况，需要独
+占一行，同时支持x轴方向的平铺。<code>-cu</code>是close和upload两个参数的结合，<code>-u|--upload</code>
+表示需要图片上传，这个只在淘宝开发环境中需要用到。<code>-n|--nochange</code>表示保持上一次
+的拼图方式不变，只生成css，不再重新生成图片，在css修改不涉及到图片修改的时候使用。
+</p>
+
+<h4 id="toc_0.0.3.1">命令行使用与命令行参数</h4>
+
+<table>
+<tr>
+<th>
+参数
+</th>
+<th>
+缩写
+</th>
+<th>
+作用
+</th>
+</tr>
+<tr>
+<td>
+-h
+</td>
+<td>
+--help
+</td>
+<td>
+显示帮助信息
+</td>
+</tr>
+<tr>
+<td>
+-v
+</td>
+<td>
+--version
+</td>
+<td>
+显示版本
+</td>
+</tr>
+<tr>
+<td>
+-y
+</td>
+<td>
+--vertical
+</td>
+<td>
+垂直布局
+</td>
+</tr>
+<tr>
+<td>
+-x
+</td>
+<td>
+--horizontal
+</td>
+<td>
+水平布局
+</td>
+</tr>
+<tr>
+<td>
+-c
+</td>
+<td>
+--close
+</td>
+<td>
+紧凑拼图
+</td>
+</tr>
+<tr>
+<td>
+-a
+</td>
+<td>
+--alpha
+</td>
+<td>
+生成png24图
+</td>
+</tr>
+<tr>
+<td>
+-s
+</td>
+<td>
+--source
+</td>
+<td>
+使用.source.css作为输入源
+</td>
+</tr>
+<tr>
+<td>
+-n
+</td>
+<td>
+--nochange
+</td>
+<td>
+只生成css，使用上一次生成的图片
+</td>
+</tr>
+<tr>
+<td>
+-u
+</td>
+<td>
+--upload
+</td>
+<td>
+图片上传
+</td>
+</tr>
+<tr>
+<td>
+&nbsp;
+</td>
+<td>
+--config
+</td>
+<td>
+配置图片上传接口
+</td>
+</tr>
+</table>
+<p>
+注：淘宝内部请使用此接口<a href="http://wiki.ued.taobao.net/doku.php?id=team:vertical-guide:plum\#joycss">upload</a>，在线unicode转换用户名<a href="unicode.html">工具</a>。
+</p>
+
+<p>
+命令行参数都是用于说明全局配置的，如果一个css中有多个sprite图，还可以使用
+<code>-0a -1c</code>，第一个图片使用alpha生成png24图，第二个图使用紧凑拼图。不加数字前缀，
+表示是所有sprite图配置。
+</p>
+
+<h4 id="toc_0.0.3.2">图片url参数使用</h4>
+
+<p>
+除了命令行参数外，css中还可以通过背景图url参数的方式，设置单个图片。
+</p>
+
+<pre class="prettyprint linenums lang-css">
+.main-right .tese h2 {
+  background: url(../img/fenlei.png?id=1&amp;way=h) repeat-y 0 0;
+  width: 480px;
+}
+</pre>
+<p>
+url参数指的是上面css中，background的url中那一段<code>?id=1&amp;way=h</code>，表示第二组sprite
+图，排列方式way为水平horizontal，在背景图中也可以对sprite图全局配置，更就推荐命
+令行参数设置。
+</p>
+
+<p>
+参数以及对应的意义
+<table>
+<tr>
+<th>
+参数名
+</th>
+<th>
+参数全名
+</th>
+<th>
+参数的值
+</th>
+<th>
+意义与作用
+</th>
+<th>
+使用实例
+</th>
+</tr>
+<tr>
+<td>
+esc
+</td>
+<td>
+escape
+</td>
+<td>
+''
+</td>
+<td>
+图片无需拼图
+</td>
+<td>
+a.png?esc
+</td>
+</tr>
+<tr>
+<td>
+id
+</td>
+<td>
+id
+</td>
+<td>
+0-9
+</td>
+<td>
+分组id，id相同的图片合并一起
+</td>
+<td>
+a.png?id=1
+</td>
+</tr>
+<tr>
+<td>
+bottom
+</td>
+<td>
+bottom
+</td>
+<td>
+\d
+</td>
+<td>
+图片设置margin bottom [v]
+</td>
+<td>
+a.png?b=10
+</td>
+</tr>
+<tr>
+<td>
+right
+</td>
+<td>
+right
+</td>
+<td>
+\d
+</td>
+<td>
+图片设置margin right [h]
+</td>
+<td>
+a.png?r=10
+</td>
+</tr>
+<tr>
+<td>
+base
+</td>
+<td>
+base
+</td>
+<td>
+''
+</td>
+<td>
+图片放在最前面
+</td>
+<td>
+a.png?base
+</td>
+</tr>
+<tr>
+<td>
+end
+</td>
+<td>
+end
+</td>
+<td>
+&nbsp;
+</td>
+<td>
+图片放着最后面
+</td>
+<td>
+a.png?end
+</td>
+</tr>
+<tr>
+<td>
+line
+</td>
+<td>
+line
+</td>
+<td>
+&nbsp;
+</td>
+<td>
+图片独占一行，在close模式下
+</td>
+<td>
+a.png?line
+</td>
+</tr>
+<tr>
+<td>
+way
+</td>
+<td>
+h
+</td>
+<td>
+horizontal
+</td>
+<td>
+排列方式水平排列 [g]
+</td>
+<td>
+a.png?way=h
+</td>
+</tr>
+<tr>
+<td>
+way
+</td>
+<td>
+v
+</td>
+<td>
+vertical
+</td>
+<td>
+垂直排列，默认方式[g]
+</td>
+<td>
+a.png?way=v
+</td>
+</tr>
+</table>
+说明：表格中，[g]标志表示为组范围内定义，一组只需定义定一个出现的图片。[h]标
+志说明，只有在水平布局[horizontal]下才有效，[v]表示只在垂直布局[vertical]有
+效。其他都是针对单个图片设置的
+</p>
+
+<h4 id="toc_0.0.3.3">作为node模块使用</h4>
+
+<p><code>require('joycss')</code>返回joycss对象，joycss上有两个对象，<code>joycss.Event</code>和 <code>joycss.Mult</code>，
+Event对象用于事件发布，成功后，发布一个事件<code>run:end</code>。Mult用于处理一组队列，joycss
+使用php处理图片，如果一次执行多个请求需要使用Mult对象，<code>Mult.add</code>方法把一个拼图
+任务加入队列，因为php无法同时处理joycss拼图请求，所以需要做一个队列来执行多个拼图任务。add方法接受两个参数，<code>args, isAutoRun</code>。</p>
+
+<pre class="prettyprint linenums lang-javascript">
+var Joycss = require('path/to/joycss');
+new Joycss(filename, config, text);
+
+//处理多个任务队列
+config.each(function(){
+  Joycss.Mult.add([filename, config, text], isAutoRun);
+});
+</pre>
+
+<p>第一个参数必须传递，后两个可以为空</p>
+
+<ul>
+<li><code>filename</code> {string} 文件名，绝对路径，css路径地址。</li>
+<li><code>config</code> 配置方式，参考<code>./src/index.js</code>中的defaults对象，用于配置拼图方式和是
+否使用图片上传等。</li>
+<li><code>text</code> cssText，如果传入cssText，那么不从文件中读取，并且<code>filename</code>为生成的文
+件名。如果不传递text参数，从filename中读取文件作为css输入。</li>
+</ul>
+
+
+<h3 id="toc_0.0.4">安装·Install</h3>
+
+<p>
+joycss执行文件在<code>bin/joycss</code>，安装就是在path路径下可以找到joycss，最简单的方式，
+使用npm安装。
+</p>
+<pre class="prettyprint linenums lang-sh">
+npm install -g joycss
+</pre>
+  
+<p>
+第二种方式，从github上clone最新的代码，把joycss的bin目录加入PATH环境变量。
+</p>
+
+<p>
+joycss是通过node执行的，对node依赖为0.6+，如果需要使用图片上传功能，需要升级到
+0.8+，后续开发不再为0.8以后的版本做兼容。joycss中，所有图片处理都是独立的，分为
+两个接口，一个个获取图片大小，一个把图片按照指定的位置拼图，这两个接口和joycss
+独立，暂时是使用php实现，需要php在PATH中。后续会开发其他语言的接口，或者是node自
+身接口。
+</p>
+
+<p>
+对于非win用户，需要安装<a href="http://pngquant.org/">pngquant</a>(转换png24为png8图)和
+<a href="http://optipng.sourceforge.net">optipng</a>(压缩png24图片)两个工具，win用户比较
+懒，安装也不那么方便，就把依赖都放joycss中了。
+</p>
+
+<h3 id="toc_0.0.5">拼图规则·Sprite Rule</h3>
+
+<h4 id="toc_0.0.5.1">图片分组规则</h4>
+
+<p>
+默认情况下，所有的图片分在同一个组，合成一张图片，需要额外分组，则在相应背景图图
+片加上一个<code>id=\d</code>的参数，<code>\d</code>表示数字，从1开始计数，默认的sprite图片，id等于0，
+不需要写
+</p>
+
+<h4 id="toc_0.0.5.2">背景图片定位规则</h4>
+
+<p>
+背景图的位置信息，经过3个步骤的判断计算来确定的：
+</p>
+
+<ul>
+<li>
+首先是从background-position中获取到top，和left的位置，position 如果没有写top，
+  left，默认都是0。top和left定义不明确，比如使用相对位置可能导致图片位置不对。
+  position识别以下属性<code>left, 0, 100%, 50%, right, top, bottom,\dpx</code> \d表示数字。
+
+</ul>
+
+<ul>
+<li>
+第二步，根据图片本身的宽高，加上top和left的偏移，获得当前图片应该占有的空间
+
+</ul>
+
+<ul>
+<li>
+第三步，修正图片的大小，图片所占有的空间，应该等于背景图所在的盒子的大小，图片
+  大小的修正，分两种方式，第一，使用手动设置<code>b=xx||r=xx</code>，标明底部或右边需要的空
+  间。第二种，根据当前图片所在css规则的<code>height, width, line-height</code>来设置，比如
+  上面一个例子中，有个css规则<code>width: 180px; height: 180px;</code>，可以确定背景图高宽。
+  如果这两种方式都没有设置，在right和bottom默认给10像素间距。
+
+</ul>
+
+<p>
+前面两步确定了三个方向的位置，最后一步确定最后一个方向的间距。因为拼图是垂直或水
+平方式，有一个方向是无需控制的。在垂直布局下，第三步只确定底部空间高度，水平布局
+，第三步确定右边间距。
+</p>
+
+<h4 id="toc_0.0.5.3">背景图repeat</h4>
+
+<p>
+repeat不能同时和定位使用，也就是，有repeat，必须是position:0 0，这样的形式。重复
+的单位是重复图片的倍数，如果图片很大，可能大致图片重复以后高度宽度多出不少。默认
+情况下，不写repeat属性，在css解释用，是表示图片重复，不过在大多数情况下，不写
+repeat 是因为开发者懒得写，同时背景图大小和所在的div大小一致，repeat和no-repeat
+意义一样，所以，joycss默认解释repeat为no-repeat，如果有 repeat的图片，将无法拼图
+，如果是repeat-x 或者repeat-y的方式，请不用省略。
+</p>
+
+<h4 id="toc_0.0.5.4">sprite图片命名规则</h4>
+
+<p>
+sprite图片名是文件名加上spriteId加上-sprite组成的，同时生成png8和png24两个图片，
+png8图片后缀为-sprite8，比如文件a.css，拼图后生成的图片地址是
+<code>a-sprite.png,a-sprite8.png, a1-sprite.png,a1-sprite8.png</code>。spriteId构成是和文件
+名同名，如果一个css 中有多个sprite图片，那么第二个开始加上数字，数字从1开始计数。
+</p>
+
+<h4 id="toc_0.0.5.5">url参数的位置</h4>
+
+<p>
+url参数中，在[g]下的参数，默认情况下，是读取页面第一次出现相应图片的时候。比如
+</p>
+
+<pre class="prettyprint linenums lang-css">
+.main-left .fenlei h2 {
+  background: url(../img/fenlei.png?id=1&amp;way=h) repeat-y 0 0;
+  width: 180px;
+  height: 180px;
+}
+.main-right .tese h2 {
+  background: url(../img/tese.png?id=1) no-repeat 0 10px;
+  width: 480px;
+}
+</pre>
+  
+<p>
+以上css规则中，*必须*把参数<code>way=h</code>写在第一个选择器的背景图中，不能写在第二个图片
+上面，这一点规则非常重要，推荐使用命令行参数方式<code>joycss -1h file.css</code>。
+</p>
+
+  
+<h3 id="toc_0.0.6">问题·Issue</h3>
+
+<p>
+joycss自己还有一些问题，在这里归纳一下，有遇到问题的可以对照查看一下，或者在github
+上提<a href="https://github.com/shepherdwind/joycss/issues">issuses</a>。
+</p>
+
+<ul>
+<li>
+<strong>背景图中本身就有sprite图片</strong> ，这个最容易引起问题，本身已经做过一次拼图的，使用
+  background-position来定位的样式，如果只有一个sprite图，可以在此图后面追加，请
+  在图片url中声明<code>?base</code>, 这样sprite图所定义的背景定位保持原有状态，新的往后面追加
+  。如果，是有两个sprite，暂时无法支持同时修改两个sprite图片，请把这两个sprite增
+  加到过滤的图片范围，在图片的url中增加参数<code>?esc</code>。
+
+</ul>
+  
+<ul>
+<li>
+<strong>同一张图片在多处使用，并且背景定位不一致</strong> ，joycss支持一个图片在多处使用，不过，
+  要求使用方式一致，背景定位等等。如果定位方式有差异，实际上和第一个问题一样了，
+  图片本身就是sprite方式被使用了。请把不同的图片copy一份，换个名字。在上面标注图
+  中，2.4部分，为了规避这样的问题，把两个图片copy，改名。
+
+</ul>
+  
+<ul>
+<li>
+<strong>sprite图片有覆盖情况</strong> ，这种情况肯定是因为background-position使用了负值，单个图片
+  应该不会出现负值定位的情况的。请检查css文件，去掉负值定位。
+
+</ul>
+
+<ul>
+<li>
+css中没有声明高度，这种情况下，top和left定位是可以通过background-position来定位
+  的，而right可以通过宽度来定位，如果没有宽度，图片独自占有一行，所以不会有问题，
+  只有bottom的空隙定位，如果没有高度没法定位，此时，joycss会默认设置10px的间距，
+  如果，10px间距不够，自行在背景图url中增加参数设置<code>?bottom=100</code>
+
+</ul>
+  
+<ul>
+<li>
+<strong>背景定位使用相对定位，比如10%</strong> ，这种情况无法计算，对于百分号定位，只支持0 50
+  100 三种。背景图使用负值，同样会有问题，如果使用负值，可能出现sprite图片相互覆
+  盖的情况。
+
+</ul>
+  
+<ul>
+<li>
+背景图可能会被覆盖，这种情况很难被发现。sprite的样式会最终被写在页面顶部，图片
+  所在的css样式中，只写了background-position，和repeat，在这中间，如果有使用
+  background，background样式会被覆盖。比如：
+<pre class="prettyprint linenums lang-css">
+.comment-hd .sort .active,
+.comment-hd .sort .disable{
+  background:fff;
+}
+.comment-hd .sort .active{
+  background:fff url(../img/sort.png) 67px 4px no-repeat;
+  color:*666;
+}
+</pre>
+  在这里，<code>.comment-hd .sort .active</code>中的background将被替换为
+  background-position, 而前面的一个background定义将覆盖sprite样式中定义的
+  background-image,最终效果没有背景图。这种情况很难发现， <strong>尽量不要使用background来定义背景色</strong> 。
+
+</ul>
+ 
+<ul>
+<li>
+背景图的repeat属性没有写，没有写repeat，安装正常情况下，css解析为repeat，但是
+  大多数情况下，背景图是不会用repeat的，不写repeat只是因为box本身大小和图片一样，
+  repeat和没有repeat一样，这时候，默认设置为no-repeat， 
+  <strong>如果有些图片确实需要使用repeat ，请不要省略</strong> 。垂直布局支持repeat-x，水平布局支持repeat-y。
+
+</ul>
+  
+<h3 id="toc_0.0.7">Thanks</h3>
+
+<p>
+非常感谢Alexander Kaupp提供的php版本
+<a href="http://www.tanila.de/smartsprite/index.php">smartsprite</a>, 如果没有这个拼图过程
+的api，joycss还是在摸索如何拼图中，smartsprite提供了很好的拼图功能
+，<code>src/graph/smartsprite.php</code>中，把smartsprite的拼图功能独立出来，通过
+<code>src/graph/tpl.json</code>这样的json文件作为数据源，php版的smartsprite完成图片处理过程
+， node执行css分析过程。
+</p>
+
+<p>
+此外,<code>lib/PropertyValuePart.js</code>使用了
+<a href="https://github.com/nzakas/parser-lib">nzakas/parser-lib</a> 中的
+<code>src/css/PropertyValuePart.js</code>，一个很好的css value读取代码。紧凑拼图使用了，
+<a href="https://github.com/jakesgordon/bin-packing">jakesgordon/bin-packing</a>的算法，
+代码位置<code>lib/packer.js</code>。
+</p>
+
+      </div>
+      <script src="js/kissy/kissy.js"></script>
+      <script src="js/kissy/sizzle.js"></script>
+      <script src="js/spy.js" type="text/javascript"></script>
+      <script src="./js/article.js" type="text/javascript"></script>
+   </div>
+   <div id="footer">
+   <p class="copyright">
+   <a href="index.html">Home</a>
+   |<a href="http://github.com/shepherdwind/joycss/">Code</a>
+   ©<a href="http://shepherdwind.com" target="_blank">shepherdwind</a>⋅ 2012</p>
+   </div>
+   <script src="js/prettify/prettify.js" type="text/javascript"></script>
+   <script src="js/prettify/lang-css.js" type="text/javascript"></script>
+   <script src="js/prettify/lang-sh.js" type="text/javascript"></script>
+   <script type="text/javascript">prettyPrint();</script>
+  </body>
+</html>
