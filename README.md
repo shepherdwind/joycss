@@ -120,10 +120,18 @@ var destImg = joycss.options.destImg;
    */
   layout : 'auto',
 
-  // 是否保存css文件到destCss
+  // 是否保存css文件到destCss, 用在gulp这样的工具时可以用上
   save: true,
 
   // 图片命令行工具，支持php或者java，如果没有尝试执行php和java，自动选择
   api: 'auto'
 }
 ```
+
+##Questions
+
+提问有几种方式
+
+1. 新建[issue](https://github.com/shepherdwind/velocity.js/issues/new)
+2. 邮件到eward.song at gmail.com
+3. 阿里内部员工，可以通过hanwen.sah搜到我的旺旺
