@@ -14,10 +14,8 @@ describe('postion', function(){
     var style = yield read(file);
     var pieces = slice(css.parse(style));
     var config = yield position(pieces, file);
-    if (!process.env.TRAVIS) {
-      config.width.should.eql(16);
-      config.height.should.eql(78);
-    }
+    config.width.should.eql(16);
+    config.height.should.eql(78);
     config.images.length.should.eql(3);
   }));
 });
