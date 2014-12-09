@@ -17,4 +17,4 @@ install:
   - npm install
 
 script:
-  - make test
+  - make coverage
