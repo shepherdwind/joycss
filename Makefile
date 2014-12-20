@@ -19,10 +19,12 @@ node_modules: package.json
 coverage: $(SRC) $(TESTS)
 	@$(BIN)/gnode $(BIN)/istanbul cover \
 	  $(BIN)/_mocha -- \
-	    --reporter $(REPORTER) \
+	    --reporter mocha-lcov-reporter \
 	    --require co-mocha \
 	    --timeout 5s \
-			$(TESTS)
+			$(TESTS) \
+			&& cat ./coverage/lcov.info | \
+			$(BIN)/coveralls --verbose
 
 clean:
 	@rm -rf coverage
